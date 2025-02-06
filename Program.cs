@@ -1,6 +1,7 @@
 using EyePocket.Components;
 using EyePocket.Components.Account;
 using EyePocket.Data;
+using EyePocket.Service;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,11 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
+builder.Services.AddBlazorBootstrap();
+
+//inject services
+builder.Services.AddScoped<ClienteServices>();
 
 var app = builder.Build();
 
