@@ -1,0 +1,45 @@
+﻿@page "/Cliente/Edit/{ClienteId:int}"
+@inject ClienteServices clienteService
+@inject NavigationManager navigation
+
+@code {
+    [Parameter]
+    public int ClienteId { get; set; }
+    public Clientes clientes { get; set; } = new Clientes();
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ClienteId > 0)
+        {
+            clientes = await clienteService.Buscar(ClienteId);
+            
+        }
+    }
+
+    public Edit(ToastService toastService)
+    {
+        ToastService = toastService;
+    }
+
+    public async Task Modificar()
+    {
+        if (!await Validar())
+        {
+            await clienteService.Guardar(clientes);
+            ToastService.Notify(new(ToastType.Success, "Exito", $"Cliente Editado correctamente."));
+            navigation.NavigateTo("/Cliente/Index");
+        }
+        else
+        {
+            ToastService.Notify(new(ToastType.Danger, "Error", $"Ya existe un cliente con ese nombre y rnc."));
+        }
+    }
+
+    public async Task<bool> Validar()
+    {
+        var existeNombre = await clienteService.BuscarNombres(clientes.Nombre);
+        var existeRnc = await clienteService.BuscarRNC(clientes.Cedula);
+        return existeNombre != null && existeRnc != null;
+   }
+}
