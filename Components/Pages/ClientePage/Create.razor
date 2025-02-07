@@ -1,0 +1,40 @@
+﻿@page "/Cliente/Create"
+@inject ClienteServices clienteService
+@inject NavigationManager navigation
+
+@code {
+    public Clientes clientes { get; set; } = new Clientes();
+    [Inject] protected ToastService ToastService { get; set; }
+
+    public Create(ToastService toastService)
+    {
+        ToastService = toastService;
+    }
+
+    public async Task Crear()
+    {
+        if (!await Validar())
+        {
+            await clienteService.Guardar(clientes);
+            ToastService.Notify(new(ToastType.Success, "Exito", $"Cliente Creado correctamente."));
+            clientes = new Clientes();
+            navigation.NavigateTo("/Cliente/Index");
+        }
+        else
+        {
+            ToastService.Notify(new(ToastType.Danger, "Error", $"Cliente ya existe."));
+        }
+    }
+
+    public void Nuevo()
+    {
+        clientes = new Clientes();
+    }
+
+    public async Task<bool> Validar()
+    {
+        var existeNombre = await clienteService.BuscarNombres(clientes.Nombre);
+        var existeRnc = await clienteService.BuscarRNC(clientes.Cedula);
+        return existeNombre != null && existeRnc != null;
+    }
+}
