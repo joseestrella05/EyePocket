@@ -17,8 +17,6 @@ public class Clientes
     [Required(ErrorMessage = "El Nombres obligatorio")]
     public string? Nombre { get; set; }
 
-    [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "No se permiten Numero")]
-    [Required(ErrorMessage = "El Apellido es obligatorio")]
     public string? Apellido { get; set; }
 
     [Required(ErrorMessage = "Por favor agrega una cedula o Rnc ")]
