@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EyePocket", "EyePocket.csproj", "{3C6046CC-607B-43A6-92BD-9B88013E8261}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "..\Shared\Shared.csproj", "{A286683A-6489-4F48-B19B-CAF19FEDCBE2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +15,6 @@ Global
 		{3C6046CC-607B-43A6-92BD-9B88013E8261}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C6046CC-607B-43A6-92BD-9B88013E8261}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C6046CC-607B-43A6-92BD-9B88013E8261}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A286683A-6489-4F48-B19B-CAF19FEDCBE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A286683A-6489-4F48-B19B-CAF19FEDCBE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A286683A-6489-4F48-B19B-CAF19FEDCBE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A286683A-6489-4F48-B19B-CAF19FEDCBE2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
