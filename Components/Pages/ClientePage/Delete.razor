@@ -1,0 +1,42 @@
+﻿@page "/Cliente/Delete/{ClienteId:int}"
+@inject ClienteServices clienteService
+@inject NavigationManager navigation
+
+
+@code {
+    [Parameter]
+    public int ClienteId { get; set; }
+    public Clientes clientes { get; set; } = new Clientes();
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ClienteId > 0)
+        {
+            clientes = await clienteService.Buscar(ClienteId);
+        }
+    }
+
+    public Delete(ToastService toastService)
+    {
+        ToastService = toastService;
+    }
+
+    public async Task Eliminar()
+    {
+        if (clientes != null)
+        {
+            var eliminar = await clienteService.Eliminar(ClienteId);
+            if (eliminar)
+            {
+                ToastService.Notify(new(ToastType.Success, "Exito", $"Cliente eliminado correctamente."));
+                navigation.NavigateTo("/Cliente/Index");
+            }
+            else
+            {
+                ToastService.Notify(new(ToastType.Danger, "Eliminar", $"Error al eliminar Cliente."));
+
+            }
+        }
+    }
+}
