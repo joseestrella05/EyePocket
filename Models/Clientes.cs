@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared.Models;
+namespace EyePocket.Models;
 
 public class Clientes
 {
