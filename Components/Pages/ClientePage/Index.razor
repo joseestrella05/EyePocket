@@ -22,11 +22,11 @@
 					<InputText class="form-control" @bind-Value="Filtro" placeholder="Nombre del cliente"></InputText>
 				</div>
 				<div class="col">
-					<label>Filtrar por:</label>
+					<label>Fecha de creacion:</label>
 					<InputDate class="form-control" @bind-Value="FechaI" placeholder="Nombre del cliente"></InputDate>
 				</div>
 				<div class="col">
-					<label>Filtrar por:</label>
+					<label>Fecha de creacion:</label>
 					<InputDate class="form-control" @bind-Value="FechaF" placeholder="Nombre del cliente"></InputDate>
 				</div>
 			</div>
@@ -56,7 +56,7 @@
 							@*Concepto*@
 							<th>@clientes.Cedula</th>
 							@*Deuda*@
-							<th>@clientes.Telefono</th>
+							<th>@($"({clientes.Telefono.Substring(0, 3)}) {clientes.Telefono.Substring(3, 3)}-{clientes.Telefono.Substring(6, 4)}")</th>
 							<th>@clientes.Email</th>
 							<th>@clientes.Direccion</th>
 							<th>@clientes.FechaIngreso.ToString("yyyy/M/dd")</th>
@@ -65,16 +65,14 @@
 							<td class="text-center">
 								<a href="/Cliente/Details/@clientes.ClienteId" class="btn btn-outline-dark bi-eye"></a>
 
-								<a href="/Cliente/Edit/@clientes.ClienteId"  class="btn btn-outline-dark bi bi-pencil-square"></a>
+								<a href="/Cliente/Edit/@clientes.ClienteId"  class="btn btn-outline-info bi bi-pencil-square"></a>
 
-								<a href="/Cliente/Delete/@clientes.ClienteId" class="btn btn-outline-dark bi bi-trash"></a>
+								<a href="/Cliente/Delete/@clientes.ClienteId" class="btn btn-outline-danger bi bi-trash"></a>
 							</td>
 
 						</tr>
 					}
-
 				</tbody>
-
 			</table>
 		</div>
 	</div>
