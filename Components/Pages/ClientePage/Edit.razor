@@ -61,8 +61,8 @@
 
     </div>
     <div class="text-center">
-        <button class="btn btn-success">Guardar</button>
-        <a class="btn btn-secondary">Volver</a>
+        <button  @onclick="Guardar" class="btn btn-success">Guardar</button>
+        <a href="/Cliente/Index" class="btn btn-secondary">Volver</a>
     </div>
 </div>
 
@@ -131,24 +131,18 @@
         ToastService = toastService;
     }
 
-    public async Task Crear()
+    public async Task Guardar()
     {
         if (!await Validar())
         {
             await clienteService.Guardar(clientes);
-            ToastService.Notify(new(ToastType.Success, "Exito", $"Cliente Creado correctamente."));
-            clientes = new Clientes();
+            ToastService.Notify(new(ToastType.Success, "Exito", $"Cliente se ha editado correctamente."));
             navigation.NavigateTo("/Cliente/Index");
         }
         else
         {
             ToastService.Notify(new(ToastType.Danger, "Error", $"Cliente ya existe."));
         }
-    }
-
-    public void Nuevo()
-    {
-        clientes = new Clientes();
     }
 
     public async Task<bool> Validar()
