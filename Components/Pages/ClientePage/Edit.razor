@@ -2,6 +2,7 @@
 @inject ClienteServices clienteService
 @inject NavigationManager navigation
 
+<PageTitle>Editando Cliente | @clientes.Nombre</PageTitle>
 <div class="text-left">
     <h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-person-plus m-1"></i>Editar Cliente</h2>
 </div>
@@ -32,9 +33,14 @@
                     <label>Dirección *</label>
                     <InputText class="form-control" @bind-Value="clientes.Direccion" placeholder="Ej. Av. Duarte #10"></InputText>
                 </div>
+
+                <!-- 
+                    Se inhabilito la posibilidad de poder modificar la fecha de ingreso
+                    por motivos de seguridad
+                -->
                 <div class="col">
                     <label>Fecha Registro *</label>
-                    <InputDate class="form-control" @bind-Value="clientes.FechaIngreso"></InputDate>
+                    <InputDate class="form-control" @bind-Value="clientes.FechaIngreso" readonly disabled></InputDate>
                 </div>
             </div>
 
