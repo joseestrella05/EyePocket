@@ -1,0 +1,159 @@
+@page "/Servicio/Edit/{TicketId:int}"
+@inject TicketServices ticketServices
+@inject NavigationManager navigation
+
+<PageTitle>Editando Ticket | @tickets.TicketId</PageTitle>
+<div class="text-left">
+    <h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-person-plus m-1"></i>Actualizar Ticket</h2>
+</div>
+
+<EditForm Model="tickets" OnValidSubmit="Guardar">
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+            
+                <div class="section-title">Datos del ticket</div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Nombre del cliente</label>
+                        <InputText class="form-control" @bind-Value="tickets.NombreCliente"></InputText>
+                    </div>
+                    <div class="col">
+                        <label>Agente encargado</label>
+                        <InputText class="form-control" @bind-Value="tickets.NombreAgente"></InputText>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Asunto</label>
+                        <InputText class="form-control" @bind-Value="tickets.Asunto"></InputText>
+                    </div>
+                    
+                    <div class="col">
+                        <label>Descripción Ticket*</label>
+                        <InputText class="form-control" @bind-Value="tickets.Descripcion"></InputText>
+                    </div>
+                </div>
+
+                <div class="section-title"></div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Prioridad</label>
+                        <InputSelect class="form-select" @bind-Value="tickets.Prioridad">
+                            <option value="Baja">Baja</option>
+                            <option value="Media">Media</option>
+                            <option value="Alta">Alta</option>
+                            <option value="Crítica">Crítica</option>
+                        </InputSelect>
+                    </div>
+                    <div class="col">
+                        <label>Estado</label>
+                        <InputSelect class="form-select" @bind-Value="tickets.Estado">
+                            <option value="Recibido">Recibido</option>
+                            <option value="En proceso">En proceso</option>
+                            <option value="Cerrado">Cerrado</option>
+                        </InputSelect>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Fecha de ticket</label>
+                        <InputDate class="form-control" @bind-Value="tickets.Fecha" readonly=""></InputDate>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="text-center">
+            <button  @onclick="Guardar" class="btn btn-success">Guardar</button>
+            <a href="/Servicio/Index" class="btn btn-secondary">Volver</a>
+        </div>
+    </div>
+</EditForm>
+
+<style>
+    body {
+    background-color: #f5f5f5;
+    }
+
+    .container {
+    max-width: 800px;
+    margin: auto;
+    padding: 10px;
+    }
+
+    .card {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    }
+
+    .section-title {
+    background: #0d5c63;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    padding: 8px;
+    margin: 10px;
+    border-radius: 5px;
+    }
+
+    .btn {
+    margin: 10px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    }
+
+    .btn-success {
+    background-color: #0d5c63;
+    border: none;
+    }
+
+    .btn-secondary {
+    background-color: #444;
+    color: white;
+    text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+    background-color: #222;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public int TicketId { get; set; }
+    public Tickets tickets { get; set; } = new Tickets();
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        tickets = await ticketServices.Buscar(TicketId);
+    }
+
+    public Edit(ToastService toastService)
+    {
+        ToastService = toastService;
+    }
+
+    public async Task Guardar()
+    {
+        
+        var  creado = await ticketServices.Guardar(tickets);
+        if (creado)
+        {
+            
+            ToastService.Notify(new(ToastType.Success, "Exito", $"Ticket se ha editado correctamente."));
+            navigation.NavigateTo("/Servicio/Index");
+        }
+        else
+        {
+            ToastService.Notify(new(ToastType.Danger, "Error", $"Cliente ya existe."));
+        }
+    }
+    
+}
