@@ -46,6 +46,10 @@ builder.Services.AddScoped<ProductosService>();
 
 builder.Services.AddScoped<TicketServices>();
 
+builder.Services.AddScoped<ProvedoresServices>();
+
+
+
 
 //notificacion
 builder.Services.AddBlazoredToast();
