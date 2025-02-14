@@ -16,6 +16,13 @@
             <VentasMenuLateral />
         </div>
     }
+    else if (navigationManager.ToBaseRelativePath(navigationManager.Uri).StartsWith("Provedores/"))
+    {
+        <div class="sidebar">
+            <CxP_MenuLateral />
+        </div>
+    }
+
 
     <main>
         <NavMenu />
