@@ -1,0 +1,220 @@
+@page "/Servicio/Index"
+@inject TicketServices ticketsService
+@inject ToastService toastService
+
+@rendermode InteractiveServer
+
+<PageTitle>Clientes</PageTitle>
+<div class="row" style="background-color:white; padding:10px; margin:10px;">
+    <div class="col">
+        <div class="text-left">
+            <h2 class="text-black"><i class="bi bi-person-plus m-1"></i> Tickets</h2>
+        </div>
+    </div>
+    <div class="col">
+        <a href="/Servicio/Create" class="btn btn-secondary">Crear nuevo Ticket</a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-4">
+                    <div class="input-group" style="width: 250px">
+                        <div class="form-floating">
+                            <InputSelect class="form-select" id="floatingSelect" aria-label="Floating label select example" @bind-Value="valorFiltro">
+                                <option value="" selected disabled>--- Selecciona ---</option>
+                                <option value="idticket">ID Ticket</option>
+                                <option value="fechaingreso">Fecha</option>
+                                <option value="nombres">Cliente</option>
+                            </InputSelect>
+                            <label for="floatingSelect"><strong>Filtrar en base a...</strong></label>
+                        </div>
+                        <button type="button" class="btn btn-secondary bi bi-arrow-counterclockwise"></button>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="input-group" style="width: 500px">
+                        <div class="form-floating d-flex align-items-center">
+                           @* <InputText class="form-control" placeholder="" id="floatingSearch" />*@
+                            <label for="floatingSearch">Buscar</label>
+                        </div>
+                        <button class="btn btn-secondary bi bi-search" @onclick="Buscar" type="button"></button>
+                    </div>
+                </div>
+            </div>
+
+            <br />
+
+            <table class="table table-light table-hover">
+                <thead class="table table-striped">
+                    <tr class="text-center">
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Agente</th>
+                        <th>Asunto</th>
+                        <th>Estado</th>
+                        <th>Prioridad</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var ticket in ListaTickets)
+                {
+                <tr class="text-center text-white">
+                    <td>@ticket.TicketId</td>
+                    <td>@ticket.NombreCliente</td>
+                    <td>@ticket.NombreAgente</td>
+                    <td>@ticket.Asunto</td>
+                    <td>@ticket.Estado</td>
+                    <td>@ticket.Prioridad</td>
+                 
+
+                    @*Botones*@
+                    <td class="text-center">
+                        <a href="/Service/Details/@ticket.TicketId" class="btn btn-outline-dark bi-eye"></a>
+                        <a href="/Servicio/Edit/@ticket.TicketId" class="btn btn-outline-info bi bi-pencil-square"></a>
+                        <button type="button" @onclick="() => MostrarModal(ticket.TicketId, ticket.Asunto)" class="btn btn-outline-danger bi bi-trash"></button>
+                    </td>
+                </tr>
+                }
+                </tbody>
+                <caption>Cant. De Tickets: @ListaTickets.Count</caption>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (mostrarModal){
+<div class="modal fade show" tabindex="-1" style="display: block;" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #7B0323; color: white;">
+                <h5 class="modal-title">Eliminar Ticket</h5>
+                <button type="button" class="btn-close" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de que desea eliminar este ticket?</p>
+                <p>Esta opción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cancelar</button>
+                <button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-backdrop fade show"></div>
+}
+<style>
+    body {
+        background-color: #f5f5f5;
+    }
+
+    .btn-success {
+        background-color: #0d5c63;
+        border: none;
+    }
+</style>
+
+@code{
+
+    
+	public string searchBarValue { get; set; } = string.Empty;
+	public string valorFiltro { get; set; } = string.Empty;
+	public DateTime? Desde { get; set; } = null;
+	public DateTime? Hasta { get; set; } = null;
+	public List<Tickets> ListaTickets { get; set; } = new List<Tickets>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		ListaTickets = await ticketsService.Listar(t=>t.TicketId > 0);
+	}
+
+	// MODALS
+	private bool mostrarModal = false;
+	private int ClienteIdSeleccionado { get; set; }
+	private string EmailClienteSelecionado { get; set; } = "";
+
+	private void MostrarModal(int clienteId, string clienteEmail)
+	{
+		ClienteIdSeleccionado = clienteId;
+		EmailClienteSelecionado = clienteEmail;
+		mostrarModal = true;
+	}
+
+	private void CerrarModal()
+	{
+		mostrarModal = false;
+		ClienteIdSeleccionado = 0;
+		EmailClienteSelecionado = "";
+	}
+
+	public async Task Eliminar()
+	{
+		try
+		{
+
+			await ticketsService.Eliminar(ClienteIdSeleccionado);
+			ListaTickets = await ticketsService.Listar(x => true);
+			mostrarModal = false;
+			ClienteIdSeleccionado = 0;
+			TipoNotificacion = ToastType.Success;
+			TituloNotificacion = "Enhorabuena";
+			MensajeNotificacion = "¡Se ha eliminado el ticket exitosamente!";
+			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+		}
+		catch (Exception ex)
+		{
+			TipoNotificacion = ToastType.Danger;
+			TituloNotificacion = "Error";
+			MensajeNotificacion = "Hubo un error al eliminar el cliente.";
+			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+		}
+	}
+
+	//NOTIFICACIONES
+	public ToastType TipoNotificacion { get; set; }
+	public string MensajeNotificacion { get; set; } = string.Empty;
+	public string TituloNotificacion { get; set; } = string.Empty;
+
+	public void MostrarToast(ToastType tipo, string titulo, string cuerpo)
+	=> toastService.Notify(new(tipo, titulo, cuerpo));
+
+	// Filtro de busqueda
+	public async Task Buscar()
+	{
+		if (string.IsNullOrEmpty(valorFiltro))
+		{
+			TipoNotificacion = ToastType.Warning;
+			TituloNotificacion = "Aviso";
+			MensajeNotificacion = "Debe seleccionar una opción en el fitro.";
+			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+			ListaTickets = await ticketsService.Listar(x => true);
+			return;
+		}
+
+		searchBarValue.Trim().ToLower();
+
+	
+
+}
+	
+
+	public async Task Restablecer()
+	{
+		ListaTickets = await ticketsService.Listar(x => true);
+		searchBarValue = string.Empty;
+		valorFiltro = string.Empty;
+		Desde = null;
+		Hasta = null;
+
+		TipoNotificacion = ToastType.Info;
+		TituloNotificacion = "Aviso";
+		MensajeNotificacion = "Se han restablecido los criterios de búsqueda.";
+		MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+	}
+
+}

@@ -41,7 +41,11 @@ builder.Services.AddBlazorBootstrap();
 
 //inject services
 builder.Services.AddScoped<ClienteServices>();
+
 builder.Services.AddScoped<ProductosService>();
+
+builder.Services.AddScoped<TicketServices>();
+
 
 //notificacion
 builder.Services.AddBlazoredToast();
