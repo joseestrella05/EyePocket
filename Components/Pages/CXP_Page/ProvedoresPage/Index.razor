@@ -1,9 +1,12 @@
 ﻿@page "/Provedores/Index"
 @inject ProvedoresServices provedoresService
 @rendermode InteractiveServer
+@inject NavigationManager navigation
 @inject ToastService toastService
 
-<PageTitle>Clientes</PageTitle>
+
+
+<PageTitle>Provedores</PageTitle>
 <div class="row" style="background-color:white; padding:10px; margin:10px;">
 	<div class="col">
 
@@ -80,9 +83,9 @@
 
 							@*Botones*@
 							<td class="text-center">
-								<a href="/Cliente/Details/@provedores.ProvedorId" class="btn btn-outline-dark bi-eye"></a>
+								<a href="/Provedores/Details/@provedores.ProvedorId" class="btn btn-outline-dark bi-eye"></a>
 
-								<a href="/Cliente/Edit/@provedores.ProvedorId" class="btn btn-outline-info bi bi-pencil-square"></a>
+								<a href="/Provedores/Edit/@provedores.ProvedorId" class="btn btn-outline-info bi bi-pencil-square"></a>
 
 								<button type="button" @onclick="() => MostrarModal(provedores.ProvedorId, provedores.Correo)" class="btn btn-outline-danger bi bi-trash"></button>
 							</td>
