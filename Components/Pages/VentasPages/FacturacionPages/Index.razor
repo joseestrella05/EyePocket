@@ -1,0 +1,134 @@
+﻿@page "/Ventas/Facturacion/Index"
+
+<PageTitle>Facturación</PageTitle>
+
+@* DISENO NO DEFINITIVO SOLO COMO EJEMPLO DE LA PAGINA DE VENTAS *@
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h2 class="text-black"><i class="bi bi-box-seam m-1"></i> Facturación</h2>
+        </div>
+        <div class="col text-end">
+            <a href="/Ventas/Facturacion/Create" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Crear nueva factura</a>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <select class="form-select">
+                            <option selected disabled>--- Selecciona ---</option>
+                            <option value="codigo">Código</option>
+                            <option value="nombre">Nombre</option>
+                            <option value="precio">Precio</option>
+                            <option value="descuento">Descuento</option>
+                        </select>
+                        <button class="btn btn-outline-secondary" type="button"><i class="bi bi-arrow-counterclockwise"></i></button>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Buscar" />
+                        <button class="btn btn-outline-secondary" type="button"><i class="bi bi-search"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Descuento</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>02145879</td>
+                        <td>NATHIEL TAVERAS</td>
+                        <td>15</td>
+                        <td>2500.00</td>
+                        <td>10%</td>
+                        <td>
+                            <button class="btn btn-outline-dark btn-sm"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-outline-info btn-sm"><i class="bi bi-pencil-square"></i></button>
+                            <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>01478224</td>
+                        <td>ORLANDO LORA</td>
+                        <td>02</td>
+                        <td>150.00</td>
+                        <td>5%</td>
+                        <td>
+                            <button class="btn btn-outline-dark btn-sm"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-outline-info btn-sm"><i class="bi bi-pencil-square"></i></button>
+                            <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>01223245</td>
+                        <td>ESMAILIN MARTINEZ</td>
+                        <td>29</td>
+                        <td>1500.00</td>
+                        <td>0%</td>
+                        <td>
+                            <button class="btn btn-outline-dark btn-sm"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-outline-info btn-sm"><i class="bi bi-pencil-square"></i></button>
+                            <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>03434542</td>
+                        <td>NATHIEL TAVERAS</td>
+                        <td>05</td>
+                        <td>4800.00</td>
+                        <td>25%</td>
+                        <td>
+                            <button class="btn btn-outline-dark btn-sm"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-outline-info btn-sm"><i class="bi bi-pencil-square"></i></button>
+                            <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <button class="btn btn-success btn-lg"><i class="bi bi-printer"></i> Imprimir</button>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button class="btn btn-danger btn-lg"><i class="bi bi-cash"></i> Cobrar</button>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Registro</h5>
+                            <p class="card-text"><strong>Descuento:</strong> 100.00</p>
+                            <p class="card-text"><strong>Pesos:</strong> 8,500.00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+}
