@@ -55,7 +55,9 @@ public class TicketServices (IDbContextFactory<ApplicationDbContext> DbFactory)
     public async Task<List<Tickets>> Listar(Expression<Func<Tickets, bool>> criterio)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return contexto.Tickets.AsNoTracking().Where(criterio).ToList();
+        return await contexto.Tickets.AsNoTracking()
+            .Where(criterio)
+            .ToListAsync();
     }
     
     
