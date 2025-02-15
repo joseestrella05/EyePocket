@@ -60,8 +60,8 @@ public class ClienteServices(IDbContextFactory<ApplicationDbContext> DbFactory)
     }
     public async Task<List<Clientes>> Listar(Expression<Func<Clientes, bool>> criterio)
     {
-        await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Clientes.AsNoTracking()
+         await using var contexto = await DbFactory.CreateDbContextAsync();
+            return await contexto.Clientes.AsNoTracking()
             .Where(criterio)
             .ToListAsync();
     }

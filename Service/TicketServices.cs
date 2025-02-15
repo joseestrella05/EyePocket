@@ -1,7 +1,10 @@
+using System.Linq;
 using System.Linq.Expressions;
 using EyePocket.Data;
 using EyePocket.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace EyePocket.Service;
 
@@ -51,12 +54,14 @@ public class TicketServices (IDbContextFactory<ApplicationDbContext> DbFactory)
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.Tickets.AsNoTracking().FirstOrDefaultAsync(t => t.TicketId == id);
     }
-
+    
     public async Task<List<Tickets>> Listar(Expression<Func<Tickets, bool>> criterio)
     {
-        await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Tickets.AsNoTracking()
+        await using var context = await DbFactory.CreateDbContextAsync();
+
+        return await context.Tickets
             .Where(criterio)
+            .AsNoTracking()
             .ToListAsync();
     }
     
