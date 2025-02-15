@@ -4,44 +4,45 @@
 <PageTitle>Facturación</PageTitle>
 
 <EditForm Model="ListaFacturas" class="border shadow-lg p-3 rounded">
-    <div class="card-header bg-black text-white text-center py-2 rounded-3">
-        <h3 style="font-weight: bold;" class="mb-0 font-weight-bold">Facturación</h3>
-    </div>
     <div class="container mt-4">
         <div class="row justify-content-center">
             <div class="col-md-auto">
                 <div class="card border-0 rounded-3">
                     <div class="card-body">
                         <div class="row align-items-center">
+                            <!-- Etiqueta Buscar Código -->
                             <div class="col-md-3 text-center text-md-end mb-3 mb-md-0">
                                 <label class="d-inline-block fs-4 fw-bold text-black">
-                                    Buscar Codigo
+                                    Código del producto
                                 </label>
                             </div>
-                            <!-- Filtro -->
-                            <div class="col-md-4 d-flex align-items-center mb-3 mb-md-0">
-                                <label for="Filtro" class="form-label fw-bold me-3">Seleccionar:</label>
-                                <select @bind="filtro" class="form-select form-select-lg">
-                                    <option value="codigo">Código</option>
-                                    <option value="nombre">Nombre</option>
-                                    <option value="fecha">Precio</option>
-                                    <option value="fecha">Descuento</option>
-                                </select>
-                            </div>
-                            <!-- Barra de Búsqueda -->
-                            <div class="col-md-5 d-flex align-items-center mb-3 mb-md-0">
-                                <div class="input-group input-group-lg">
-                                    <input @bind="valorFiltro" class="form-control" placeholder="Buscar..." />
+
+                            <!-- Barra de Búsqueda y Cantidad -->
+                            <div class="col-md-6 d-flex align-items-center mb-3 mb-md-0">
+                                <div class="input-group input-group-lg flex-grow-1 me-3">
+                                    <input @bind="valorFiltro" class="form-control" placeholder="Buscar" />
                                     <button @onclick="Buscar" class="btn btn-primary" type="button">
                                         <span class="bi bi-search"></span> Buscar
                                     </button>
                                 </div>
-                                <!-- Restablecer -->
-                                <div class="col-md-2 d-flex align-items-center ms-3">
+
+                                <div class="d-flex align-items-center">
+                                    <!-- Cantidad -->
+                                    <label for="Cantidad" class="form-label fw-bold me-2 mb-0">Cantidad:</label>
+                                    <input type="text" id="Cantidad" class="form-control me-3" style="width: 100px;">
+
+                                    <!-- Botón Restablecer -->
                                     <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2" @onclick="Restablecer">
-                                        <span class="bi bi-arrow-counterclockwise"></span>
+                                        <i class="bi bi-arrow-counterclockwise"></i>
                                     </button>
                                 </div>
+                            </div>
+
+                            <!-- Botón Registrar-->
+                            <div class="col-md-3 d-flex justify-content-end">
+                                <a href="/Facturacion/Create" class="btn btn-success" type="button" style="background-color: #004b55; border-color: #004b55;">
+                                    <span class="bi bi-plus"></span> Registro
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -49,6 +50,7 @@
             </div>
         </div>
     </div>
+
     <!-- Tabla -->
     <table class="table table-striped table-hover table-bordered text-center align-middle">
         <thead class="bg-dark text-black">
@@ -59,7 +61,8 @@
                 <th>Cantidad</th>
                 <th>Precio</th>
                 <th>Descuento</th>
-                <th>Acciones</th>
+                <th>Editar</th>
+                <th>Eliminar</th>
             </tr>
         </thead>
         <tbody class="text-white">
