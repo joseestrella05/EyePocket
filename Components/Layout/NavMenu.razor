@@ -2,7 +2,6 @@
 
 @inject NavigationManager NavigationManager
 
-
 <div class="Menu" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
 
@@ -30,7 +29,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Inicio </a>
+                    <a class="nav-link" href="#">Inicio</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="Cliente/Index">Clientes</a>
@@ -46,7 +45,7 @@
 
                 </li>
             </ul>
-            <button class="btn btn-success" type="button">Iniciar sesion</button>
+            <button class="btn btn-success" style="background:#0d5c63;" type="button">Iniciar sesión</button>
         </div>
     </nav>
 </div>
@@ -71,4 +70,3 @@
         NavigationManager.LocationChanged -= OnLocationChanged;
     }
 }
-
