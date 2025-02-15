@@ -10,10 +10,15 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<Estados> Estados { get; set; }
 
-
     public DbSet<Productos> Productos { get; set; }
 
-    
     public DbSet<Tickets> Tickets { get; set; }
+
+    public DbSet<OrdenVenta> OrdenVentas { get; set; }
+
+    public DbSet<OrdenVentaDetalle> OrdenVentasDetalle { get; set; }
+
+    public DbSet<MetodoPago> MetodoPago { get; set; }
+
 
 }
