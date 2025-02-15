@@ -12,7 +12,7 @@ public class OrdenVenta
     public DateTime FechaEmision { get; set; }
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
-    public string? NumeroFactura { get;set; }
+    public string? NumeroFactura { get; set; }
 
     [Required]
     [Range(1, 999999, ErrorMessage = "Ingrese un número mayor que {1} y menor que {2}. ")]
@@ -22,7 +22,8 @@ public class OrdenVenta
     public bool Estado { get; set; }
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
-    public string? NFC {  get; set; }
+    [RegularExpression(@"^[EBP][0-9]{9,11}[A-Za-z0-9]{2}[0-9]{9}$", ErrorMessage = "El formato del NCF no es válido.")]
+    public string? NCF { get; set; }
 
     //fk
     public int ClienteId { get; set; }
