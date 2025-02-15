@@ -1,8 +1,6 @@
 ﻿@page "/Ventas/Facturacion/Index"
 
-<PageTitle>Facturación</PageTitle>
 
-@* DISENO NO DEFINITIVO SOLO COMO EJEMPLO DE LA PAGINA DE VENTAS *@
 <PageTitle>Facturación</PageTitle>
 
 <EditForm Model="ListaFacturas" class="border shadow-lg p-3 rounded">
@@ -17,7 +15,7 @@
                         <div class="row align-items-center">
                             <div class="col-md-3 text-center text-md-end mb-3 mb-md-0">
                                 <label class="d-inline-block fs-4 fw-bold text-black">
-                                    Buscar Factura
+                                    Buscar Codigo
                                 </label>
                             </div>
                             <!-- Filtro -->
@@ -53,7 +51,7 @@
     </div>
     <!-- Tabla -->
     <table class="table table-striped table-hover table-bordered text-center align-middle">
-        <thead class="bg-dark text-white">
+        <thead class="bg-dark text-black">
             <tr>
                 <th>#</th>
                 <th>Código</th>
@@ -64,27 +62,27 @@
                 <th>Acciones</th>
             </tr>
         </thead>
-        @* <tbody class="text-white">
+        <tbody class="text-white">
             @foreach (var factura in ListaFacturas)
             {
                 <tr>
-                    <td class="text-black">@factura.Numero</td>
-                    <td class="text-black">@factura.Codigo</td>
-                    <td class="text-black">@factura.Descripcion</td>
+                    <td class="text-black">@factura.OrdenVentaId</td>
+                    <td class="text-black">@factura.OrdenVenta?.Codigo</td>
+                    <td class="text-black">@factura.Productos?.Nombre</td>
                     <td class="text-black">@factura.Cantidad</td>
-                    <td class="text-black">@factura.Precio.ToString("C")</td>
-                    <td class="text-black">@factura.Descuento%</td>
+                    <td class="text-black">@factura.Productos?.Precio</td>
+                    @* <td class="text-black">@factura.Descuento%</td> *@
                     <td>
-                        <a href="/Ventas/Facturacion/Details/@factura.Id" class="btn btn-info btn-sm">
+                        <a href="/Ventas/Facturacion/Edit/@factura.OrdenVenta?.OrdenVentaId" class="btn btn-info btn-sm">
                             <i class="bi bi-eye"></i>
                         </a>
-                        <a href="/Ventas/Facturacion/Delete/@factura.Id" class="btn btn-danger btn-sm">
+                        <a href="/Ventas/Facturacion/Delete/@factura.OrdenVenta?.OrdenVentaId" class="btn btn-danger btn-sm">
                             <i class="bi bi-trash"></i>
                         </a>
                     </td>
                 </tr>
             }
-        </tbody> *@
+        </tbody>
     </table>
 
     <div class="d-flex justify-content-between align-items-center mt-4">
@@ -111,7 +109,7 @@
 <!-- Estilo personalizado -->
 <style>
     .table th, .table td {
-        color: white !important;
+        color: black !important;
     }
 
         .table td.text-black {
@@ -156,5 +154,33 @@
 </footer>
 
 @code {
+    [Parameter]
+    public int OrdenVentaId { get; set; }
+    public List<OrdenVentaDetalle> ListaFacturas { get; set; } = new List<OrdenVentaDetalle>();
+    private string valorFiltro = "";
+    private string filtro = "id";
 
+
+    public async Task Buscar()
+    {
+        if (!string.IsNullOrWhiteSpace(valorFiltro))
+        {
+            if (filtro == "Código")
+            {
+               
+            }
+        }
+        else
+        {
+           
+        }
+    }
+
+
+    private async Task Restablecer()
+    {
+        // ListaVentas = await eventosService.Listar(t => t.eventoId > 0);
+        // filtro = string.Empty;
+        // valorFiltro = string.Empty;
+    }
 }
