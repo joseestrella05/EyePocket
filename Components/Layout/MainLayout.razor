@@ -4,16 +4,10 @@
 
 
 <div class="page">
-    @if (navigationManager.ToBaseRelativePath(navigationManager.Uri).StartsWith("Cliente/"))
+    @if (!string.IsNullOrEmpty(navigationManager.ToBaseRelativePath(navigationManager.Uri).TrimEnd('#', '/')))
     {
         <div class="sidebar">
             <MenuLateral />
-        </div>
-    }
-    else if (navigationManager.ToBaseRelativePath(navigationManager.Uri).StartsWith("Ventas/"))
-    {
-        <div class="sidebar">
-            <VentasMenuLateral />
         </div>
     }
 
