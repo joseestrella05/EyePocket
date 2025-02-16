@@ -7,19 +7,18 @@
 <PageTitle>Provedores</PageTitle>
 <div class="row" style="background-color:white; padding:10px; margin:10px;">
 	<div class="col">
-
 		<div class="text-left">
-			<h2 class="text-black"><i class="bi bi-person-plus m-1"></i> Provedor</h2>
+			<h2 class="text-black"><i class="bi bi-person-badge m-1"></i> Proveedores</h2>
 		</div>
 	</div>
-	<div class="col" style="">
-		<a href="/Provedores/Create" class="btn btn-secondary">Crear nuevo Provedor</a>
+	<div class="col text-end">
+		<a href="/Proveedores/Create" class="btn btn-secondary">Crear nuevo proveedor</a>
 	</div>
 </div>
 
 <div class="container">
 	<div class="card">
-		<div class="card-body">
+		<div class="card-body" style="padding: 20px;">
 			<div class="row">
 				<div class="col-4">
 					<div class="input-group" style="width: 250px">
@@ -32,15 +31,12 @@
 							</InputSelect>
 							<label for="floatingSelect"><strong>Filtrar en base a...</strong></label>
 						</div>
-						@*btn restablecer*@
 						<button type="button" class="btn btn-secondary bi bi-arrow-counterclockwise" @onclick="() => Restablecer()"></button>
 					</div>
 				</div>
 
-				@*Btn Buscar*@
 				<div class="col">
 					<div class="input-group" style="width: 500px">
-						@*textbox buscar*@
 						<div class="form-floating d-flex align-items-center">
 							<InputText @bind-Value="@searchBarValue" class="form-control" placeholder="" id="floatingSearch" />
 							<label for="floatingSearch">Buscar</label>
@@ -49,52 +45,44 @@
 					</div>
 				</div>
 			</div>
-
-
-			<br />
-
-			<table class="table table-light table-hover">
-				<thead class="table table-striped ">
-					<tr class="text-center ">
-						<th>ID</th>
-						<th>Nombre</th>
-						<th>Cédula</th>
-						<th>Contacto</th>
-						<th>Email</th>
-						<th>Dirección</th>
-						<th>Fecha registrado</th>
-						<th>Acciones</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var provedores in ListaProvedores)
-					{
-						<tr class="text-center text-white">
-							@*Id*@
-							<td>@provedores.ProvedorId</td>
-							@*Nombre*@
-							<td>@provedores.Nombre</td>
-							<td>@($"({provedores.Telefono?[..3]}) {provedores.Telefono?[3..6]}-{provedores.Telefono?[6..]}")</td>
-							<td>@provedores.Correo</td>
-							<td>@provedores.Direccion</td>
-
-
-							@*Botones*@
-							<td class="text-center">
-								<a href="/Provedores/Details/@provedores.ProvedorId" class="btn btn-outline-dark bi-eye"></a>
-
-								<a href="/Provedores/Edit/@provedores.ProvedorId" class="btn btn-outline-info bi bi-pencil-square"></a>
-
-								<button type="button" @onclick="() => MostrarModal(provedores.ProvedorId, provedores.Correo)" class="btn btn-outline-danger bi bi-trash"></button>
-							</td>
+			
+			<div style="overflow-x: auto;">
+				<table class="table table-light table-hover" style="min-width: 100%;">
+					<thead class="table table-striped">
+						<tr class="text-center">
+							<th>ID</th>
+							<th>Nombre</th>
+							<th style="white-space: nowrap;">Contacto</th>
+							<th>Email</th>
+							<th>Dirección</th>
+							<th>Acciones</th>
 						</tr>
-					}
-				</tbody>
-				<caption>Cant. De Clientes: @ListaProvedores.Count</caption>
-			</table>
+					</thead>
+					<tbody>
+						@foreach (var provedores in ListaProvedores)
+						{
+							<tr class="text-center">
+								<td>@provedores.ProvedorId</td>
+								<td>@provedores.Nombre</td>
+								<td style="white-space: nowrap;">@($"({provedores.Telefono?[..3]}) {provedores.Telefono?[3..6]}-{provedores.Telefono?[6..]}")</td>
+								<td>@provedores.Correo</td>
+								<td>@provedores.Direccion</td>
+								<td class="text-center" style="display: flex; justify-content: center; gap: 5px;">
+									<a href="/Provedores/Details/@provedores.ProvedorId" class="btn btn-outline-dark bi-eye"></a>
+									<a href="/Provedores/Edit/@provedores.ProvedorId" class="btn btn-outline-info bi bi-pencil-square"></a>
+									<button type="button" @onclick="() => MostrarModal(provedores.ProvedorId, provedores.Correo)" class="btn btn-outline-danger bi bi-trash"></button>
+								</td>
+							</tr>
+						}
+					</tbody>
+					<caption>Cant. De Clientes: @ListaProvedores.Count</caption>
+				</table>
+			</div>
 		</div>
 	</div>
 </div>
+
+
 
 @if (mostrarModal)
 {
@@ -118,6 +106,8 @@
 	</div>
 	<div class="modal-backdrop fade show" @onclick="CerrarModal"></div>
 }
+
+
 
 @code {
 	public string searchBarValue { get; set; } = string.Empty;
