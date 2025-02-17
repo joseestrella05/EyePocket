@@ -2,6 +2,8 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    display: flex;
+    height: auto;
 }
 
 main {
