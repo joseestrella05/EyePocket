@@ -27,11 +27,15 @@
                                     <label for="Cantidad" class="form-label fw-bold me-2 mb-0">Cantidad:</label>
                                     <input type="text" id="Cantidad" class="form-control me-3" style="width: 100px;" @bind="cantidad" />
                                 </div>
+
+                                <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2" @onclick="Restablecer">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                </button>
                             </div>
 
                             <div class="col-md-3 d-flex justify-content-end">
                                 <button @onclick="Añadir" class="btn btn-success" type="button" style="background-color: #004b55; border-color: #004b55;">
-                                    <span class="bi bi-plus"></span> Registro
+                                    <span class="bi bi-plus"></span> Añadir
                                 </button>
                             </div>
                         </div>
@@ -76,10 +80,19 @@
     </table>
 
     <div class="d-flex justify-content-between align-items-center mt-4">
+        <!-- Botón de Cobrar -->
         <a href="/Ventas/Cobro" class="btn btn-danger d-flex align-items-center px-3 py-2">
             <i class="bi bi-cash me-2"></i> Cobrar
         </a>
+
+        <!-- Cuadro de monto total con color corregido -->
+        <div class="p-3 rounded-3 shadow" style="background-color: #004b55; color: white; min-width: 120px;">
+            <h4 class="m-0 text-end">$ </h4>
+            <p class="m-0 text-end" style="font-size: 0.8rem;">Descuento: $ <br> Precio: $</p>
+        </div>
     </div>
+
+   
 
     <div class="card-footer text-start">
         <p>Total de Facturas: @ListaFacturas.Count</p>
@@ -92,6 +105,12 @@
     public List<OrdenVentaDetalle> ListaFacturas { get; set; } = new List<OrdenVentaDetalle>();
     private string valorFiltro = "";
     private int cantidad = 1;
+
+    private async Task Restablecer()
+    {
+        valorFiltro = "";
+        cantidad = 1;
+    }
 
     private async Task Añadir()
     {
