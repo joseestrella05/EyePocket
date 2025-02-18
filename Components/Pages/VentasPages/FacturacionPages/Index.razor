@@ -1,6 +1,5 @@
 ﻿@page "/Ventas/Facturacion/Index"
 
-
 <PageTitle>Facturación</PageTitle>
 
 <EditForm Model="ListaFacturas" class="border shadow-lg p-3 rounded">
@@ -10,14 +9,12 @@
                 <div class="card border-0 rounded-3">
                     <div class="card-body">
                         <div class="row align-items-center">
-                            <!-- Etiqueta Buscar Código -->
                             <div class="col-md-3 text-center text-md-end mb-3 mb-md-0">
                                 <label class="d-inline-block fs-4 fw-bold text-black">
                                     Código del producto
                                 </label>
                             </div>
 
-                            <!-- Barra de Búsqueda y Cantidad -->
                             <div class="col-md-6 d-flex align-items-center mb-3 mb-md-0">
                                 <div class="input-group input-group-lg flex-grow-1 me-3">
                                     <input @bind="valorFiltro" class="form-control" placeholder="Buscar" />
@@ -27,22 +24,19 @@
                                 </div>
 
                                 <div class="d-flex align-items-center">
-                                    <!-- Cantidad -->
                                     <label for="Cantidad" class="form-label fw-bold me-2 mb-0">Cantidad:</label>
-                                    <input type="text" id="Cantidad" class="form-control me-3" style="width: 100px;">
+                                    <input type="text" id="Cantidad" class="form-control me-3" style="width: 100px;" @bind="cantidad" />
 
-                                    <!-- Botón Restablecer -->
                                     <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2" @onclick="Restablecer">
                                         <i class="bi bi-arrow-counterclockwise"></i>
                                     </button>
                                 </div>
                             </div>
 
-                            <!-- Botón Registrar-->
                             <div class="col-md-3 d-flex justify-content-end">
-                                <a href="/Facturacion/Create" class="btn btn-success" type="button" style="background-color: #004b55; border-color: #004b55;">
+                                <button @onclick="Añadir" class="btn btn-success" type="button" style="background-color: #004b55; border-color: #004b55;">
                                     <span class="bi bi-plus"></span> Registro
-                                </a>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -51,7 +45,6 @@
         </div>
     </div>
 
-    <!-- Tabla -->
     <table class="table table-striped table-hover table-bordered text-center align-middle">
         <thead class="bg-dark text-black">
             <tr>
@@ -60,7 +53,6 @@
                 <th>Descripción</th>
                 <th>Cantidad</th>
                 <th>Precio</th>
-                <th>Descuento</th>
                 <th>Editar</th>
                 <th>Eliminar</th>
             </tr>
@@ -68,14 +60,12 @@
         <tbody class="text-white">
             @foreach (var factura in ListaFacturas)
             {
-
                 <tr>
                     <td class="text-black">@factura.OrdenVentaId</td>
                     <td class="text-black">@factura.OrdenVenta?.Codigo</td>
                     <td class="text-black">@factura.Productos?.Nombre</td>
                     <td class="text-black">@factura.Cantidad</td>
                     <td class="text-black">@factura.Productos?.Precio</td>
-                    @* <td class="text-black">@factura.Descuento%</td> *@
                     <td>
                         <a href="/Ventas/Facturacion/Edit/@factura.OrdenVenta?.OrdenVentaId" class="btn btn-info btn-sm">
                             <i class="bi bi-eye"></i>
@@ -90,101 +80,56 @@
     </table>
 
     <div class="d-flex justify-content-between align-items-center mt-4">
-        <!-- Botón de Cobrar -->
         <a href="/Ventas/Cobro" class="btn btn-danger d-flex align-items-center px-3 py-2">
             <i class="bi bi-cash me-2"></i> Cobrar
         </a>
-
-        <!-- Cuadro de monto total con color corregido -->
-        <div class="p-3 rounded-3 shadow" style="background-color: #004b55; color: white; min-width: 120px;">
-            <h4 class="m-0 text-end">$ </h4>
-            <p class="m-0 text-end" style="font-size: 0.8rem;">Descuento: $ <br> Precio: $</p>
-        </div>
     </div>
-
-
 
     <div class="card-footer text-start">
         <p>Total de Facturas: @ListaFacturas.Count</p>
     </div>
-    <div style="height: 415px;"></div>
 </EditForm>
-
-<!-- Estilo personalizado -->
-<style>
-    .table th, .table td {
-        color: black !important;
-    }
-
-        .table td.text-black {
-            color: black !important;
-        }
-
-    .btn-custom {
-        border: none;
-        padding: 1rem 1.5rem;
-        border-radius: 0.75rem;
-        font-weight: bold;
-        font-size: 1.25rem;
-        color: white;
-        transition: background-color 0.3s, transform 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .btn-group {
-        display: flex;
-        gap: 1rem;
-    }
-
-    .btn-black {
-        background-color: black;
-    }
-
-        .btn-black:hover {
-            background-color: #1e40af;
-            transform: translateY(-2px);
-        }
-
-    .bi {
-        margin-right: 0.5rem;
-    }
-</style>
-
-<!-- Footer-->
-<footer class="py-5 bg-dark" style="border-top-left-radius: 20px; border-top-right-radius: 20px;">
-    <div class="container"><p class="m-0 text-center text-white">EyePocket </p></div>
-</footer>
 
 @code {
     [Parameter]
     public int OrdenVentaId { get; set; }
     public List<OrdenVentaDetalle> ListaFacturas { get; set; } = new List<OrdenVentaDetalle>();
     private string valorFiltro = "";
-    private string filtro = "id";
-
+    private int cantidad = 1;
 
     public async Task Buscar()
     {
-        if (!string.IsNullOrWhiteSpace(valorFiltro))
-        {
-            if (filtro == "Código")
-            {
-               
-            }
-        }
-        else
-        {
-           
-        }
+        // Implementación de búsqueda si es necesaria
     }
-
 
     private async Task Restablecer()
     {
-        // ListaVentas = await eventosService.Listar(t => t.eventoId > 0);
-        // filtro = string.Empty;
-        // valorFiltro = string.Empty;
+        valorFiltro = "";
+        cantidad = 1;
+    }
+
+    private async Task Añadir()
+    {
+        if (!string.IsNullOrWhiteSpace(valorFiltro))
+        {
+            var producto = await ObtenerProductoPorCodigo(valorFiltro);
+            if (producto != null)
+            {
+                ListaFacturas.Add(new OrdenVentaDetalle
+                    {
+                        OrdenVentaId = OrdenVentaId,
+                        ProductoId = producto.ProductoId,
+                        Productos = producto,
+                        Cantidad = cantidad,
+                        Subtotal = (double)(producto.Precio * cantidad)
+                    });
+            }
+        }
+    }
+
+    private async Task<Productos?> ObtenerProductoPorCodigo(string codigo)
+    {
+        // Simulación de búsqueda del producto (debería conectarse a un servicio o base de datos)
+        return new Productos { ProductoId = 1, Codigo = codigo, Nombre = "Ejemplo", Precio = 100 };
     }
 }
