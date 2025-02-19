@@ -1,7 +1,6 @@
 ﻿@page "/Ventas/Cobro"
 @using Microsoft.AspNetCore.Components
 @inject NavigationManager Navigation
-@* @inject CobroService cobroService *@
 
 <PageTitle>Cobros</PageTitle>
 
@@ -9,17 +8,17 @@
     <!-- Panel Izquierdo -->
     <div class="text-white p-4 d-flex flex-column justify-content-center" style="width: 30%; background-color: #004b55;">
         <h5 class="fw-bold">Número de Artículos</h5>
-        <h3 class="mb-4">@NumeroArticulos</h3>
+        <h3 class="mb-4">@TotalProductos</h3>
 
-        <button class="btn btn-light w-100 mb-2" >Pago en Efectivo</button>
-        <button class="btn btn-light w-100 mb-2" >Pago con Tarjeta</button>
+        <button class="btn btn-light w-100 mb-2">Pago en Efectivo</button>
+        <button class="btn btn-light w-100 mb-2">Pago con Tarjeta</button>
         <button class="btn btn-light w-100 mb-2">Pago a Crédito</button>
     </div>
 
     <!-- Panel Derecho -->
     <div class="bg-light p-4 d-flex flex-column align-items-center justify-content-center flex-grow-1">
         <h3>Total a Pagar</h3>
-        <h1 class="fw-bold">$ @TotalPagar.ToString("0.00")</h1>
+        <h1 class="fw-bold">$ @Subtotal.ToString("0.00")</h1>
 
         <button class="btn btn-success w-50 mt-4" @onclick="Cobrar">
             <i class="bi bi-cash"></i> Cobrar
@@ -41,27 +40,26 @@
 </div>
 
 @code {
-    private int NumeroArticulos = 4;
-    private decimal TotalPagar = 500.00m;
-    private string MetodoPagoSeleccionado = "";
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public double Subtotal { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int TotalProductos { get; set; }
+
     private string MensajeError = "";
 
-   
-
-    private async Task Cobrar()
+    private void Cobrar()
     {
-       
-        {
-            Navigation.NavigateTo("/Ventas/Confirmacion");
-        }
-
         Navigation.NavigateTo("/Ventas/Confirmacion");
     }
 
     private void Cancelar()
     {
-        Navigation.NavigateTo("/Ventas");
+        Navigation.NavigateTo($"/Ventas/Facturacion/Index");
     }
+
 
     private void Imprimir()
     {
