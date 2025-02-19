@@ -33,8 +33,8 @@
                                 </button>
                             </div>
 
-                            <div class="col-md-3 d-flex justify-content-end">
-                                <button @onclick="Añadir" class="btn btn-success" type="button" style="background-color: #004b55; border-color: #004b55;">
+                            <div class="col-md-3 d-flex justify-content-end rounded-pill">
+                                <button @onclick="Añadir" class="btn btn-success rounded-pill" type="button" style="background-color: #004b55; border-color: #004b55;">
                                     <span class="bi bi-plus"></span> Añadir
                                 </button>
                             </div>
@@ -92,7 +92,7 @@
     <div class="d-flex justify-content-between align-items-center mt-4">
         <!-- Botón de Cobrar -->
         <a href="/Ventas/Cobro?subtotal=@ListaFacturas.Sum(f => f.Subtotal)&totalProductos=@ListaFacturas.Count"
-           class="btn btn-danger d-flex align-items-center px-3 py-2">
+           class="btn btn-danger d-flex align-items-center px-3 py-2 rounded-pill">
             <i class="bi bi-cash me-2"></i> Cobrar
         </a>
 
