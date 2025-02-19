@@ -45,6 +45,7 @@
         </div>
     </div>
 
+    <!-- Tabla de Facturas -->
     <div style="max-height: 400px; overflow-y: auto;">
         <table class="table table-striped table-hover table-bordered text-center align-middle">
             <thead class="bg-dark text-black">
@@ -78,16 +79,16 @@
                             </a>
                         </td>
                         <td>
-                            <a href="/Ventas/Facturacion/Delete/@factura.OrdenVenta?.OrdenVentaId" class="btn btn-danger btn-sm">
+                            <button class="btn btn-danger btn-sm" @onclick="@(() => ConfirmarEliminacion(factura.Productos?.Codigo))">
                                 <i class="bi bi-trash"></i>
-                            </a>
+                            </button>
+
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
-
 
     <div class="d-flex justify-content-between align-items-center mt-4">
         <!-- Botón de Cobrar -->
@@ -96,11 +97,10 @@
             <i class="bi bi-cash me-2"></i> Cobrar
         </a>
 
-
         <!-- Cuadro de monto total -->
         <div class="p-3 rounded-3 shadow" style="background-color: #004b55; color: white; min-width: 200px;">
             <h4 class="m-0 text-start" style="font-size: 1.5rem;">Total$ @ListaFacturas.Sum(f => f.Subtotal)</h4>
-            <p class="m-0 text-start" style="font-size: 1rem;">SubTotal$ @ListaFacturas.Sum(f => f.Subtotal) <br> @* Descuento$ *@</p>
+            <p class="m-0 text-start" style="font-size: 1rem;">SubTotal$ @ListaFacturas.Sum(f => f.Subtotal)</p>
         </div>
     </div>
 
@@ -109,18 +109,47 @@
     </div>
 </EditForm>
 
+
+@if (mostrarModalConfirmacion)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #004b55;">
+                    <h5 class="modal-title fw-bold text-white">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" @onclick="CancelarEliminacion"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro que quieres eliminar este artículo?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary rounded-pill" @onclick="CancelarEliminacion">Cancelar</button>
+                    <button class="btn btn-danger rounded-pill" @onclick="EliminarConfirmado">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     [Parameter]
     public int OrdenVentaId { get; set; }
-    public List<OrdenVentaDetalle> ListaFacturas { get; set; } = new List<OrdenVentaDetalle>();
+
+    public List<OrdenVentaDetalle> ListaFacturas { get; set; } = new();
     private string valorFiltro = "";
     private int cantidad;
+
+    private bool mostrarModalConfirmacion = false;
+    private int indiceAEliminar = -1;
+    private string? codigoProductoAEliminar;
+
 
     private async Task Restablecer()
     {
         valorFiltro = "";
         cantidad = 0;
     }
+
     private async Task Añadir()
     {
         if (cantidad < 1)
@@ -141,7 +170,7 @@
                         Productos = producto,
                         Cantidad = cantidad,
                         Subtotal = (double)(producto.Precio * cantidad)
-                    });
+                    });             
             }
             else
             {
@@ -152,6 +181,43 @@
         {
             MostrarToast(ToastType.Warning, "Atención", "Ingrese un nombre de producto");
         }
+    }
+
+    private void ConfirmarEliminacion(string? codigoProducto)
+    {
+        codigoProductoAEliminar = codigoProducto;
+        mostrarModalConfirmacion = true;
+    }
+
+    private void EliminarConfirmado()
+    {
+        if (!string.IsNullOrWhiteSpace(codigoProductoAEliminar))
+        {
+            var productoAEliminar = ListaFacturas.FirstOrDefault(f => f.Productos?.Codigo == codigoProductoAEliminar);
+
+            if (productoAEliminar != null)
+            {
+                ListaFacturas.Remove(productoAEliminar);
+                MostrarToast(ToastType.Success, "Eliminado", "Producto eliminado correctamente");
+            }
+            else
+            {
+                MostrarToast(ToastType.Danger, "Error", "Producto no encontrado");
+            }
+        }
+        else
+        {
+            MostrarToast(ToastType.Danger, "Error", "Código de producto inválido");
+        }
+
+        mostrarModalConfirmacion = false;
+        codigoProductoAEliminar = null;
+    }
+
+    private void CancelarEliminacion()
+    {
+        mostrarModalConfirmacion = false;
+        codigoProductoAEliminar = null;
     }
 
 
