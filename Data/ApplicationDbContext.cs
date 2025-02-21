@@ -13,9 +13,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<Productos> Productos { get; set; }
 
-    
     public DbSet<Tickets> Tickets { get; set; }
 
+
     public DbSet<Inventarios> Inventarios { get; set; }
+
+    public DbSet<Provedores> Provedores { get; set; }
+
 
 }
