@@ -230,7 +230,7 @@
                                 <option value="DK">Dinamarca</option>
                             </select>
 
-                            <button type="submit" class="btn btn-success mt-3 bi bi-currency-dollar">Pagar Ahora</button>
+                            <button type="button" class="btn btn-success mt-3 bi bi-currency-dollar">Pagar Ahora</button>
                             <button type="button" @onclick="CerrarModalPagoTarjeta" class="btn btn-danger mt-3 bi bi-arrow-left-circle">Volver</button>
                         </form>
                     </div>
@@ -292,8 +292,8 @@
                                         </div>
                                     </div>
                                     <div class="col-12 d-flex justify-content-between">
-                                        <button class="btn btn-success" @onclick="MostrarModalPagoaCredito">Confirmar Pago</button>
-                                        <button class="btn btn-danger" @onclick="CerrarModalPagoaCredito">Cancelar</button>
+                                        <button class="btn btn-success bi bi-currency-dollar" @onclick="MostrarModalPagoaCredito">Confirmar Pago</button>
+                                        <button class="btn btn-danger bi bi-arrow-left-circle" @onclick="CerrarModalPagoaCredito">Cancelar</button>
                                     </div>
                                 </div>
                             </div>
@@ -341,14 +341,14 @@
                                         <input type="number" id="efectivo" @bind-value="Efectivo" @bind-value:event="oninput" placeholder="Ingrese el monto en efectivo" class="form-control">
                                     </div>
 
-                                    <div class="p-4 text-white w-40 text-center" style="background-color: #004b55; border-radius: 6px;">
+                                    <div class="p-4 text-white w-40 text-center " style="background-color: #004b55; border-radius: 6px;">
                                         <h5 class="fw-bold">Cambio a Devolver</h5>
                                         <h3>$ @Cambio.ToString("0.00")</h3>
                                     </div>
 
-                                    <div class="col-12 d-flex justify-content-between">
-                                        <button class="btn btn-success" @onclick="MostrarModalPagoEfectivo">Confirmar Pago</button>
-                                        <button class="btn btn-danger" @onclick="CerrarModalPagoEfectivo">Cancelar</button>
+                                    <div class="col-12 d-flex justify-content-left" style="margin-top: 16px;">
+                                        <button class="btn btn-success bi bi-currency-dollar" @onclick="MostrarModalPagoEfectivo">Confirmar Pago</button>
+                                        <button class="btn btn-danger bi bi-arrow-left-circle" @onclick="CerrarModalPagoEfectivo">Cancelar</button>
                                     </div>
                                 </div>
                             </div>
