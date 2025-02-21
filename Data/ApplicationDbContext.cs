@@ -16,4 +16,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     
     public DbSet<Tickets> Tickets { get; set; }
 
+    public DbSet<Inventarios> Inventarios { get; set; }
+
 }
