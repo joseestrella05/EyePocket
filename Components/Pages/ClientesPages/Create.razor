@@ -99,16 +99,16 @@
     .btn-success {
     background-color: #0d5c63;
     border: none;
-        margin: 10px;
-        padding: 10px 20px;
+    margin: 10px;
+    padding: 10px 20px;
     }
 
     .btn-secondary {
     background-color: #444;
     color: white;
     text-decoration: none;
-        margin: 10px;
-        padding: 10px 20px;
+    margin: 10px;
+    padding: 10px 20px;
     }
 
     .btn-secondary:hover {
@@ -123,13 +123,13 @@
     public async Task Crear()
     {
         clientes.Apellido = "  ";
-        clientes.EstadoId = 1;
+        clientes.Activo = false;
         if (!await Validar())
         {
             await clienteService.Guardar(clientes);
             ToastService.Notify(new(ToastType.Success, "Exito", $"Cliente Creado correctamente."));
             clientes = new Clientes();
-            navigation.NavigateTo("/Cliente/Index");
+            navigation.NavigateTo("/Clientes/Index");
         }
         else
         {

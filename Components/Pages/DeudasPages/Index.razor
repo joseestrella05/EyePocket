@@ -1,5 +1,5 @@
 ﻿@page "/Deudas/Index"
-@inject ClienteServices clientesService
+@inject DeudaService DeudaService
 @inject ToastService toastService
 
 @rendermode InteractiveServer
@@ -9,11 +9,11 @@
 	<div class="col">
 
 		<div class="text-left">
-			<h2 class="text-black"><i class="bi bi-person-plus m-1"></i> Clientes</h2>
+			<h2 class="text-black"><i class="bi bi-plus-circle"></i> Deudas</h2>
 		</div>
 	</div>
 	<div class="col text-end">
-		<a href="/Cliente/Create" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Crear nuevo cliente</a>
+		<a href="/Deudas/Create" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Crear nueva deuda</a>
 	</div>
 </div>
 
@@ -77,42 +77,41 @@
 				<thead class="table table-striped ">
 					<tr class="text-center ">
 						<th>ID</th>
+						<th>Numero factura</th>
 						<th>Cliente</th>
-						<th>Monto</th>
+						<th>Monto total</th>
+						<th>Saldo pendiente</th>
 						<th>Contacto</th>
-						<th>Descripcion</th>
-						<th>Fecha registro</th>
 						<th>Acciones</th>
 					</tr>
 				</thead>
 				<tbody>
-					@foreach (var cliente in ListaClientes)
+					@foreach (var deudas in ListaDeudas)
 					{
 						<tr class="text-center text-white">
 							@*Id*@
-							<td>@cliente.ClienteId</td>
+							<td>@deudas.DeudasId</td>
 							@*Nombre*@
-							<td>@cliente.Nombre</td>
+							<td>@deudas.OrdenVenta?.NumeroFactura</td>
+							<td>@deudas.OrdenVenta?.Clientes?.Nombre</td>				
 							@*Concepto*@
-							<td>@cliente.Cedula</td>
-							@*Deuda*@
-							<td>@($"({cliente.Telefono?[..3]}) {cliente.Telefono?[3..6]}-{cliente.Telefono?[6..]}")</td>
-							<td>@cliente.Email</td>
-							<td>@cliente.Direccion</td>
-							<td>@cliente.FechaIngreso.ToString("dd/M/yyyy")</td>
+							<td>@deudas.OrdenVenta?.MontoTotal.ToString("N2")</td>
+							<td>@deudas.SaldoPendiente.ToString("N2")</td>
+
+							<td>@($"({deudas.OrdenVenta?.Clientes?.Telefono?[..3]}) {deudas.OrdenVenta?.Clientes?.Telefono?[3..6]}-{deudas.OrdenVenta?.Clientes?.Telefono?[6..]}")</td>
 
 							@*Botones*@
 							<td class="text-center">
-								<a href="/Cliente/Details/@cliente.ClienteId" class="btn btn-outline-dark bi-eye"></a>
+								<a href="/Deudas/Details/@deudas.DeudasId" class="btn btn-outline-dark bi-eye"></a>
 
-								<a href="/Cliente/Edit/@cliente.ClienteId" class="btn btn-outline-info bi bi-pencil-square"></a>
+								<a href="/Deudas/Edit/@deudas.DeudasId" class="btn btn-outline-info bi bi-pencil-square"></a>
 
-								<button type="button" @onclick="() => MostrarModal(cliente.ClienteId, cliente.Email)" class="btn btn-outline-danger bi bi-trash"></button>
+								<button type="button" @onclick="() => MostrarModal(deudas.DeudasId, deudas.OrdenVenta?.Clientes?.Nombre)" class="btn btn-outline-danger bi bi-trash"></button>
 							</td>
 						</tr>
 					}
 				</tbody>
-				<caption>Cant. De Clientes: @ListaClientes.Count</caption>
+				<caption>Cant. De deudas: @ListaDeudas.Count</caption>
 			</table>
 		</div>
 	</div>
@@ -124,11 +123,11 @@
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
 				<div class="modal-header" style="background-color: #7B0323; color: white;">
-					<h5 class="modal-title">Eliminar Cliente</h5>
+					<h5 class="modal-title">Eliminar Deuda</h5>
 					<button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					<p>¿Está seguro de que desea eliminar a este cliente?</p>
+					<p>¿Está seguro de que desea eliminar a este Deuda?</p>
 					<p>Esta opción no se puede deshacer.</p>
 				</div>
 				<div class="modal-footer">
@@ -143,12 +142,12 @@
 
 <style>
 	body {
-		background-color: #f5f5f5;
+	background-color: #f5f5f5;
 	}
 
 	.btn-success {
-		background-color: #0d5c63;
-		border: none;
+	background-color: #0d5c63;
+	border: none;
 	}
 </style>
 @code {
@@ -156,11 +155,11 @@
 	public string valorFiltro { get; set; } = string.Empty;
 	public DateTime? Desde { get; set; } = null;
 	public DateTime? Hasta { get; set; } = null;
-	public List<Clientes> ListaClientes { get; set; } = new List<Clientes>();
+	public List<Deudas> ListaDeudas { get; set; } = new List<Deudas>();
 
 	protected override async Task OnInitializedAsync()
 	{
-		ListaClientes = await clientesService.Listar(C => true);
+		ListaDeudas = await DeudaService.Listar(C => true);
 	}
 
 	// MODALS
@@ -193,20 +192,20 @@
 			// 	return;
 			// await UserManager.DeleteAsync(user);
 
-			await clientesService.Eliminar(ClienteIdSeleccionado);
-			ListaClientes = await clientesService.Listar(x => true);
+			await DeudaService.Eliminar(ClienteIdSeleccionado);
+			ListaDeudas = await DeudaService.Listar(x => true);
 			mostrarModal = false;
 			ClienteIdSeleccionado = 0;
 			TipoNotificacion = ToastType.Success;
 			TituloNotificacion = "Enhorabuena";
-			MensajeNotificacion = "¡Se ha eliminado el cliente exitosamente!";
+			MensajeNotificacion = "¡Se ha eliminado la deuda exitosamente!";
 			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 		}
 		catch (Exception ex)
 		{
 			TipoNotificacion = ToastType.Danger;
 			TituloNotificacion = "Error";
-			MensajeNotificacion = "Hubo un error al eliminar el cliente.";
+			MensajeNotificacion = "Hubo un error al eliminar la deuda.";
 			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 		}
 	}
@@ -228,7 +227,7 @@
 			TituloNotificacion = "Aviso";
 			MensajeNotificacion = "Debe seleccionar una opción en el fitro.";
 			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
-			ListaClientes = await clientesService.Listar(x => true);
+			ListaDeudas = await DeudaService.Listar(x => true);
 			return;
 		}
 
@@ -241,7 +240,7 @@
 				{
 					TipoNotificacion = ToastType.Warning;
 					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "Debe proveer un ID de cliente para buscar";
+					MensajeNotificacion = "Debe proveer un ID de deuda para buscar";
 					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 					return;
 				}
@@ -254,77 +253,18 @@
 					return;
 				}
 				if (int.TryParse(searchBarValue, out int id))
-					ListaClientes = await clientesService.Listar(lt => lt.ClienteId == id);
-				break;
-
-			case "fechaingreso":
-				if (Desde == null || Hasta == null)
-				{
-					TipoNotificacion = ToastType.Warning;
-					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "Ambos campos de las fechas deben llenarse.";
-					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
-					return;
-				}
-				if (Desde > Hasta)
-				{
-					TipoNotificacion = ToastType.Warning;
-					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "La fecha inicial no puede ser mayor a la final.";
-					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
-					return;
-				}
-				await clientesService.Listar(x => x.FechaIngreso >= Desde && x.FechaIngreso <= Hasta);
-				break;
-
-			case "email":
-				if (string.IsNullOrEmpty(searchBarValue))
-				{
-					TipoNotificacion = ToastType.Warning;
-					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "Debe proveer un email para buscar.";
-					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
-					return;
-				}
-				ListaClientes = await clientesService.Listar(lt => lt.Email.Trim().ToLower()
-															.Contains(searchBarValue));
-				break;
-
-			case "nombres":
-				if (string.IsNullOrEmpty(searchBarValue))
-				{
-					TipoNotificacion = ToastType.Warning;
-					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "Debe proveer un nombre y/o apellido/s para buscar.";
-					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
-					return;
-				}
-				ListaClientes = await clientesService.Listar(lt => lt.Nombre.Trim().ToLower()
-															.Contains(searchBarValue));
-				break;
-
-			case "cedula":
-				if (string.IsNullOrEmpty(searchBarValue))
-				{
-					TipoNotificacion = ToastType.Warning;
-					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "Debe proveer una cédula para buscar.";
-					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
-					return;
-				}
-				ListaClientes = await clientesService.Listar(lt => lt.Cedula.Trim().ToLower()
-															.Contains(searchBarValue));
+					ListaDeudas = await DeudaService.Listar(lt => lt.DeudasId == id);
 				break;
 
 			default:
-				ListaClientes = await clientesService.Listar(x => true);
+				ListaDeudas = await DeudaService.Listar(x => true);
 				break;
 		}
 	}
 
 	public async Task Restablecer()
 	{
-		ListaClientes = await clientesService.Listar(x => true);
+		ListaDeudas = await DeudaService.Listar(x => true);
 		searchBarValue = string.Empty;
 		valorFiltro = string.Empty;
 		Desde = null;
@@ -337,7 +277,3 @@
 	}
 }
 
-
-@code {
-
-}
