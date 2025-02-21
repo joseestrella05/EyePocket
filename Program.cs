@@ -48,7 +48,9 @@ builder.Services.AddScoped<TicketServices>();
 
 builder.Services.AddScoped<ProvedoresServices>();
 
+builder.Services.AddScoped<EstadoServices>();
 
+builder.Services.AddScoped<CompraServices>();
 
 
 //notificacion

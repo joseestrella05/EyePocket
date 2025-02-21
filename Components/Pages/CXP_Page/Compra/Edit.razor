@@ -1,0 +1,87 @@
+﻿@page "/CxP/Compra/Edit{CompraId:int}"
+@inject ProvedoresServices provedoresService
+@inject CompraServices compraService
+@inject EstadoServices estadoServices
+@inject NavigationManager navigation
+
+<EditForm Model="Compra" OnValidSubmit="Crear">
+    <DataAnnotationsValidator />
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <div class="section-title">Datos personales</div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>ID *</label>
+                        <InputNumber class="form-control" @bind-Value="Compra.CompraId" placeholder="CompraId "></InputNumber>
+                    </div>
+                </div>
+
+                <div class="section-title">Datos Adicionales</div>
+
+                <div class="row">
+
+                    <InputSelect class="form-control form-select" @bind-Value="Compra.ProvedorId">
+                        <option value="0" selected disabled>Elija una opción</option>
+                        @foreach (var provedor in provedor)
+                        {
+                            <option value="@provedor.ProvedorId">@provedor.Nombre</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="row">
+                    <InputSelect class="form-control form-select" @bind-Value="Compra.EstadoId">
+                        <option value="0" selected disabled>Elija una opción</option>
+                        @foreach (var Estado in estados)
+                        {
+                            <option value="@Estado.EstadoId">@Estado.Nombre</option>
+                        }
+                    </InputSelect>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <a href="/CxP/Compra/Index" class="btn btn-secondary">Volver</a>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int CompraId { get; set; }
+    public Compras Compra { get; set; } = new Compras();
+    public List<Provedores> provedor { get; set; } = new List<Provedores>();
+    public List<Estados> estados { get; set; } = new List<Estados>();
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Compra = await compraService.Buscar(CompraId);
+        provedor = await provedoresService.Listar(C => true);
+        estados = await estadoServices.Listar(C => true);
+
+    }
+    public Edit(ToastService toastService)
+    {
+        ToastService = toastService;
+    }
+    public async Task Crear()
+    {
+        if (Compra.CompraId < 0)
+        {
+            await compraService.Guardar(Compra);
+            ToastService.Notify(new(ToastType.Success, "Exito", $"Provedor Editado correctamente."));
+            navigation.NavigateTo("/CxP/Compra/Index");
+        }
+        else
+        {
+            ToastService.Notify(new(ToastType.Danger, "Error", $"Provedor ya existe."));
+        }
+    }
+
+}
