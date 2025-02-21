@@ -7,52 +7,49 @@
 <div class="d-flex vh-75">
     <!-- Panel Izquierdo -->
     <div class="text-white p-4 d-flex flex-column justify-content-center" style="width: 30%; background-color: #004b55;">
-        <h5 class="fw-bold">Contacto</h5>
-        <select class="form-control" @bind="ContactoSeleccionado">
-            <option value="buscar">Buscar...</option>
-            <option value="contacto1">Contacto 1</option>
-            <option value="contacto2">Contacto 2</option>
-            <option value="contacto3">Contacto 3</option>
-        </select>
-        <button class="btn btn-light w-100 mt-2">Nuevo Contacto</button>
+        <h5 class="fw-bold">Total a Pagar</h5>
+        <h3 class="mb-4">$ @Total.ToString("0.00")</h3>
+
+        <button class="btn btn-light w-100 mb-2">Pago en Efectivo</button>
+        <a href="/Ventas/Pago" class="btn btn-light w-100 mb-2">Pago con Tarjeta</a>
+        <button class="btn btn-light w-100 mb-2">Pago a Crédito</button>
     </div>
 
     <!-- Panel Derecho -->
     <div class="bg-light p-4 d-flex flex-column align-items-center justify-content-center flex-grow-1">
-        <h3>Pago a Credito</h3>
+        <h3>Cálculo de Cambio</h3>
 
-        <div class="form-group w-50">
-            <label for="identificacion">Identificación</label>
-            <input type="text" id="identificacion" class="form-control" @bind="Identificacion">
+        <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" @bind="Nombre" placeholder="Ingrese Nombre" class="form-control">
         </div>
 
-        <div class="form-group w-50">
-            <label for="telefono">Teléfono</label>
-            <input type="text" id="telefono" class="form-control" @bind="Telefono">
+        <div class="form-group">
+            <label for="ncf">NCF</label>
+            <input type="text" id="ncf" @bind="NCF" placeholder="Ingrese el NCF" class="form-control">
         </div>
 
-        <div class="form-group w-50">
-            <label for="fecha">Fecha</label>
-            <input type="text" id="fecha" class="form-control" @bind="Fecha">
+        <div class="form-group">
+            <label for="efectivo">Monto en Efectivo</label>
+            <input type="number" id="efectivo" @bind="Efectivo" placeholder="Ingrese el monto en efectivo" class="form-control" @oninput="CalcularCambio">
         </div>
 
-        <div class="form-group w-50">
-            <label for="plazo">Plazo de pago</label>
-            <input type="text" id="plazo" class="form-control" @bind="Plazo">
-        </div>
-
-        <div class="form-group w-50">
-            <label for="vencimiento">Vencimiento</label>
-            <input type="text" id="vencimiento" class="form-control" @bind="Vencimiento">
+        <div class="alert alert-info mt-3" role="alert">
+            Cambio a Devolver: $ @Cambio.ToString("0.00")
         </div>
     </div>
 </div>
 
 @code {
-    private string ContactoSeleccionado { get; set; } = "buscar";
-    private string Identificacion { get; set; } = "";
-    private string Telefono { get; set; } = "";
-    private string Fecha { get; set; } = "04/10/2021";
-    private string Plazo { get; set; } = "45 días";
-    private string Vencimiento { get; set; } = "18/11/2021";
+    private string Nombre { get; set; } = "";
+    private string NCF { get; set; } = "";
+    private double Total { get; set; } = 38.00;
+    private double Efectivo { get; set; } = 0.00;
+    private double Cambio => Efectivo - Total;
+
+    private void CalcularCambio(ChangeEventArgs e)
+    {
+        double.TryParse(e.Value?.ToString(), out double efectivo);
+        Efectivo = efectivo;
+    }
 }
