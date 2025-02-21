@@ -4,41 +4,39 @@
 
 <PageTitle>Pago a Credito</PageTitle>
 
-<div class="d-flex vh-75">
-    <!-- Panel Izquierdo -->
-    <div class="text-white p-4 d-flex flex-column justify-content-center" style="width: 30%; background-color: #004b55;">
-        <h5 class="fw-bold">Total a Pagar</h5>
-        <h3 class="mb-4">$ @Total.ToString("0.00")</h3>
-
-        <button class="btn btn-light w-100 mb-2">Pago en Efectivo</button>
-        <a href="/Ventas/Pago" class="btn btn-light w-100 mb-2">Pago con Tarjeta</a>
-        <button class="btn btn-light w-100 mb-2">Pago a Crédito</button>
-    </div>
-
-    <!-- Panel Derecho -->
+<div class="container mt-4 d-flex justify-content-center">
     <div class="bg-light p-4 d-flex flex-column align-items-center justify-content-center flex-grow-1">
-        <h3>Cálculo de Cambio</h3>
+        <h3>Pago con Efectivo</h3>
 
-        <div class="form-group">
+        <div class="form-group w-40">
             <label for="nombre">Nombre</label>
             <input type="text" id="nombre" @bind="Nombre" placeholder="Ingrese Nombre" class="form-control">
         </div>
 
-        <div class="form-group">
+        <div class="form-group w-40">
             <label for="ncf">NCF</label>
             <input type="text" id="ncf" @bind="NCF" placeholder="Ingrese el NCF" class="form-control">
         </div>
 
-        <div class="form-group">
+        <div class="form-group w-40">
+            <label for="total">Total a Pagar</label>
+            <input type="text" id="total" value="@Total.ToString("0.00")" class="form-control" readonly>
+        </div>
+
+        <div class="form-group w-40 mb-4">
             <label for="efectivo">Monto en Efectivo</label>
             <input type="number" id="efectivo" @bind="Efectivo" placeholder="Ingrese el monto en efectivo" class="form-control" @oninput="CalcularCambio">
         </div>
 
-        <div class="alert alert-info mt-3" role="alert">
-            Cambio a Devolver: $ @Cambio.ToString("0.00")
+        <div class="p-4 text-white w-40 text-center" style="background-color: #004b55; border-radius: 6px;">
+            <h5 class="fw-bold">Cambio a Devolver</h5>
+            <h3>$ @Cambio.ToString("0.00")</h3>
         </div>
     </div>
 </div>
+
+
+
 
 @code {
     private string Nombre { get; set; } = "";
