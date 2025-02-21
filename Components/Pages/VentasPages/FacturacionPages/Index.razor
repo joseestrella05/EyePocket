@@ -309,36 +309,36 @@
 @if (mostrarModalPagoEfectivo)
 {
     <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
-        <div class="modal-dialog modal-xl">
-                <div class="modal-content">
-                    <div class="modal-header" style="background-color: #004b55; color: white;">
-                        <h5 class="modal-title">Pago por Efectivo</h5>
-                        <button type="button" class="btn-close" @onclick="CerrarModalPagoEfectivo"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="d-flex vh-75">
-                            <div class="bg-light p-4 d-flex flex-column align-items-center justify-content-center flex-grow-1">
-                                <h3>Pago a Crédito</h3>
-                                <div class="container">
-                                    <div class="row">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #004b55; color: white;">
+                    <h5 class="modal-title">Pago por Efectivo</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModalPagoEfectivo"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex vh-75">
+                        <div class="bg-light p-4 d-flex flex-column align-items-center justify-content-center flex-grow-1">
+                            <h3>Pago en Efectivo</h3>
+                            <div class="container">
+                                <div class="row">
                                     <div class="form-group w-40">
                                         <label for="nombre">Nombre</label>
-                                        <input type="text" id="nombre"  placeholder="Ingrese Nombre" class="form-control">
+                                        <input type="text" id="nombre" placeholder="Ingrese Nombre" class="form-control">
                                     </div>
 
                                     <div class="form-group w-40">
                                         <label for="ncf">NCF</label>
-                                        <input type="text" id="ncf"  placeholder="Ingrese el NCF" class="form-control">
+                                        <input type="text" id="ncf" placeholder="Ingrese el NCF" class="form-control">
                                     </div>
 
                                     <div class="form-group w-40">
                                         <label for="total">Total a Pagar</label>
-                                        <input type="text" id="total" value=$@ListaFacturas.Sum(f => f.Subtotal) class="form-control" readonly>
-                                    </div>
-
+                                        <input type="text" id="total" value="@Total.ToString("0.00")" class="form-control" disabled readonly>
+                                    </div>  
+                                     
                                     <div class="form-group w-40 mb-4">
                                         <label for="efectivo">Monto en Efectivo</label>
-                                        <input type="number" id="efectivo" @bind="Efectivo" placeholder="Ingrese el monto en efectivo" class="form-control" @oninput="CalcularCambio">
+                                        <input type="number" id="efectivo" @bind-value="Efectivo" @bind-value:event="oninput" placeholder="Ingrese el monto en efectivo" class="form-control">
                                     </div>
 
                                     <div class="p-4 text-white w-40 text-center" style="background-color: #004b55; border-radius: 6px;">
@@ -346,19 +346,20 @@
                                         <h3>$ @Cambio.ToString("0.00")</h3>
                                     </div>
 
-                                        <div class="col-12 d-flex justify-content-between">
-                                            <button class="btn btn-success" @onclick="MostrarModalPagoEfectivo">Confirmar Pago</button>
-                                            <button class="btn btn-danger" @onclick="CerrarModalPagoEfectivo">Cancelar</button>
-                                        </div>
+                                    <div class="col-12 d-flex justify-content-between">
+                                        <button class="btn btn-success" @onclick="MostrarModalPagoEfectivo">Confirmar Pago</button>
+                                        <button class="btn btn-danger" @onclick="CerrarModalPagoEfectivo">Cancelar</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
         </div>
     </div>
 }
+
 
 
 @code {
@@ -367,8 +368,10 @@
     private string valorFiltro = "";
     private int cantidad;
     private double Efectivo { get; set; } = 0.00;
-    private double Cambio => Efectivo - Total;
-    private double Total { get; set; } = 0.00;
+    private double Total => ListaFacturas.Sum(f => f.Subtotal);
+    private double Cambio => Efectivo > 0 ? Math.Max(Efectivo - Total, 0) : 0.00;
+
+
 
     private bool mostrarModalConfirmacion = false;
     private bool mostrarModalCobro = false;
@@ -379,7 +382,8 @@
 
     private void MostrarModalCobro() => mostrarModalCobro = true;
     private void CerrarModalCobro() => mostrarModalCobro = false;   
-    
+  
+
     private void MostrarModalPagoaCredito()
     {
         mostrarModalCobro = false;
