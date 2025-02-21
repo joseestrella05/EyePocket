@@ -17,4 +17,39 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<Provedores> Provedores { get; set; }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Estados>().HasData(
+            new List<Estados>()
+            {
+                new()
+                {
+                    EstadoId = 1,
+                    Nombre = "Pendientes"
+                },
+                new()
+                {
+                    EstadoId = 2,
+                    Nombre = "Aprobrado"
+                },
+                new()
+                {
+                    EstadoId = 3,
+                    Nombre = "Aceptada"
+                }, 
+                new()
+                {
+                    EstadoId = 4,
+                    Nombre = "Cancelada"
+                },
+                new()
+                {
+                    EstadoId = 5,
+                    Nombre = "Rechazada"
+                }
+            }
+        );
+        base.OnModelCreating(modelBuilder);
+    }
+
 }
