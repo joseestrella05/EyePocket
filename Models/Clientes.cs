@@ -36,9 +36,7 @@ public class Clientes
     [Required(ErrorMessage = "El Email es obligatorio")]
     public string? Email { get; set; }
 
-    public int EstadoId { get; set; }
+    public bool Activo { get; set; }
 
-    [ForeignKey("EstadoId")]
-    public virtual Estados Estados { get; set; } = null!;
 
 }
