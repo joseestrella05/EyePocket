@@ -41,10 +41,12 @@ builder.Services.AddBlazorBootstrap();
 
 //inject services
 builder.Services.AddScoped<ClienteServices>();
-
 builder.Services.AddScoped<ProductosService>();
-
 builder.Services.AddScoped<TicketServices>();
+builder.Services.AddScoped<DeudaService>();
+builder.Services.AddScoped<OrdenVentaService>();
+
+
 
 
 //notificacion
