@@ -17,4 +17,15 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<OrdenVenta> OrdenVenta { get; set; }
     public DbSet<Tickets> Tickets { get; set; }
 
+    public DbSet<MetodosPago> MetodosPago { get; set; }
+
+
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
+	{
+		modelBuilder.Entity<MetodosPago>().HasData(
+			new MetodosPago { MetodoPagoId = 1, Descripcion = "Tarjeta" },
+			new MetodosPago { MetodoPagoId = 2, Descripcion = "Efectivo" },
+			new MetodosPago { MetodoPagoId = 3, Descripcion = "Cheque" }
+		);
+	}
 }
