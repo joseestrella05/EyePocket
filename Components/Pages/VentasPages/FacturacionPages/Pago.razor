@@ -2,155 +2,57 @@
 @using Microsoft.AspNetCore.Components
 @inject NavigationManager Navigation
 
-<PageTitle>Pago con Tarjeta</PageTitle>
+<PageTitle>Pago a Credito</PageTitle>
 
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-    }
+<div class="d-flex vh-75">
+    <!-- Panel Izquierdo -->
+    <div class="text-white p-4 d-flex flex-column justify-content-center" style="width: 30%; background-color: #004b55;">
+        <h5 class="fw-bold">Contacto</h5>
+        <select class="form-control" @bind="ContactoSeleccionado">
+            <option value="buscar">Buscar...</option>
+            <option value="contacto1">Contacto 1</option>
+            <option value="contacto2">Contacto 2</option>
+            <option value="contacto3">Contacto 3</option>
+        </select>
+        <button class="btn btn-light w-100 mt-2">Nuevo Contacto</button>
+    </div>
 
-    .payment-container {
-        background-color: #fff;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        width: 450px;
-    }
+    <!-- Panel Derecho -->
+    <div class="bg-light p-4 d-flex flex-column align-items-center justify-content-center flex-grow-1">
+        <h3>Pago a Credito</h3>
 
-        .payment-container h2 {
-            margin-bottom: 25px;
-            font-size: 28px;
-            color: #333;
-            text-align: center;
-        }
-
-        .payment-container label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: #555;
-        }
-
-        .payment-container input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 25px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-
-        .payment-container .row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 25px;
-        }
-
-            .payment-container .row .input-group {
-                width: 48%;
-            }
-
-        .payment-container button {
-            width: 100%;
-            padding: 14px;
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-            .payment-container button:hover {
-                background-color: #218838;
-            }
-
-        .payment-container .secure {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #777;
-        }
-</style>
-
-<div class="payment-container">
-    <h2>Pago por Tarjeta</h2>
-    <form>
-        <label for="email">Email</label>
-            <input type="email" id="email" name="email" required> 
-
-        <label for="card-number">Número de Tarjeta</label>
-        <input type="text" id="card-number" name="card-number" placeholder="1234 1234 1234 1234" required>
-
-        <div class="row">
-            <div class="input-group">
-                <label for="expiration">Fecha de Expiración</label>
-                <input type="text" id="expiration" name="expiration" placeholder="MM/YYYY" required>
-            </div>
-            <div class="input-group">
-                <label for="cvc">CVC</label>
-                <input type="text" id="cvc" name="cvc" placeholder="CVC" required>
-            </div>
+        <div class="form-group w-50">
+            <label for="identificacion">Identificación</label>
+            <input type="text" id="identificacion" class="form-control" @bind="Identificacion">
         </div>
 
-        <div class="row">
-            <div class="input-group">
-                <label for="country">País</label>
-                <select id="country" name="country" required style="width: 200%; padding: 15px; margin-bottom: 25px; border: 1px solid #ccc; border-radius: 6px; font-size: 13.3px;">
-                    <option value="">Selecciona un país</option>
-                    <option value="AR">Argentina</option>
-                    <option value="BR">Brasil</option>
-                    <option value="CL">Chile</option>
-                    <option value="CO">Colombia</option>
-                    <option value="MX">México</option>
-                    <option value="US">Estados Unidos</option>
-                    <option value="RD">Republica Dominicana</option>
-                    <option value="CA">Canadá</option>
-                    <option value="GB">Reino Unido</option>
-                    <option value="FR">Francia</option>
-                    <option value="DE">Alemania</option>
-                    <option value="IT">Italia</option>
-                    <option value="ES">España</option>
-                    <option value="PT">Portugal</option>
-                    <option value="AU">Australia</option>
-                    <option value="IN">India</option>
-                    <option value="JP">Japón</option>
-                    <option value="CN">China</option>
-                    <option value="RU">Rusia</option>
-                    <option value="ZA">Sudáfrica</option>
-                    <option value="EG">Egipto</option>
-                    <option value="NG">Nigeria</option>
-                    <option value="KR">Corea del Sur</option>
-                    <option value="ID">Indonesia</option>
-                    <option value="SA">Arabia Saudita</option>
-                    <option value="SE">Suecia</option>
-                    <option value="FI">Finlandia</option>
-                    <option value="NO">Noruega</option>
-                    <option value="DK">Dinamarca</option>
-                </select>
-            </div>
-
-            <div class="input-group">
-                <label for="zip">Código Postal</label>
-                <input type="text" id="zip" placeholder="12345" required>
-            </div>
+        <div class="form-group w-50">
+            <label for="telefono">Teléfono</label>
+            <input type="text" id="telefono" class="form-control" @bind="Telefono">
         </div>
 
-        <button type="button" class="btn btn-success w-100" @onclick="ProcesarPago">Pagar $</button>
-    </form>
-    <div class="secure"><i class="bi bi-lock"></i> Pago seguro</div>
+        <div class="form-group w-50">
+            <label for="fecha">Fecha</label>
+            <input type="text" id="fecha" class="form-control" @bind="Fecha">
+        </div>
+
+        <div class="form-group w-50">
+            <label for="plazo">Plazo de pago</label>
+            <input type="text" id="plazo" class="form-control" @bind="Plazo">
+        </div>
+
+        <div class="form-group w-50">
+            <label for="vencimiento">Vencimiento</label>
+            <input type="text" id="vencimiento" class="form-control" @bind="Vencimiento">
+        </div>
+    </div>
 </div>
 
 @code {
-    private void ProcesarPago()
-    {
-        Navigation.NavigateTo("/Ventas/Confirmacion");
-    }
+    private string ContactoSeleccionado { get; set; } = "buscar";
+    private string Identificacion { get; set; } = "";
+    private string Telefono { get; set; } = "";
+    private string Fecha { get; set; } = "04/10/2021";
+    private string Plazo { get; set; } = "45 días";
+    private string Vencimiento { get; set; } = "18/11/2021";
 }
