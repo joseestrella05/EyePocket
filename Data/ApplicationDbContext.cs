@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using EyePocket.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace EyePocket.Data;
 
@@ -18,10 +19,16 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Tickets> Tickets { get; set; }
 
     public DbSet<MetodosPago> MetodosPago { get; set; }
+    public DbSet<PagosCXC> PagosCXC { get; set; }
 
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
+		base.OnModelCreating(modelBuilder); // Asegura que Identity esté bien configurado
+
+		modelBuilder.Entity<IdentityUserLogin<string>>()
+			.HasKey(login => new { login.LoginProvider, login.ProviderKey });
+
 		modelBuilder.Entity<MetodosPago>().HasData(
 			new MetodosPago { MetodoPagoId = 1, Descripcion = "Tarjeta" },
 			new MetodosPago { MetodoPagoId = 2, Descripcion = "Efectivo" },
