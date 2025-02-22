@@ -4,6 +4,7 @@ using EyePocket.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EyePocket.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250221185633_Hola2")]
+    partial class Hola2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -267,9 +270,6 @@ namespace EyePocket.Migrations
                     b.Property<string>("Descripcion")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("DeudasId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("FechaPago")
                         .HasColumnType("datetime2");
 
@@ -280,8 +280,6 @@ namespace EyePocket.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DeudasId");
 
                     b.ToTable("PagosCXC");
                 });
@@ -532,17 +530,6 @@ namespace EyePocket.Migrations
                         .IsRequired();
 
                     b.Navigation("Clientes");
-                });
-
-            modelBuilder.Entity("EyePocket.Models.PagosCXC", b =>
-                {
-                    b.HasOne("EyePocket.Models.Deudas", "Deuda")
-                        .WithMany()
-                        .HasForeignKey("DeudasId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Deuda");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

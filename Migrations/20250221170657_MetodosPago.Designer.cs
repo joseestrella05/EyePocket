@@ -4,6 +4,7 @@ using EyePocket.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EyePocket.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250221170657_MetodosPago")]
+    partial class MetodosPago
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -251,39 +254,6 @@ namespace EyePocket.Migrations
                     b.HasIndex("ClienteId");
 
                     b.ToTable("OrdenVenta");
-                });
-
-            modelBuilder.Entity("EyePocket.Models.PagosCXC", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CXCId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Descripcion")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DeudasId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("FechaPago")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("MetodoPagoId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("MontoPagado")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DeudasId");
-
-                    b.ToTable("PagosCXC");
                 });
 
             modelBuilder.Entity("EyePocket.Models.Productos", b =>
@@ -532,17 +502,6 @@ namespace EyePocket.Migrations
                         .IsRequired();
 
                     b.Navigation("Clientes");
-                });
-
-            modelBuilder.Entity("EyePocket.Models.PagosCXC", b =>
-                {
-                    b.HasOne("EyePocket.Models.Deudas", "Deuda")
-                        .WithMany()
-                        .HasForeignKey("DeudasId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Deuda");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
