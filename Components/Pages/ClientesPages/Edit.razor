@@ -1,4 +1,4 @@
-﻿@page "/Cliente/Edit/{ClienteId:int}"
+﻿@page "/Clientes/Edit/{ClienteId:int}"
 @inject ClienteServices clienteService
 @inject NavigationManager navigation
 
@@ -34,10 +34,6 @@
                     <InputText class="form-control" @bind-Value="clientes.Direccion" placeholder="Ej. Av. Duarte #10"></InputText>
                 </div>
 
-                <!-- 
-                    Se inhabilito la posibilidad de poder modificar la fecha de ingreso
-                    por motivos de seguridad
-                -->
                 <div class="col">
                     <label>Fecha Registro *</label>
                     <InputDate class="form-control" @bind-Value="clientes.FechaIngreso" readonly disabled></InputDate>
@@ -68,7 +64,7 @@
     </div>
     <div class="text-center">
         <button  @onclick="Guardar" class="btn btn-success">Guardar</button>
-        <a href="/Deudas/Index" class="btn btn-secondary">Volver</a>
+        <a href="/Clientes/Index" class="btn btn-secondary">Volver</a>
     </div>
 </div>
 
