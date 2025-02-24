@@ -58,7 +58,9 @@ public class PagosCXCService(IDbContextFactory<ApplicationDbContext> DbFactory)
 	{
 		await using var contexto = await DbFactory.CreateDbContextAsync();
 		return await contexto.PagosCXC
-			.Include(c => c.Deuda)
+			.Include(d => d.Deuda)
+				.ThenInclude(o => o.OrdenVenta)
+					.ThenInclude(c => c.Clientes)
 			.Where(criterio)
 			.ToListAsync();
 	}
