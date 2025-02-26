@@ -5,12 +5,12 @@
 @inject DeudaService DeudaServices
 @inject NavigationManager navigation
 
-<PageTitle>Crear Deuda</PageTitle>
+<PageTitle>Crear Cuenta x Cobrar</PageTitle>
 <div class="text-left">
 	<h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-person-plus m-1"></i>Nueva deuda</h2>
 </div>
 
-<EditForm Model="Deuda" OnValidSubmit="Crear">
+<EditForm Model="CuentaXCobrar" OnValidSubmit="Crear">
 	<div class="container">
 		<div class="card">
 			<div class="card-body">
@@ -24,14 +24,14 @@
 							<option selected disabled value="0">-- Seleccione un cliente --</option>
 							@foreach (var clientes in ListClientes)
 							{
-								<option value="@clientes.ClienteId">@clientes.Nombre)</option>
+								<option value="@clientes.ClienteId">(@clientes.Nombre)</option>
 							}
 						</InputSelect>
 					</div>
 
 					<div class="col">
 						<label class="form-label">Orden de Venta:</label>
-						<InputSelect class="form-select" @bind-Value="Deuda.OrdenVentaId" @onchange="SeleccionarFactura">
+						<InputSelect class="form-select" @bind-Value="CuentaXCobrar.OrdenVentaId" @onchange="SeleccionarFactura">
 							<option selected disabled value="0">-- Seleccione una orden --</option>
 							@foreach (var OrdenVenta in ListOrdenVenta)
 							{
@@ -39,25 +39,19 @@
 							}
 						</InputSelect>
 					</div>
-					<div cla
-						<div class="col">
-							<label>Saldo pendiente *</label>
-							<InputNumber class="form-control" @bind-Value="Deuda.SaldoPendiente" placeholder="000-0000000-0"></InputNumber>
-						</div>
-					</div>
 
 					<div class="row">
 						<div class="col">
 							<label>Porcentaje de interes *</label>
-							<InputNumber class="form-control" @bind-Value="Deuda.Interes" placeholder="Ej. Av. Duarte #10"></InputNumber>
+							<InputNumber class="form-control" @bind-Value="CuentaXCobrar.Interes" placeholder="Ej. Av. Duarte #10"></InputNumber>
 						</div>
 						<div class="col">
 							<label>Capital*</label>
-							<InputNumber class="form-control" @bind-Value="Deuda.Capital" placeholder="Ej. Av. Duarte #10"></InputNumber>
+							<InputNumber class="form-control" @bind-Value="CuentaXCobrar.Capital" placeholder="Ej. Av. Duarte #10"></InputNumber>
 						</div>
 						<div class="col">
 							<label>Plazos*</label>
-							<InputNumber class="form-control" @bind-Value="Deuda.Periodos" placeholder="Ej. Av. Duarte #10"></InputNumber>
+							<InputNumber class="form-control" @bind-Value="CuentaXCobrar.Periodos" placeholder="Ej. Av. Duarte #10"></InputNumber>
 						</div>
 					</div>
 				</div>
@@ -73,54 +67,54 @@
 
 <style>
 	body {
-		background-color: #f5f5f5;
+	background-color: #f5f5f5;
 	}
 
 	.container {
-		max-width: 800px;
-		margin: auto;
-		padding: 10px;
+	max-width: 800px;
+	margin: auto;
+	padding: 10px;
 	}
 
 	.card {
-		background: white;
-		padding: 20px;
-		border-radius: 10px;
+	background: white;
+	padding: 20px;
+	border-radius: 10px;
 	}
 
 	.section-title {
-		background: #0d5c63;
-		color: white;
-		text-align: center;
-		font-weight: bold;
-		padding: 8px;
-		margin: 10px;
-		border-radius: 5px;
+	background: #0d5c63;
+	color: white;
+	text-align: center;
+	font-weight: bold;
+	padding: 8px;
+	margin: 10px;
+	border-radius: 5px;
 	}
 
 	.btn-success {
-		background-color: #0d5c63;
-		border: none;
-		margin: 10px;
-		padding: 10px 20px;
+	background-color: #0d5c63;
+	border: none;
+	margin: 10px;
+	padding: 10px 20px;
 	}
 
 	.btn-secondary {
-		background-color: #444;
-		color: white;
-		text-decoration: none;
-		margin: 10px;
-		padding: 10px 20px;
+	background-color: #444;
+	color: white;
+	text-decoration: none;
+	margin: 10px;
+	padding: 10px 20px;
 	}
 
-		.btn-secondary:hover {
-			background-color: #222;
-		}
+	.btn-secondary:hover {
+	background-color: #222;
+	}
 </style>
 
 @code {
 	public int ClienteId { get; set; }
-	public Deudas Deuda { get; set; } = new();
+	public CuentasXCobrar CuentaXCobrar { get; set; } = new();
 	public List<OrdenVenta> ListOrdenVenta { get; set; } = [];
 	public List<Clientes> ListClientes { get; set; } = [];
 
@@ -134,12 +128,12 @@
 
 	public async Task Crear()
 	{
-		Deuda.EstadoId = 1;
+		CuentaXCobrar.EstadoId = 1;
 
-		await DeudaServices.Guardar(Deuda);
+		await DeudaServices.Guardar(CuentaXCobrar);
 
 		ToastService.Notify(new(ToastType.Success, "Exito", $"Deuda creada correctamente."));
-		Deuda = new();
+		CuentaXCobrar = new();
 		navigation.NavigateTo("/Deudas/Index");
 
 
@@ -150,6 +144,8 @@
 		{
 			ClienteId = clienteIdSeleccionado;
 			ListOrdenVenta = await OrdenVentaServices.Listar(o => o.ClienteId == ClienteId);
+			CuentaXCobrar.OrdenVentaId = 0;
+			StateHasChanged();
 		}
 	}
 	private void SeleccionarFactura(ChangeEventArgs e)
@@ -159,13 +155,12 @@
 			var factura = ListOrdenVenta.FirstOrDefault(f => f.OrdenVentaId == facturaSeleccionada);
 
 
-			Deuda.SaldoPendiente = factura.MontoTotal;
+			CuentaXCobrar.Capital = factura.MontoTotal;
 
 			if (ClienteId == 0 && factura.Clientes != null)
 			{
 				ClienteId = factura.Clientes.ClienteId;
 			}
-
 		}
 	}
 

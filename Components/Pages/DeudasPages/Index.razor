@@ -86,27 +86,23 @@
 					</tr>
 				</thead>
 				<tbody>
-					@foreach (var deudas in ListaDeudas)
+					@foreach (var cxc in ListaDeudas)
 					{
 						<tr class="text-center text-white">
-							@*Id*@
-							<td>@deudas.DeudasId</td>
-							@*Nombre*@
-							<td>@deudas.OrdenVenta?.NumeroFactura</td>
-							<td>@deudas.OrdenVenta?.Clientes?.Nombre</td>				
-							@*Concepto*@
-							<td>@deudas.OrdenVenta?.MontoTotal.ToString("N2")</td>
-							<td>@deudas.SaldoPendiente.ToString("N2")</td>
-
-							<td>@($"({deudas.OrdenVenta?.Clientes?.Telefono?[..3]}) {deudas.OrdenVenta?.Clientes?.Telefono?[3..6]}-{deudas.OrdenVenta?.Clientes?.Telefono?[6..]}")</td>
+							<td>@cxc.CXCId</td>
+							<td>@cxc.OrdenVenta?.NumeroFactura</td>
+							<td>@cxc.OrdenVenta?.Clientes?.Nombre</td>
+							<td>@cxc.OrdenVenta?.MontoTotal.ToString("N2")</td>
+							<td>@cxc.Capital.ToString("N2")</td>
+							<td>@($"({cxc.OrdenVenta?.Clientes?.Telefono?[..3]}) {cxc.OrdenVenta?.Clientes?.Telefono?[3..6]}-{cxc.OrdenVenta?.Clientes?.Telefono?[6..]}")</td>
 
 							@*Botones*@
 							<td class="text-center">
-								<a href="/Deudas/Details/@deudas.DeudasId" class="btn btn-outline-dark bi-eye"></a>
+								<a href="/Deudas/Details/@cxc.CXCId" class="btn btn-outline-dark bi-eye"></a>
 
-								<a href="/Deudas/Edit/@deudas.DeudasId" class="btn btn-outline-info bi bi-pencil-square"></a>
+								<a href="/Deudas/Edit/@cxc.CXCId" class="btn btn-outline-info bi bi-pencil-square"></a>
 
-								<button type="button" @onclick="() => MostrarModal(deudas.DeudasId, deudas.OrdenVenta?.Clientes?.Nombre)" class="btn btn-outline-danger bi bi-trash"></button>
+								<button type="button" @onclick="() => MostrarModal(cxc.CXCId, cxc.OrdenVenta?.Clientes?.Nombre)" class="btn btn-outline-danger bi bi-trash"></button>
 							</td>
 						</tr>
 					}
@@ -151,11 +147,14 @@
 	}
 </style>
 @code {
+
+	public double SaldoPendiente { get; set; } = 0;
 	public string searchBarValue { get; set; } = string.Empty;
 	public string valorFiltro { get; set; } = string.Empty;
 	public DateTime? Desde { get; set; } = null;
 	public DateTime? Hasta { get; set; } = null;
-	public List<Deudas> ListaDeudas { get; set; } = new List<Deudas>();
+	public List<CuentasXCobrar> ListaDeudas { get; set; } = new List<CuentasXCobrar>();
+	public List<CuotasCXC> ListaCuotas { get; set; } = new List<CuotasCXC>();
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -253,7 +252,7 @@
 					return;
 				}
 				if (int.TryParse(searchBarValue, out int id))
-					ListaDeudas = await DeudaService.Listar(lt => lt.DeudasId == id);
+					ListaDeudas = await DeudaService.Listar(lt => lt.CXCId == id);
 				break;
 
 			default:

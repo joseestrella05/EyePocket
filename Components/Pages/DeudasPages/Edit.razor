@@ -10,7 +10,7 @@
     <h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-person-plus m-1"></i>Editar deuda</h2>
 </div>
 
-<EditForm Model="Deuda" OnValidSubmit="Crear">
+<EditForm Model="CuentaXCobrar" OnValidSubmit="Crear">
     <div class="container">
         <div class="card">
             <div class="card-body">
@@ -19,19 +19,19 @@
 
                 <div class="row">
                     <div class="col">
-                        <label class="form-label">Factura:</label>
+                        <label class="form-label">Cliente:</label>
                         <InputSelect class="form-select" @bind-Value="ClienteId" @onchange="FiltrarFacturas">
                             <option selected disabled value="0">-- Seleccione un cliente --</option>
-                            @foreach (var clientes in ListClientes)
+                            @foreach (var cliente in ListaClientes)
                             {
-                                <option value="@clientes.ClienteId">@clientes.Nombre)</option>
+                                <option value="@cliente.ClienteId">@cliente.Nombre</option>
                             }
                         </InputSelect>
                     </div>
 
                     <div class="col">
                         <label class="form-label">Factura:</label>
-                        <InputSelect class="form-select" @bind-Value="Deuda.OrdenVentaId" @onchange="SeleccionarFactura">
+                        <InputSelect class="form-select" @bind-Value="CuentaXCobrar.OrdenVentaId" @onchange="SeleccionarFactura">
                             <option selected disabled value="0">-- Seleccione una deuda --</option>
                             @foreach (var OrdenVenta in ListOrdenVenta)
                             {
@@ -39,25 +39,19 @@
                             }
                         </InputSelect>
                     </div>
-                    <div cla
-                        <div class="col">
-                            <label>Monto *</label>
-                            <InputNumber class="form-control" @bind-Value="Deuda.SaldoPendiente" placeholder="000-0000000-0"></InputNumber>
-                        </div>
-                    </div>
 
                     <div class="row">
                         <div class="col">
                             <label>Porcentaje de interes *</label>
-                            <InputNumber class="form-control" @bind-Value="Deuda.Interes" placeholder="Ej. Av. Duarte #10"></InputNumber>
+                            <InputNumber class="form-control" @bind-Value="CuentaXCobrar.Interes" placeholder="Ej. Av. Duarte #10"></InputNumber>
                         </div>
                         <div class="col">
                             <label>Capital*</label>
-                            <InputNumber class="form-control" @bind-Value="Deuda.Capital" placeholder="Ej. Av. Duarte #10"></InputNumber>
+                            <InputNumber class="form-control" @bind-Value="CuentaXCobrar.Capital" placeholder="Ej. Av. Duarte #10"></InputNumber>
                         </div>
                         <div class="col">
                             <label>Plazos*</label>
-                            <InputNumber class="form-control" @bind-Value="Deuda.Periodos" placeholder="Ej. Av. Duarte #10"></InputNumber>
+                            <InputNumber class="form-control" @bind-Value="CuentaXCobrar.Periodos" placeholder="Ej. Av. Duarte #10"></InputNumber>
                         </div>
                     </div>
                 </div>
@@ -122,27 +116,27 @@
     [Parameter]
     public int DeudaId { get; set; }
     public int ClienteId { get; set; }
-    public Deudas Deuda { get; set; } = new();
+    public CuentasXCobrar CuentaXCobrar { get; set; } = new();
     public List<OrdenVenta> ListOrdenVenta { get; set; } = [];
-    public List<Clientes> ListClientes { get; set; } = [];
+    public List<Clientes> ListaClientes { get; set; } = [];
 
     [Inject] protected ToastService ToastService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Deuda = await DeudaServices.Buscar(DeudaId);
-        ListClientes = await ClientesService.Listar(o => true);
+        CuentaXCobrar = await DeudaServices.Buscar(DeudaId);
+        ListaClientes = await ClientesService.Listar(o => true);
         ListOrdenVenta = await OrdenVentaServices.Listar(o => true);
     }
 
     public async Task Crear()
     {
-        Deuda.EstadoId = 1;
+        CuentaXCobrar.EstadoId = 1;
 
-        await DeudaServices.Guardar(Deuda);
+        await DeudaServices.Guardar(CuentaXCobrar);
 
         ToastService.Notify(new(ToastType.Success, "Exito", $"Deuda modificada correctamente."));
-        Deuda = new();
+        CuentaXCobrar = new();
         navigation.NavigateTo("/Deudas/Index");
 
 
@@ -153,6 +147,7 @@
         {
             ClienteId = clienteIdSeleccionado;
             ListOrdenVenta = await OrdenVentaServices.Listar(o => o.ClienteId == ClienteId);
+            StateHasChanged();
         }
     }
     private void SeleccionarFactura(ChangeEventArgs e)
@@ -162,13 +157,12 @@
             var factura = ListOrdenVenta.FirstOrDefault(f => f.OrdenVentaId == facturaSeleccionada);
 
 
-            Deuda.SaldoPendiente = factura.MontoTotal;
+            CuentaXCobrar.Capital = factura.MontoTotal;
 
             if (ClienteId == 0 && factura.Clientes != null)
             {
                 ClienteId = factura.Clientes.ClienteId;
             }
-
         }
     }
 
