@@ -3,21 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EyePocket.Models
 {
-    public class Deudas
+    public class CuentasXCobrar
     {
         [Key]
-        public int DeudasId { get; set; }
-  
-        public double SaldoPendiente { get; set; }
-
-        public int Periodos { get; set; }
-
-        public float Capital { get; set; }
-
-        public float Interes { get; set; }
+        public int CXCId { get; set; }
 
         public int OrdenVentaId { get; set; }
-
         [ForeignKey("OrdenVentaId")]
         public OrdenVenta? OrdenVenta { get; set; }
 
@@ -25,5 +16,12 @@ namespace EyePocket.Models
         [ForeignKey("EstadoId")]
         public Estados? Estados { get; set; }
 
-    }
+        public int Periodos { get; set; }
+
+        public double Capital { get; set; }
+
+        public double Interes { get; set; }
+
+        public List<CuotasCXC> ListaCuotasCXC { get; set; } = new();
+	}
 }
