@@ -1,108 +1,133 @@
 ﻿@page "/Pagos/Create"
 @inject PagosCXCService pagosCXCService
+@inject DeudaService cxcService
 @inject NavigationManager navigation
 
 <PageTitle>Crear pagos</PageTitle>
 <div class="text-left">
-    <h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-person-plus m-1"></i>Nuevo/a Cliente</h2>
+	<h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-person-plus m-1"></i>Nuevo Pago</h2>
 </div>
 
 <EditForm Model="pagos" OnValidSubmit="Crear">
-    <div class="container">
-        <div class="card">
-            <div class="card-body">
-                <div class="section-title">Datos del pago</div>
+	<div class="container">
+		<div class="card">
+			<div class="card-body">
+				<div class="section-title">Datos del pago</div>
 
-                <div class="row">
+				<div class="row">
+					<div class="col">
+						<label>Cuenta X Cobrar *</label>
+						<InputSelect class="form-control" aria-label="Floating label select example" @bind-Value="pagos.CXCId">
+							<option value="0" selected disabled>-- Selecciona una CXC --</option>
+							@foreach (var cxc in ListaCXC)
+							{
+								<option value="@cxc.CXCId">
+									ID: @cxc.CXCId -- Deudor: @cxc.OrdenVenta?.Clientes?.Nombre --  @($"Balance: {(cxc.Capital + (cxc.Capital * cxc.Interes / 100)):N2}")
+								</option>
+							}
+						</InputSelect>
+					</div>
 
-                    <div class="col">
-                        <label>Descripción</label>
-                        <InputText class="form-control" @bind-Value="pagos.Descripcion" placeholder="Descripción"></InputText>
-                    </div>
+					<div class="col">
+						<label>Monto a pagar *</label>
+						<InputNumber class="form-control" @bind-Value="pagos.MontoPagado"></InputNumber>
+					</div>
+				</div>
 
-                    <div class="col">
-                        <label>Monto a pagar *</label>
-                        <InputNumber class="form-control" @bind-Value="pagos.MontoPagado"></InputNumber>
-                    </div>
+				<div class="row">
 
-                    <div class="col">
-                        <label>Fecha de pago *</label>
-                        <InputDate class="form-control" readonly disabled @bind-Value="pagos.FechaPago"></InputDate>
-                    </div>
+					<div class="col">
+						<label>Descripción</label>
+						<InputText class="form-control" @bind-Value="pagos.Descripcion" placeholder="Descripción"></InputText>
+					</div>
 
-                </div>
-                
-            </div>
+					<div class="col">
+						<label>Fecha de pago *</label>
+						<InputDate class="form-control" readonly disabled @bind-Value="pagos.FechaPago"></InputDate>
+					</div>
 
-        </div>
-        <div class="text-center">
-            <button type="submit" class="btn btn-success">Guardar</button>
-            <a href="/Cliente/Index" class="btn btn-secondary">Volver</a>
-        </div>
-    </div>
+				</div>
+
+			</div>
+
+		</div>
+		<div class="text-center">
+			<button type="submit" class="btn btn-success">Guardar</button>
+			<a href="/Pagos/Index" class="btn btn-secondary">Volver</a>
+		</div>
+	</div>
 </EditForm>
 
 <style>
-    body {
-        background-color: #f5f5f5;
-    }
+	body {
+		background-color: #f5f5f5;
+	}
 
-    .container {
-        max-width: 800px;
-        margin: auto;
-        padding: 10px;
-    }
+	.container {
+		max-width: 800px;
+		margin: auto;
+		padding: 10px;
+	}
 
-    .card {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-    }
+	.card {
+		background: white;
+		padding: 20px;
+		border-radius: 10px;
+	}
 
-    .section-title {
-        background: #0d5c63;
-        color: white;
-        text-align: center;
-        font-weight: bold;
-        padding: 8px;
-        margin: 10px;
-        border-radius: 5px;
-    }
+	.section-title {
+		background: #0d5c63;
+		color: white;
+		text-align: center;
+		font-weight: bold;
+		padding: 8px;
+		margin: 10px;
+		border-radius: 5px;
+	}
 
-    .btn-success {
-        background-color: #0d5c63;
-        border: none;
-        margin: 10px;
-        padding: 10px 20px;
-    }
+	.btn-success {
+		background-color: #0d5c63;
+		border: none;
+		margin: 10px;
+		padding: 10px 20px;
+	}
 
-    .btn-secondary {
-        background-color: #444;
-        color: white;
-        text-decoration: none;
-        margin: 10px;
-        padding: 10px 20px;
-    }
+	.btn-secondary {
+		background-color: #444;
+		color: white;
+		text-decoration: none;
+		margin: 10px;
+		padding: 10px 20px;
+	}
 
-        .btn-secondary:hover {
-            background-color: #222;
-        }
+		.btn-secondary:hover {
+			background-color: #222;
+		}
 </style>
 
 @code {
-    public PagosCXC pagos { get; set; } = new PagosCXC();
-    [Inject] protected ToastService ToastService { get; set; }
+	public PagosCXC pagos { get; set; } = new PagosCXC();
+	[Inject] protected ToastService ToastService { get; set; }
+	public List<CuentasXCobrar> ListaCXC { get; set; } = new();
 
-    public async Task Crear()
-    {
-            pagos = new PagosCXC();
-            if(pagos.MontoPagado <= 0)
-            {
-                ToastService.Notify(new(ToastType.Danger, "Error", $"El monto a pagar debe ser mayor a 0."));
-                return;
-            }
-            await pagosCXCService.Guardar(pagos);
-            ToastService.Notify(new(ToastType.Success, "Exito", $"Pago registrado correctamente."));
-            navigation.NavigateTo("/Pagos/Index");
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		ListaCXC = await cxcService.Listar(x => true);
+	}
+
+	public async Task Crear()
+	{
+		Console.WriteLine(pagos.MontoPagado);
+		foreach (var cxc in ListaCXC)
+		{
+			if (pagos.MontoPagado != cxc.Capital + cxc.Capital * cxc.Interes / 100 && pagos.CXCId == cxc.CXCId)
+			{
+				ToastService.Notify(new(ToastType.Danger, "Error", $"El monto a pagar debe ser igual al de la CXC."));
+				return;
+			}
+		}
+		await pagosCXCService.Guardar(pagos);
+		ToastService.Notify(new(ToastType.Success, "Exito", $"Pago registrado correctamente."));
+		navigation.NavigateTo("/Pagos/Index");
+	}
 }
