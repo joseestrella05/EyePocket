@@ -11,7 +11,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<Estados> Estados { get; set; }
 
-    public DbSet<Deudas> Deudas { get; set; }
+    public DbSet<CuentasXCobrar> CuentasXCobrar { get; set; }
 
     public DbSet<Productos> Productos { get; set; }
 
