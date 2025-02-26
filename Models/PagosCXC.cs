@@ -9,9 +9,10 @@ public class PagosCXC
 	public int Id { get; set; }
 
 
-	[ForeignKey("DeudaId")]
+	[ForeignKey(nameof(Deuda))]
 	public int CXCId { get; set; }
-	public Deudas Deuda { get; set; } = null!;
+
+	public CuentasXCobrar? Deuda { get; set; }
 
 
 	public string? Descripcion { get; set; }
@@ -22,8 +23,7 @@ public class PagosCXC
 
 	public int MetodoPagoId { get; set; }
 
+
 	[Required(ErrorMessage = "Este campo es obligatorio")]
-
-
 	public double MontoPagado { get; set; }
 }
