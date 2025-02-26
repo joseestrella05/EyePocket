@@ -1,6 +1,8 @@
 ﻿@page "/Pagos/Index"
 @inject ClienteServices clientesService
 @inject PagosCXCService pagosCXCService
+@inject OrdenVentaService ordenVentaService
+@inject DeudaService deudasService
 @inject ToastService toastService
 
 @rendermode InteractiveServer
@@ -30,7 +32,7 @@
 								<option value="idpago">ID Pago</option>
 								<option value="idcxc">ID CxC</option>
 								<option value="fechapago">Fecha de Pago</option>
-								@* <option value="cliente">Cliente</option> *@
+								<option value="cliente">Cliente</option>
 							</InputSelect>
 							<label for="floatingSelect"><strong>Filtrar en base a...</strong></label>
 						</div>
@@ -79,10 +81,11 @@
 					<tr class="text-center ">
 						<th>ID Pago</th>
 						<th>ID CxC</th>
-						@* <th>Cliente</th> *@
+						<th>Cliente</th>
 						<th>Descripción</th>
 						<th>Monto pagado</th>
 						<th>Fecha de Último Pago</th>
+						<th>Acciones</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -90,10 +93,15 @@
 					{
 						<tr class="text-center text-white">
 							<td>@pago.Id</td>
-							<td>@pago.Deuda.DeudasId</td>
+							<td>@pago.Deuda?.CXCId</td>
+							<td>@pago.Deuda?.OrdenVenta?.Clientes?.Nombre</td>
 							<td>@pago.Descripcion</td>
-							<td>@pago.MontoPagado</td>
+							<td>RD$@pago.MontoPagado.ToString("N2")</td>
 							<td>@pago.FechaPago.ToString("dd/M/yyyy")</td>
+							<td class="text-center">
+								<a href="/Pagos/View/@pago.Id" class="btn btn-outline-dark bi-eye"></a>
+								<a href="/Pagos/Edit/@pago.Id" class="btn btn-outline-dark bi-pencil"></a>
+							</td>
 						</tr>
 					}
 				</tbody>
@@ -143,10 +151,16 @@
 	public DateTime? Desde { get; set; } = null;
 	public DateTime? Hasta { get; set; } = null;
 	public List<PagosCXC> ListaPagos { get; set; } = new List<PagosCXC>();
+	public List<CuentasXCobrar> ListaCXC { get; set; } = new List<CuentasXCobrar>();
+	public List<Clientes> ListaClientes { get; set; } = new List<Clientes>();
+	public List<OrdenVenta> ListaOrdenVenta { get; set; } = new List<OrdenVenta>();
 
 	protected override async Task OnInitializedAsync()
 	{
 		ListaPagos = await pagosCXCService.Listar(C => true);
+		ListaClientes = await clientesService.Listar(C => true);
+		ListaCXC = await deudasService.Listar(C => true);
+		ListaOrdenVenta = await ordenVentaService.Listar(C => true);
 	}
 
 	// MODALS
@@ -222,7 +236,68 @@
 
 		switch (valorFiltro)
 		{
-			case "fechaingreso":
+			case "idpago":
+				if (string.IsNullOrEmpty(searchBarValue))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "Debe proveer un ID de pago para buscar";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				if (!searchBarValue.All(char.IsDigit))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "El criterio de búsqueda solo puede alojar numeros.";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				if (int.TryParse(searchBarValue, out int id))
+					ListaPagos = await pagosCXCService.Listar(lt => lt.Id == id);
+				break;
+
+			case "idcxc":
+				if (string.IsNullOrEmpty(searchBarValue))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "Debe proveer un ID de CXC para buscar";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				if (!searchBarValue.All(char.IsDigit))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "El criterio de búsqueda solo puede alojar numeros.";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				ListaPagos = await pagosCXCService.Listar(lt => lt.CXCId.ToString() == searchBarValue);
+				break;
+
+			case "cliente":
+				if (string.IsNullOrEmpty(searchBarValue))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "Debe proveer un nombre para buscar";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				if (searchBarValue.Any(char.IsDigit))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "El criterio de búsqueda solo puede alojar letras";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				ListaPagos = await pagosCXCService.Listar(c => c.Deuda.OrdenVenta.Clientes.Nombre == searchBarValue);
+				break;
+
+			case "fechapago":
 				if (Desde == null || Hasta == null)
 				{
 					TipoNotificacion = ToastType.Warning;
@@ -239,7 +314,7 @@
 					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 					return;
 				}
-				await clientesService.Listar(x => x.FechaIngreso >= Desde && x.FechaIngreso <= Hasta);
+				ListaPagos = await pagosCXCService.Listar(x => x.FechaPago >= Desde && x.FechaPago <= Hasta);
 				break;
 
 			default:
