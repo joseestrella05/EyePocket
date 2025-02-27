@@ -1,53 +1,169 @@
-﻿@page "/Ventas/Pago"
-@using Microsoft.AspNetCore.Components
-@inject NavigationManager Navigation
+﻿@page "/Ventas/Factura"
 
-<PageTitle>Pago a Credito</PageTitle>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
 
-<div class="container mt-4 d-flex justify-content-center">
-    <div class="bg-light p-4 d-flex flex-column align-items-center justify-content-center flex-grow-1">
-        <h3>Pago con Efectivo</h3>
+        .invoice {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
 
-        <div class="form-group w-40">
-            <label for="nombre">Nombre</label>
-            <input type="text" id="nombre" @bind="Nombre" placeholder="Ingrese Nombre" class="form-control">
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+            .invoice-header h1 {
+                margin: 0;
+                font-size: 24px;
+            }
+
+        .invoice-details {
+            margin-bottom: 20px;
+        }
+
+            .invoice-details p {
+                margin: 5px 0;
+            }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+            .invoice-table th, .invoice-table td {
+                border: 1px solid #ccc;
+                padding: 10px;
+                text-align: center;
+            }
+
+            .invoice-table th {
+                background-color: #f9f9f9;
+            }
+
+        .invoice-total {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+            .invoice-total p {
+                margin: 5px 0;
+            }
+
+        .invoice-contact-payment {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .invoice-contact, .invoice-payment {
+            width: 48%;
+        }
+
+            .invoice-contact p, .invoice-payment p {
+                margin: 5px 0;
+            }
+    </style>
+</head>
+<body>
+    <div class="invoice">
+        <div class="invoice-header">
+            <h1>FACTURA</h1>
         </div>
-
-        <div class="form-group w-40">
-            <label for="ncf">NCF</label>
-            <input type="text" id="ncf" @bind="NCF" placeholder="Ingrese el NCF" class="form-control">
+        <div class="invoice-details">
+            <p>Factura n°: 01234</p>
+            <p>Fecha: 14 de julio de 2023</p>
+            <p>Cliente: Ricardo Soto</p>
         </div>
-
-        <div class="form-group w-40">
-            <label for="total">Total a Pagar</label>
-            <input type="text" id="total" value="@Total.ToString("0.00")" class="form-control" readonly>
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Código</th>
+                    <th>Descripción</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Descuento</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>001</td>
+                    <td>Producto A</td>
+                    <td>1</td>
+                    <td>$100</td>
+                    <td>0%</td>
+                    <td>$100</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>002</td>
+                    <td>Producto B</td>
+                    <td>4</td>
+                    <td>$200</td>
+                    <td>10%</td>
+                    <td>$720</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>003</td>
+                    <td>Producto C</td>
+                    <td>3</td>
+                    <td>$300</td>
+                    <td>5%</td>
+                    <td>$855</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>004</td>
+                    <td>Producto D</td>
+                    <td>2</td>
+                    <td>$100</td>
+                    <td>0%</td>
+                    <td>$200</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="invoice-total">
+            <p>Subtotal: $1875</p>
+            <p>Impuestos: $100</p>
+            <p><strong>TOTAL: $1975</strong></p>
         </div>
-
-        <div class="form-group w-40 mb-4">
-            <label for="efectivo">Monto en Efectivo</label>
-            <input type="number" id="efectivo" @bind="Efectivo" placeholder="Ingrese el monto en efectivo" class="form-control" @oninput="CalcularCambio">
-        </div>
-
-        <div class="p-4 text-white w-40 text-center" style="background-color: #004b55; border-radius: 6px;">
-            <h5 class="fw-bold">Cambio a Devolver</h5>
-            <h3>$ @Cambio.ToString("0.00")</h3>
+        <div class="invoice-contact-payment">
+            <div class="invoice-contact">
+                <p><strong>Contacto:</strong></p>
+                <p>603 9126 - 3631</p>
+                <p>Santiago@santiago.com</p>
+                <p>www.santiago.com</p>
+                <p>Calle Calendario 125, Calendario Lugar</p>
+            </div>
+            <div class="invoice-payment">
+                <p><strong>Información de pago:</strong></p>
+                <p>Nombre del tercero</p>
+                <p>Nombre de cuentas</p>
+                <p>Alto de cuenta</p>
+                <p>Fecha de pago</p>
+                <p>6125 4547 5901</p>
+                <p>Fundación sobre</p>
+                <p>$ 16 de julio de 2023</p>
+            </div>
         </div>
     </div>
-</div>
-
-
-
-
-@code {
-    private string Nombre { get; set; } = "";
-    private string NCF { get; set; } = "";
-    private double Total { get; set; } = 38.00;
-    private double Efectivo { get; set; } = 0.00;
-    private double Cambio => Efectivo - Total;
-
-    private void CalcularCambio(ChangeEventArgs e)
-    {
-        double.TryParse(e.Value?.ToString(), out double efectivo);
-        Efectivo = efectivo;
-    }
-}
+</body>
+</html>

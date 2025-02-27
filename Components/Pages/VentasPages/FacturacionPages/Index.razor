@@ -151,9 +151,12 @@
                                 <i class="bi bi-cash"></i> Cobrar
                             </button>
 
-                            <button class="btn btn-success w-50 mt-4 rounded-pill" @onclick="Imprimir">
-                                <i class="bi bi-printer"></i> Imprimir
-                            </button>
+                            <a href="/Ventas/Factura">
+                                <button class="btn btn-success w-100 mt-2 rounded-pill">
+                                    <i class="bi bi-printer"></i> Imprimir
+                                </button>
+                            </a>
+
 
                             <button class="btn btn-danger w-50 mt-2 rounded-pill" @onclick="CerrarModalCobro">
                                 <i class="bi bi-x-circle"></i> Cancelar
@@ -510,10 +513,10 @@
         CerrarModalCobro();
     }
 
-    private void Imprimir()
-    {
-        MostrarToast(ToastType.Info, "Impresión", "Se ha enviado la factura a la impresora.");
-    }
+    // private void Imprimir()
+    // {
+    //     MostrarToast(ToastType.Info, "Impresión", "Se ha enviado la factura a la impresora.");
+    // }
 
     public void MostrarToast(ToastType tipo, string titulo, string cuerpo) =>
         toastService.Notify(new(tipo, titulo, cuerpo));
