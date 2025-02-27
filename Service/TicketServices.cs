@@ -23,7 +23,7 @@ public class TicketServices (IDbContextFactory<ApplicationDbContext> DbFactory)
     public async Task<bool> ExisteCedula(int ClienteId, string cedula)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Tickets.Include(t => t.Clientes).AnyAsync(t => t.Clientes.Cedula == cedula && t.ClienteId != ClienteId);
+        return await contexto.Clientes.AnyAsync(c => c.Cedula == cedula && c.ClienteId != ClienteId);
     }
 
     public async Task<bool> Existe(int id)
