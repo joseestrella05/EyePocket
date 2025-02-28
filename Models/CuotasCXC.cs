@@ -31,6 +31,9 @@ public class CuotasCXC
 	public double SaldoFinal { get; set; }
 
 
+	public double Mora { get; set; } = 0;
+
+
 	public int EstadoId { get; set; }
 	public Estados? Estado { get; set; }
 }
