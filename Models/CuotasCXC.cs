@@ -13,12 +13,23 @@ public class CuotasCXC
 	public int CXCId { get; set; }
 
 
+	public int NumeroCuota { get; set; } = 1;
+
+
 	[Required(ErrorMessage = "Este campo es obligatorio")]
 	public DateTime FechaVencimiento { get; set; }
 
 
 	[Required(ErrorMessage = "Este campo es obligatorio")]
-	public double MontoCuota { get; set; }
+	public double Interes { get; set; }
+	
+
+	[Required(ErrorMessage = "Este campo es obligatorio")]
+	public double PagoCapital { get; set; }
+	
+
+	[Required(ErrorMessage = "Este campo es obligatorio")]
+	public double SaldoFinal { get; set; }
 
 
 	public int EstadoId { get; set; }
