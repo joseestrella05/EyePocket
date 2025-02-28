@@ -84,6 +84,7 @@
 						<th>Cliente</th>
 						<th>Descripción</th>
 						<th>Monto pagado</th>
+						<th>Metodo de Pago</th>
 						<th>Fecha de Último Pago</th>
 						<th>Acciones</th>
 					</tr>
@@ -97,6 +98,23 @@
 							<td>@pago.Deuda?.OrdenVenta?.Clientes?.Nombre</td>
 							<td>@pago.Descripcion</td>
 							<td>RD$@pago.MontoPagado.ToString("N2")</td>
+							<td>
+								@switch (pago.MetodoPagoId)
+								{
+									case 1:
+										<span class="badge text-bg-info">Tarjeta</span>
+										break;
+									case 2:
+										<span class="badge btn-success">Efectivo</span>
+										break;
+									case 3:
+										<span class="badge text-bg-primary">Cheque</span>
+										break;
+									default:
+										<span class="badge text-bg-secondary">N/A</span>
+										break;
+								}
+							</td>
 							<td>@pago.FechaPago.ToString("dd/M/yyyy")</td>
 							<td class="text-center">
 								<a href="/Pagos/View/@pago.Id" class="btn btn-outline-dark bi-eye"></a>
