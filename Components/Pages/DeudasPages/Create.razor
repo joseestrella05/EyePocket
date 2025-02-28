@@ -1,16 +1,17 @@
 ﻿@page "/Deudas/Create"
 @rendermode InteractiveServer
-@inject ClienteServices ClientesService
 @inject OrdenVentaService OrdenVentaServices
 @inject DeudaService DeudaServices
+@inject CuotasCXCService cuotasCXCServices
 @inject NavigationManager navigation
 
 <PageTitle>Crear Cuenta x Cobrar</PageTitle>
 <div class="text-left">
-	<h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-person-plus m-1"></i>Nueva deuda</h2>
+	<h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-person-plus m-1"></i>Nueva Cuenta X Cobrar</h2>
 </div>
 
-<EditForm Model="CuentaXCobrar" OnValidSubmit="Crear">
+<EditForm Model="CuentaXCobrar" OnValidSubmit="Guardar">
+	<DataAnnotationsValidator />
 	<div class="container">
 		<div class="card">
 			<div class="card-body">
@@ -19,42 +20,30 @@
 
 				<div class="row">
 					<div class="col">
-						<label class="form-label">Cliente:</label>
-						<InputSelect class="form-select" @bind-Value="ClienteId" @onchange="FiltrarFacturas">
-							<option selected disabled value="0">-- Seleccione un cliente --</option>
-							@foreach (var clientes in ListClientes)
-							{
-								<option value="@clientes.ClienteId">(@clientes.Nombre)</option>
-							}
-						</InputSelect>
-					</div>
-
-					<div class="col">
-						<label class="form-label">Orden de Venta:</label>
-						<InputSelect class="form-select" @bind-Value="CuentaXCobrar.OrdenVentaId" @onchange="SeleccionarFactura">
+						<label class="form-label"><strong>Orden de Venta *</strong></label>
+						<InputSelect required class="form-select" @bind-Value="CuentaXCobrar.OrdenVentaId" @onchange="SeleccionarFactura">
 							<option selected disabled value="0">-- Seleccione una orden --</option>
-							@foreach (var OrdenVenta in ListOrdenVenta)
+							@foreach (var ordenVenta in ListaOrdenVenta)
 							{
-								<option value="@OrdenVenta.OrdenVentaId">@OrdenVenta.NumeroFactura (@OrdenVenta.Clientes?.Nombre)</option>
+								<option value="@ordenVenta.OrdenVentaId">Codigo: @ordenVenta.NumeroFactura -- Deudor: @ordenVenta.Clientes?.Nombre -- Capital: RD$@ordenVenta.MontoTotal.ToString("N2")</option>
 							}
 						</InputSelect>
-					</div>
-
-					<div class="row">
-						<div class="col">
-							<label>Porcentaje de interes *</label>
-							<InputNumber class="form-control" @bind-Value="CuentaXCobrar.Interes" placeholder="Ej. Av. Duarte #10"></InputNumber>
-						</div>
-						<div class="col">
-							<label>Capital*</label>
-							<InputNumber class="form-control" @bind-Value="CuentaXCobrar.Capital" placeholder="Ej. Av. Duarte #10"></InputNumber>
-						</div>
-						<div class="col">
-							<label>Plazos*</label>
-							<InputNumber class="form-control" @bind-Value="CuentaXCobrar.Periodos" placeholder="Ej. Av. Duarte #10"></InputNumber>
-						</div>
 					</div>
 				</div>
+
+				<br />
+				<div class="row">
+					<div class="col">
+						<label><strong>% de interes *</strong></label>
+						<InputNumber class="form-control" @bind-Value="CuentaXCobrar.Interes" placeholder="123"></InputNumber>
+					</div>
+					<div class="col">
+						<label><strong>Plazos *</strong></label>
+						<InputNumber class="form-control" @bind-Value="CuentaXCobrar.Periodos" placeholder="123"></InputNumber>
+					</div>
+				</div>
+
+				<br/>
 				<div class="text-center">
 					<button type="submit" class="btn btn-success">Guardar</button>
 					<a href="/Deudas/Index" class="btn btn-secondary">Volver</a>
@@ -115,44 +104,81 @@
 @code {
 	public int ClienteId { get; set; }
 	public CuentasXCobrar CuentaXCobrar { get; set; } = new();
-	public List<OrdenVenta> ListOrdenVenta { get; set; } = [];
-	public List<Clientes> ListClientes { get; set; } = [];
+	public OrdenVenta OrdenVenta { get; set; } = new();
+	public List<OrdenVenta> ListaOrdenVenta { get; set; } = [];
 
 	[Inject] protected ToastService ToastService { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
-		ListClientes = await ClientesService.Listar(o => true);
-		ListOrdenVenta = await OrdenVentaServices.Listar(o => true);
+		ListaOrdenVenta = await OrdenVentaServices.Listar(o => true);
 	}
 
-	public async Task Crear()
+	public async Task CalcularCuotas()
 	{
+		var ListaCuotas = await cuotasCXCServices.CalcularCuotas(CuentaXCobrar);
+		if (!await cuotasCXCServices.Guardar(ListaCuotas))
+		{
+			ToastService.Notify(new(ToastType.Danger, "Error", $"No se pudo calcular las cuotas."));
+			return;
+		}
+		else
+			ToastService.Notify(new(ToastType.Success, "Éxito", $"Se han calculado las cuotas de la Cuenta X Cobrar con ID: {CuentaXCobrar.CXCId}"));
+	}
+
+	public async Task Guardar()
+	{
+		if (CuentaXCobrar.OrdenVentaId <= 0)
+		{
+			ToastService.Notify(new(ToastType.Danger, "Error", $"Debe seleccionar una Orden de Venta."));
+			return;
+		}
+
+		if (CuentaXCobrar.Interes <= 0)
+		{
+			ToastService.Notify(new(ToastType.Danger, "Error", $"El interés no puede ser menor que 1."));
+			return;
+		}
+
+		if (CuentaXCobrar.Periodos < 3)
+		{
+			ToastService.Notify(new(ToastType.Danger, "Error", $"Los plazos no pueden ser menor que 3."));
+			return;
+		}
+
 		CuentaXCobrar.EstadoId = 1;
 
+		foreach (var orden in ListaOrdenVenta)
+		{
+			if (CuentaXCobrar.OrdenVentaId == orden.OrdenVentaId)
+			{
+				CuentaXCobrar.Capital = orden.MontoTotal + orden.MontoTotal * CuentaXCobrar.Interes / 100;
+			}
+		}
+
 		await DeudaServices.Guardar(CuentaXCobrar);
+		await CalcularCuotas();
 
-		ToastService.Notify(new(ToastType.Success, "Exito", $"Deuda creada correctamente."));
-		CuentaXCobrar = new();
+		ToastService.Notify(new(ToastType.Success, "Éxito", $"Cuenta X Cobrar con ID: {CuentaXCobrar.CXCId} creada correctamente."));
 		navigation.NavigateTo("/Deudas/Index");
-
-
 	}
+
 	private async Task FiltrarFacturas(ChangeEventArgs e)
 	{
 		if (int.TryParse(e.Value?.ToString(), out int clienteIdSeleccionado))
 		{
 			ClienteId = clienteIdSeleccionado;
-			ListOrdenVenta = await OrdenVentaServices.Listar(o => o.ClienteId == ClienteId);
+			ListaOrdenVenta = await OrdenVentaServices.Listar(o => o.ClienteId == ClienteId);
 			CuentaXCobrar.OrdenVentaId = 0;
 			StateHasChanged();
 		}
 	}
+
 	private void SeleccionarFactura(ChangeEventArgs e)
 	{
 		if (int.TryParse(e.Value?.ToString(), out int facturaSeleccionada))
 		{
-			var factura = ListOrdenVenta.FirstOrDefault(f => f.OrdenVentaId == facturaSeleccionada);
+			var factura = ListaOrdenVenta.FirstOrDefault(f => f.OrdenVentaId == facturaSeleccionada);
 
 
 			CuentaXCobrar.Capital = factura.MontoTotal;
@@ -162,10 +188,5 @@
 				ClienteId = factura.Clientes.ClienteId;
 			}
 		}
-	}
-
-	public async Task<bool> Validar()
-	{
-		return true;
 	}
 }
