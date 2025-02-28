@@ -9,6 +9,11 @@ public class Compras
     [Key]
     public int CompraId { get; set; }
 
+    [Required(ErrorMessage ="el campo es obligatorio")]
+    public double Precio { get; set; }
+
+    [Required(ErrorMessage = "el campo es obligatorio")]
+    public string? Descripcion { get; set; }
     public int EstadoId { get; set; }
 
     [ForeignKey("EstadoId")]

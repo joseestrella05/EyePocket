@@ -9,7 +9,7 @@
     <div class="container">
         <div class="card">
             <div class="card-body">
-                <div class="section-title">Datos personales</div>
+                <div class="section-title">Datos de compra</div>
 
                 <div class="row">
                     <div class="col">
@@ -18,27 +18,45 @@
                     </div>
                 </div>
 
-                <div class="section-title">Datos Adicionales</div>
-
                 <div class="row">
-
-                    <InputSelect class="form-control form-select" @bind-Value="Compra.ProvedorId">
-                        <option value="0" selected disabled>Elija una opción</option>
-                        @foreach (var provedor in provedor)
-                        {
-                            <option value="@provedor.ProvedorId">@provedor.Nombre</option>
-                        }
-                    </InputSelect>
+                    <div class="col">
+                        <label>Precio</label>
+                        <InputNumber class="form-control" @bind-Value="Compra.Precio" placeholder="Precio"></InputNumber>
+                    </div>
                 </div>
 
                 <div class="row">
-                    <InputSelect class="form-control form-select" @bind-Value="Compra.EstadoId">
-                        <option value="0" selected disabled>Elija una opción</option>
-                        @foreach (var Estado in estados)
-                        {
-                            <option value="@Estado.EstadoId">@Estado.Nombre</option>
-                        }
-                    </InputSelect>
+                    <div class="col">
+                        <label>Descripcion</label>
+                        <InputText class="form-control" @bind-Value="Compra.Descripcion" placeholder="Precio"></InputText>
+                    </div>
+                </div>
+
+                <div class="section-title">Datos Adicionales</div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Provedor</label>
+                        <InputSelect class="form-control form-select" @bind-Value="Compra.ProvedorId">
+                            <option value="0" selected disabled>Elija una opción</option>
+                            @foreach (var provedor in provedor)
+                            {
+                                <option value="@provedor.ProvedorId">@provedor.Nombre</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <InputSelect class="form-control form-select" @bind-Value="Compra.EstadoId">
+                            <option value="0" selected disabled>Elija una opción</option>
+                            @foreach (var Estado in estados)
+                            {
+                                <option value="@Estado.EstadoId">@Estado.Nombre</option>
+                            }
+                        </InputSelect>
+                    </div>
 
                 </div>
             </div>

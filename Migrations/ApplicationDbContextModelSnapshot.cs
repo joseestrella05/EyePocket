@@ -131,6 +131,29 @@ namespace EyePocket.Migrations
                     b.ToTable("Clientes");
                 });
 
+            modelBuilder.Entity("EyePocket.Models.Compras", b =>
+                {
+                    b.Property<int>("CompraId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompraId"));
+
+                    b.Property<int>("EstadoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProvedorId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CompraId");
+
+                    b.HasIndex("EstadoId");
+
+                    b.HasIndex("ProvedorId");
+
+                    b.ToTable("Compras");
+                });
+
             modelBuilder.Entity("EyePocket.Models.Estados", b =>
                 {
                     b.Property<int>("EstadoId")
@@ -146,6 +169,33 @@ namespace EyePocket.Migrations
                     b.HasKey("EstadoId");
 
                     b.ToTable("Estados");
+
+                    b.HasData(
+                        new
+                        {
+                            EstadoId = 1,
+                            Nombre = "Pendientes"
+                        },
+                        new
+                        {
+                            EstadoId = 2,
+                            Nombre = "Aprobrado"
+                        },
+                        new
+                        {
+                            EstadoId = 3,
+                            Nombre = "Aceptada"
+                        },
+                        new
+                        {
+                            EstadoId = 4,
+                            Nombre = "Cancelada"
+                        },
+                        new
+                        {
+                            EstadoId = 5,
+                            Nombre = "Rechazada"
+                        });
                 });
 
             modelBuilder.Entity("EyePocket.Models.Productos", b =>
@@ -404,6 +454,25 @@ namespace EyePocket.Migrations
                         .IsRequired();
 
                     b.Navigation("Estados");
+                });
+
+            modelBuilder.Entity("EyePocket.Models.Compras", b =>
+                {
+                    b.HasOne("EyePocket.Models.Estados", "Estados")
+                        .WithMany()
+                        .HasForeignKey("EstadoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EyePocket.Models.Provedores", "Provedores")
+                        .WithMany()
+                        .HasForeignKey("ProvedorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Estados");
+
+                    b.Navigation("Provedores");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
