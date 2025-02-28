@@ -88,12 +88,13 @@ public class CuotasCXCService(IDbContextFactory<ApplicationDbContext> DbFactory)
 			.ExecuteDeleteAsync();
 		return Cuota > 0;
 	}
-	public async Task<CuotasCXC?> Buscar(int id)
+	public async Task<List<CuotasCXC>> Buscar(int cxcId)
 	{
 		await using var contexto = await DbFactory.CreateDbContextAsync();
 		return await contexto.CuotasCXC
 			.AsNoTracking()
-			.FirstOrDefaultAsync(c => c.CuotaCXCID == id);
+			.Where(c => c.CXCId == cxcId)
+			.ToListAsync();
 	}
 
 	public async Task<List<CuotasCXC>> Listar(Expression<Func<CuotasCXC, bool>> criterio)
@@ -109,7 +110,7 @@ public class CuotasCXCService(IDbContextFactory<ApplicationDbContext> DbFactory)
 		List<CuotasCXC> listaCuotas = new List<CuotasCXC>();
 		double saldo = cuenta.Capital;
 		double tasaMensual = cuenta.Interes / 100 / 12;
-		double cuota = cuenta.Capital * (tasaMensual / (1 - Math.Pow(1 + tasaMensual, - cuenta.Periodos)));
+		double cuota = cuenta.Capital * (tasaMensual / (1 - Math.Pow(1 + tasaMensual, -cuenta.Periodos)));
 
 		for (int mes = 1; mes <= cuenta.Periodos; mes++)
 		{
