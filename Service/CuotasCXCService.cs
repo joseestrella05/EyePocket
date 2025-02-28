@@ -84,7 +84,7 @@ public class CuotasCXCService(IDbContextFactory<ApplicationDbContext> DbFactory)
 	{
 		await using var contexto = await DbFactory.CreateDbContextAsync();
 		var Cuota = await contexto.CuotasCXC
-			.Where(c => c.CuotaCXCID == id)
+			.Where(c => c.CXCId == id)
 			.ExecuteDeleteAsync();
 		return Cuota > 0;
 	}
