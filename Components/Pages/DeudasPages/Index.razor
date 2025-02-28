@@ -1,5 +1,6 @@
 ﻿@page "/Deudas/Index"
 @inject DeudaService DeudaService
+@inject CuotasCXCService cuotasCXCService
 @inject ToastService toastService
 
 @rendermode InteractiveServer
@@ -9,7 +10,7 @@
 	<div class="col">
 
 		<div class="text-left">
-			<h2 class="text-black"><i class="bi bi-plus-circle"></i> Deudas</h2>
+			<h2 class="text-black"><i class="bi bi-plus-circle"></i> Cuentas x Cobrar</h2>
 		</div>
 	</div>
 	<div class="col text-end">
@@ -79,8 +80,10 @@
 						<th>ID</th>
 						<th>Numero factura</th>
 						<th>Cliente</th>
-						<th>Monto total</th>
+						<th>Monto de Orden</th>
+						<th>% de Interés</th>
 						<th>Saldo pendiente</th>
+						<th>Estado</th>
 						<th>Contacto</th>
 						<th>Acciones</th>
 					</tr>
@@ -92,16 +95,31 @@
 							<td>@cxc.CXCId</td>
 							<td>@cxc.OrdenVenta?.NumeroFactura</td>
 							<td>@cxc.OrdenVenta?.Clientes?.Nombre</td>
-							<td>@cxc.OrdenVenta?.MontoTotal.ToString("N2")</td>
-							<td>@cxc.Capital.ToString("N2")</td>
+							<td>RD$@cxc.OrdenVenta?.MontoTotal.ToString("N2")</td>
+							<td>@cxc.Interes%</td>
+							<td>RD$@cxc.Capital.ToString("N2")</td>
+							<td>
+								@switch (cxc.EstadoId)
+								{
+									case 1:
+										<span class="badge text-bg-danger">Pendiente</span>
+										break;
+									case 2:
+										<span class="badge btn-success">Pagado</span>
+										break;
+									case 3:
+										<span class="badge text-bg-warning">Pagada Tard&iacute;o</span>
+										break;
+									default:
+										<span class="badge text-bg-secondary">N/A</span>
+										break;
+								}
+							</td>
 							<td>@($"({cxc.OrdenVenta?.Clientes?.Telefono?[..3]}) {cxc.OrdenVenta?.Clientes?.Telefono?[3..6]}-{cxc.OrdenVenta?.Clientes?.Telefono?[6..]}")</td>
 
 							@*Botones*@
 							<td class="text-center">
 								<a href="/Deudas/Details/@cxc.CXCId" class="btn btn-outline-dark bi-eye"></a>
-
-								<a href="/Deudas/Edit/@cxc.CXCId" class="btn btn-outline-info bi bi-pencil-square"></a>
-
 								<button type="button" @onclick="() => MostrarModal(cxc.CXCId, cxc.OrdenVenta?.Clientes?.Nombre)" class="btn btn-outline-danger bi bi-trash"></button>
 							</td>
 						</tr>
@@ -138,23 +156,22 @@
 
 <style>
 	body {
-	background-color: #f5f5f5;
+		background-color: #f5f5f5;
 	}
 
 	.btn-success {
-	background-color: #0d5c63;
-	border: none;
+		background-color: #0d5c63;
+		border: none;
 	}
 </style>
 @code {
-
-	public double SaldoPendiente { get; set; } = 0;
 	public string searchBarValue { get; set; } = string.Empty;
 	public string valorFiltro { get; set; } = string.Empty;
 	public DateTime? Desde { get; set; } = null;
 	public DateTime? Hasta { get; set; } = null;
 	public List<CuentasXCobrar> ListaDeudas { get; set; } = new List<CuentasXCobrar>();
 	public List<CuotasCXC> ListaCuotas { get; set; } = new List<CuotasCXC>();
+	public CuotasCXC Cuota { get; set; } = new CuotasCXC();
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -163,12 +180,12 @@
 
 	// MODALS
 	private bool mostrarModal = false;
-	private int ClienteIdSeleccionado { get; set; }
+	private int CXCIdSeleccionado { get; set; }
 	private string EmailClienteSelecionado { get; set; } = "";
 
 	private void MostrarModal(int clienteId, string clienteEmail)
 	{
-		ClienteIdSeleccionado = clienteId;
+		CXCIdSeleccionado = clienteId;
 		EmailClienteSelecionado = clienteEmail;
 		mostrarModal = true;
 	}
@@ -176,7 +193,7 @@
 	private void CerrarModal()
 	{
 		mostrarModal = false;
-		ClienteIdSeleccionado = 0;
+		CXCIdSeleccionado = 0;
 		EmailClienteSelecionado = "";
 	}
 
@@ -191,13 +208,14 @@
 			// 	return;
 			// await UserManager.DeleteAsync(user);
 
-			await DeudaService.Eliminar(ClienteIdSeleccionado);
+			await cuotasCXCService.Eliminar(CXCIdSeleccionado);
+			await DeudaService.Eliminar(CXCIdSeleccionado);
 			ListaDeudas = await DeudaService.Listar(x => true);
 			mostrarModal = false;
-			ClienteIdSeleccionado = 0;
+			CXCIdSeleccionado = 0;
 			TipoNotificacion = ToastType.Success;
 			TituloNotificacion = "Enhorabuena";
-			MensajeNotificacion = "¡Se ha eliminado la deuda exitosamente!";
+			MensajeNotificacion = "¡Se ha eliminado la Cuenta X Cobrar y sus cuotas exitosamente!";
 			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 		}
 		catch (Exception ex)
