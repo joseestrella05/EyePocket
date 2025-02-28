@@ -9,7 +9,6 @@ public class CuotasCXC
 	public int CuotaCXCID { get; set; }
 
 
-	[ForeignKey("CXCId")]
 	public int CXCId { get; set; }
 
 
