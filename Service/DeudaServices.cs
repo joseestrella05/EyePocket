@@ -53,6 +53,7 @@ public class DeudaService(IDbContextFactory<ApplicationDbContext> DbFactory)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.CuentasXCobrar
+        .Include(x => x.ListaCuotasCXC)
         .Include(c => c.OrdenVenta)
           .ThenInclude (c => c.Clientes)
         .Where(criterio)
