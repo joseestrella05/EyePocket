@@ -20,6 +20,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<MetodosPago> MetodosPago { get; set; }
     public DbSet<PagosCXC> PagosCXC { get; set; }
+    public DbSet<CuotasCXC> CuotasCXC { get; set; }
 
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
