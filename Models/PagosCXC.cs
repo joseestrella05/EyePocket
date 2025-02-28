@@ -20,7 +20,7 @@ public class PagosCXC
 
 	public DateTime FechaPago { get; set; } = DateTime.Now;
 
-
+	[Required(ErrorMessage = "Este campo es obligatorio")]
 	public int MetodoPagoId { get; set; }
 
 
