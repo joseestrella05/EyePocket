@@ -46,6 +46,7 @@ builder.Services.AddScoped<TicketServices>();
 builder.Services.AddScoped<DeudaService>();
 builder.Services.AddScoped<OrdenVentaService>();
 builder.Services.AddScoped<PagosCXCService>();
+builder.Services.AddScoped<CuotasCXCService>();
 
 
 
