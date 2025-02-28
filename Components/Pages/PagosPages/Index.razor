@@ -1,20 +1,22 @@
-﻿@page "/Deudas/Index"
-@inject DeudaService DeudaService
-@inject CuotasCXCService cuotasCXCService
+﻿@page "/Pagos/Index"
+@inject ClienteServices clientesService
+@inject PagosCXCService pagosCXCService
+@inject OrdenVentaService ordenVentaService
+@inject DeudaService deudasService
 @inject ToastService toastService
 
 @rendermode InteractiveServer
 
-<PageTitle>Clientes</PageTitle>
+<PageTitle>Pagos</PageTitle>
 <div class="row" style="background-color:white; padding:10px; margin:10px;">
 	<div class="col">
 
 		<div class="text-left">
-			<h2 class="text-black"><i class="bi bi-plus-circle"></i> Cuentas x Cobrar</h2>
+			<h2 class="text-black"><i class="bi bi-person-plus m-1"></i> Pagos</h2>
 		</div>
 	</div>
 	<div class="col text-end">
-		<a href="/Deudas/Create" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Crear nueva deuda</a>
+		<a href="/Pagos/Create" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Crear Pago</a>
 	</div>
 </div>
 
@@ -27,10 +29,10 @@
 						<div class="form-floating">
 							<InputSelect class="form-select" id="floatingSelect" aria-label="Floating label select example" @bind-Value="@valorFiltro">
 								<option value="" selected disabled>--- Selecciona ---</option>
-								<option value="idcliente">ID Deuda</option>
-								<option value="fechaingreso">Fecha de pago</option>
-								<option value="nombres">Cliente</option>
-								<option value="email">Descripcion</option>
+								<option value="idpago">ID Pago</option>
+								<option value="idcxc">ID CxC</option>
+								<option value="fechapago">Fecha de Pago</option>
+								<option value="cliente">Cliente</option>
 							</InputSelect>
 							<label for="floatingSelect"><strong>Filtrar en base a...</strong></label>
 						</div>
@@ -52,7 +54,7 @@
 				</div>
 			</div>
 
-			@if (valorFiltro == "fechaingreso")
+			@if (valorFiltro == "fechapago")
 			{
 				<br />
 				<div class="row">
@@ -77,55 +79,51 @@
 			<table class="table table-light table-hover">
 				<thead class="table table-striped ">
 					<tr class="text-center ">
-						<th>ID</th>
-						<th>Numero factura</th>
+						<th>ID Pago</th>
+						<th>ID CxC</th>
 						<th>Cliente</th>
-						<th>Monto de Orden</th>
-						<th>% de Interés</th>
-						<th>Saldo pendiente</th>
-						<th>Estado</th>
-						<th>Contacto</th>
+						<th>Descripción</th>
+						<th>Monto pagado</th>
+						<th>Metodo de Pago</th>
+						<th>Fecha de Último Pago</th>
 						<th>Acciones</th>
 					</tr>
 				</thead>
 				<tbody>
-					@foreach (var cxc in ListaDeudas)
+					@foreach (var pago in ListaPagos)
 					{
 						<tr class="text-center text-white">
-							<td>@cxc.CXCId</td>
-							<td>@cxc.OrdenVenta?.NumeroFactura</td>
-							<td>@cxc.OrdenVenta?.Clientes?.Nombre</td>
-							<td>RD$@cxc.OrdenVenta?.MontoTotal.ToString("N2")</td>
-							<td>@cxc.Interes%</td>
-							<td>RD$@cxc.Capital.ToString("N2")</td>
+							<td>@pago.Id</td>
+							<td>@pago.Deuda?.CXCId</td>
+							<td>@pago.Deuda?.OrdenVenta?.Clientes?.Nombre</td>
+							<td>@pago.Descripcion</td>
+							<td>RD$@pago.MontoPagado.ToString("N2")</td>
 							<td>
-								@switch (cxc.EstadoId)
+								@switch (pago.MetodoPagoId)
 								{
 									case 1:
-										<span class="badge text-bg-danger">Pendiente</span>
+										<span class="badge text-bg-info">Tarjeta</span>
 										break;
 									case 2:
-										<span class="badge btn-success">Pagado</span>
+										<span class="badge btn-success">Efectivo</span>
 										break;
 									case 3:
-										<span class="badge text-bg-warning">Pagada Tard&iacute;o</span>
+										<span class="badge text-bg-primary">Cheque</span>
 										break;
 									default:
 										<span class="badge text-bg-secondary">N/A</span>
 										break;
 								}
 							</td>
-							<td>@($"({cxc.OrdenVenta?.Clientes?.Telefono?[..3]}) {cxc.OrdenVenta?.Clientes?.Telefono?[3..6]}-{cxc.OrdenVenta?.Clientes?.Telefono?[6..]}")</td>
-
-							@*Botones*@
+							<td>@pago.FechaPago.ToString("dd/M/yyyy")</td>
 							<td class="text-center">
-								<a href="/Deudas/Details/@cxc.CXCId" class="btn btn-outline-dark bi-eye"></a>
-								<button type="button" @onclick="() => MostrarModal(cxc.CXCId, cxc.OrdenVenta?.Clientes?.Nombre)" class="btn btn-outline-danger bi bi-trash"></button>
+								<a href="/Pagos/View/@pago.Id" class="btn btn-outline-dark bi-eye"></a>
+								<a href="/Pagos/Edit/@pago.Id" class="btn btn-outline-dark bi-pencil"></a>
 							</td>
 						</tr>
 					}
 				</tbody>
-				<caption>Cant. De deudas: @ListaDeudas.Count</caption>
+				<caption>Cant. De Pagos: @ListaPagos.Count</caption>
 			</table>
 		</div>
 	</div>
@@ -137,11 +135,11 @@
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
 				<div class="modal-header" style="background-color: #7B0323; color: white;">
-					<h5 class="modal-title">Eliminar Deuda</h5>
+					<h5 class="modal-title">Eliminar Cliente</h5>
 					<button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					<p>¿Está seguro de que desea eliminar a este Deuda?</p>
+					<p>¿Está seguro de que desea eliminar a este cliente?</p>
 					<p>Esta opción no se puede deshacer.</p>
 				</div>
 				<div class="modal-footer">
@@ -164,28 +162,33 @@
 		border: none;
 	}
 </style>
+
 @code {
 	public string searchBarValue { get; set; } = string.Empty;
 	public string valorFiltro { get; set; } = string.Empty;
 	public DateTime? Desde { get; set; } = null;
 	public DateTime? Hasta { get; set; } = null;
-	public List<CuentasXCobrar> ListaDeudas { get; set; } = new List<CuentasXCobrar>();
-	public List<CuotasCXC> ListaCuotas { get; set; } = new List<CuotasCXC>();
-	public CuotasCXC Cuota { get; set; } = new CuotasCXC();
+	public List<PagosCXC> ListaPagos { get; set; } = new List<PagosCXC>();
+	public List<CuentasXCobrar> ListaCXC { get; set; } = new List<CuentasXCobrar>();
+	public List<Clientes> ListaClientes { get; set; } = new List<Clientes>();
+	public List<OrdenVenta> ListaOrdenVenta { get; set; } = new List<OrdenVenta>();
 
 	protected override async Task OnInitializedAsync()
 	{
-		ListaDeudas = await DeudaService.Listar(C => true);
+		ListaPagos = await pagosCXCService.Listar(C => true);
+		ListaClientes = await clientesService.Listar(C => true);
+		ListaCXC = await deudasService.Listar(C => true);
+		ListaOrdenVenta = await ordenVentaService.Listar(C => true);
 	}
 
 	// MODALS
 	private bool mostrarModal = false;
-	private int CXCIdSeleccionado { get; set; }
+	private int ClienteIdSeleccionado { get; set; }
 	private string EmailClienteSelecionado { get; set; } = "";
 
 	private void MostrarModal(int clienteId, string clienteEmail)
 	{
-		CXCIdSeleccionado = clienteId;
+		ClienteIdSeleccionado = clienteId;
 		EmailClienteSelecionado = clienteEmail;
 		mostrarModal = true;
 	}
@@ -193,7 +196,7 @@
 	private void CerrarModal()
 	{
 		mostrarModal = false;
-		CXCIdSeleccionado = 0;
+		ClienteIdSeleccionado = 0;
 		EmailClienteSelecionado = "";
 	}
 
@@ -208,21 +211,20 @@
 			// 	return;
 			// await UserManager.DeleteAsync(user);
 
-			await cuotasCXCService.Eliminar(CXCIdSeleccionado);
-			await DeudaService.Eliminar(CXCIdSeleccionado);
-			ListaDeudas = await DeudaService.Listar(x => true);
+			await clientesService.Eliminar(ClienteIdSeleccionado);
+			ListaPagos = await pagosCXCService.Listar(x => true);
 			mostrarModal = false;
-			CXCIdSeleccionado = 0;
+			ClienteIdSeleccionado = 0;
 			TipoNotificacion = ToastType.Success;
 			TituloNotificacion = "Enhorabuena";
-			MensajeNotificacion = "¡Se ha eliminado la Cuenta X Cobrar y sus cuotas exitosamente!";
+			MensajeNotificacion = "¡Se ha eliminado el cliente exitosamente!";
 			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 		}
 		catch (Exception ex)
 		{
 			TipoNotificacion = ToastType.Danger;
 			TituloNotificacion = "Error";
-			MensajeNotificacion = "Hubo un error al eliminar la deuda.";
+			MensajeNotificacion = "Hubo un error al eliminar el cliente.";
 			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 		}
 	}
@@ -244,7 +246,7 @@
 			TituloNotificacion = "Aviso";
 			MensajeNotificacion = "Debe seleccionar una opción en el fitro.";
 			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
-			ListaDeudas = await DeudaService.Listar(x => true);
+			ListaPagos = await pagosCXCService.Listar(x => true);
 			return;
 		}
 
@@ -252,12 +254,12 @@
 
 		switch (valorFiltro)
 		{
-			case "idcliente":
+			case "idpago":
 				if (string.IsNullOrEmpty(searchBarValue))
 				{
 					TipoNotificacion = ToastType.Warning;
 					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "Debe proveer un ID de deuda para buscar";
+					MensajeNotificacion = "Debe proveer un ID de pago para buscar";
 					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 					return;
 				}
@@ -270,18 +272,78 @@
 					return;
 				}
 				if (int.TryParse(searchBarValue, out int id))
-					ListaDeudas = await DeudaService.Listar(lt => lt.CXCId == id);
+					ListaPagos = await pagosCXCService.Listar(lt => lt.Id == id);
+				break;
+
+			case "idcxc":
+				if (string.IsNullOrEmpty(searchBarValue))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "Debe proveer un ID de CXC para buscar";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				if (!searchBarValue.All(char.IsDigit))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "El criterio de búsqueda solo puede alojar numeros.";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				ListaPagos = await pagosCXCService.Listar(lt => lt.CXCId.ToString() == searchBarValue);
+				break;
+
+			case "cliente":
+				if (string.IsNullOrEmpty(searchBarValue))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "Debe proveer un nombre para buscar";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				if (searchBarValue.Any(char.IsDigit))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "El criterio de búsqueda solo puede alojar letras";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				ListaPagos = await pagosCXCService.Listar(c => c.Deuda.OrdenVenta.Clientes.Nombre == searchBarValue);
+				break;
+
+			case "fechapago":
+				if (Desde == null || Hasta == null)
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "Ambos campos de las fechas deben llenarse.";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				if (Desde > Hasta)
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "La fecha inicial no puede ser mayor a la final.";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				ListaPagos = await pagosCXCService.Listar(x => x.FechaPago >= Desde && x.FechaPago <= Hasta);
 				break;
 
 			default:
-				ListaDeudas = await DeudaService.Listar(x => true);
+				ListaPagos = await pagosCXCService.Listar(x => true);
 				break;
 		}
 	}
 
 	public async Task Restablecer()
 	{
-		ListaDeudas = await DeudaService.Listar(x => true);
+		ListaPagos = await pagosCXCService.Listar(x => true);
 		searchBarValue = string.Empty;
 		valorFiltro = string.Empty;
 		Desde = null;
@@ -293,4 +355,3 @@
 		MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 	}
 }
-

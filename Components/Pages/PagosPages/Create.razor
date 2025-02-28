@@ -1,0 +1,234 @@
+﻿@page "/Pagos/Create"
+@inject PagosCXCService pagosCXCService
+@inject DeudaService cxcService
+@inject CuotasCXCService cuotasCXCServices
+@inject NavigationManager navigation
+
+<PageTitle>Crear pagos</PageTitle>
+<div class="text-left">
+	<h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-person-plus m-1"></i>Nuevo Pago</h2>
+</div>
+
+<EditForm Model="Pago" OnValidSubmit="Guardar">
+	<div class="container">
+		<div class="card">
+			<div class="card-body">
+				<div class="section-title">Datos del pago</div>
+				<br />
+
+				<div class="row">
+					<div class="col">
+						<label><strong>Cuenta X Cobrar *</strong></label>
+						<div class="input-group mb-3">
+							<InputSelect class="form-select" aria-label="Floating label select example" @bind-Value="Pago.CXCId">
+								<option value="0" selected disabled>-- Selecciona una CXC --</option>
+								@foreach (var cxc in ListaCXC)
+								{
+									<option value="@cxc.CXCId">
+										ID: @cxc.CXCId -- Deudor: @cxc.OrdenVenta?.Clientes?.Nombre --  Balance: RD$@cxc.Capital.ToString("N2")
+									</option>
+								}
+							</InputSelect>
+							<button type="button" @onclick="BuscarCuota" class="btn btn-lg btn-success bi bi-search"></button>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="mb-3">
+					<label><strong>M&eacute;todos de pago *</strong></label>
+					<InputSelect class="form-select" @bind-Value="@Pago.MetodoPagoId">
+						<option value="0" selected disabled>--- Selecciona un m&eacute;todo de pago---</option>
+						<option value="1">Tarjeta</option>
+						<option value="2">Efectivo</option>
+						<option value="3">Cheque</option>
+					</InputSelect>
+				</div>
+
+				<div>
+					<label><strong>Monto a Pagar *</strong></label>
+					<div class="input-group mb-3">
+						<span class="input-group-text">RD$</span>
+						<InputNumber class="form-control" placeholder="RD$ 0.00" @bind-Value="Pago.MontoPagado"></InputNumber>
+						<span class="input-group-text">Cuota</span>
+						<InputNumber class="form-control" readonly disabled @bind-Value="MontoAPagar"></InputNumber>
+					</div>
+				</div>
+
+				<div class="row">
+
+					<div class="col">
+						<label><strong>Descripción</strong></label>
+						<InputText class="form-control" @bind-Value="Pago.Descripcion" placeholder="Descripción"></InputText>
+					</div>
+
+					<div class="col">
+						<label><strong>Fecha de pago</strong></label>
+						<InputDate class="form-control" readonly disabled @bind-Value="Pago.FechaPago"></InputDate>
+					</div>
+
+				</div>
+
+			</div>
+
+			<div class="text-center">
+				<button class="btn btn-success">Guardar</button>
+				<a href="/Pagos/Index" class="btn btn-secondary">Volver</a>
+			</div>
+		</div>
+	</div>
+</EditForm>
+
+<style>
+	body {
+		background-color: #f5f5f5;
+	}
+
+	.container {
+		max-width: 800px;
+		margin: auto;
+		padding: 10px;
+	}
+
+	.card {
+		background: white;
+		padding: 20px;
+		border-radius: 10px;
+	}
+
+	.section-title {
+		background: #0d5c63;
+		color: white;
+		text-align: center;
+		font-weight: bold;
+		padding: 8px;
+		margin: 10px;
+		border-radius: 5px;
+	}
+
+	.btn-success {
+		background-color: #0d5c63;
+		border: none;
+		margin: 10px;
+		padding: 10px 20px;
+	}
+
+	.btn-secondary {
+		background-color: #444;
+		color: white;
+		text-decoration: none;
+		margin: 10px;
+		padding: 10px 20px;
+	}
+
+		.btn-secondary:hover {
+			background-color: #222;
+		}
+</style>
+
+@code {
+	[Inject] protected ToastService ToastService { get; set; }
+	public PagosCXC Pago { get; set; } = new PagosCXC();
+	public List<CuentasXCobrar> ListaCXC { get; set; } = new();
+	public List<CuotasCXC> ListaCuotas { get; set; } = new();
+	public double MontoAPagar { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		ListaCXC = await cxcService.Listar(x => true);
+		ListaCuotas = await cuotasCXCServices.Listar(c => true);
+
+		foreach (var cxc in ListaCXC)
+		{
+			cxc.ListaCuotasCXC = ListaCuotas;
+		}
+	}
+
+	private async Task BuscarCuota()
+	{
+		foreach (var cxc in ListaCXC)
+		{
+			if (Pago.CXCId != cxc.CXCId)
+			{
+				ToastService.Notify(new(ToastType.Warning, "Aviso", $"Selecciona una CxC para calcular la cuota"));
+				return;
+			}
+
+			foreach (var cuota in ListaCuotas)
+			{
+				MontoAPagar = cuota.PagoCapital + cuota.Interes;
+				Math.Round(MontoAPagar, 2);
+				break;
+			}
+		}
+	}
+
+	public async Task Guardar()
+	{
+		if (Pago.MetodoPagoId <= 0)
+		{
+			ToastService.Notify(new(ToastType.Danger, "Error", $"Seleccione un método de pago."));
+			return;
+		}
+		if (Pago.MontoPagado <= 0)
+		{
+			ToastService.Notify(new(ToastType.Danger, "Error", $"El monto a pagar no puede ser negativo ni igual a 0."));
+			return;
+		}
+
+		// NOTA: Supongo que esto debe de ir en el servicio de pagos pero no se en vrd, resuelvan.
+		foreach (var cxc in ListaCXC)
+		{
+			if (Pago.CXCId != cxc.CXCId)
+			{
+				ToastService.Notify(new(ToastType.Danger, "Error", $"No se ha podido registrar el pago."));
+				return;
+			}
+
+			foreach (var cuota in ListaCuotas)
+			{
+				if (cuota.EstadoId == 2)
+					continue;
+
+				if (Pago.CXCId != cuota.CXCId)
+				{
+					ToastService.Notify(new(ToastType.Danger, "Error", $"El ID de la CxC en el pago es diferente al de la cuota."));
+					return;
+				}
+
+				var cuotaAPagar = cuota.Interes + cuota.PagoCapital;
+
+				if (Math.Round(Pago.MontoPagado, 2) != Math.Round(cuotaAPagar, 2))
+				{
+					// NOTA: Aunque ponga una validacion de que el pago debe ser el mismo de la cuota, no
+					// se si se deberia poner el monto de la cuota automaticamente en el campo Monto a Pagar.
+
+					ToastService.Notify(new(ToastType.Danger, "Error", $"El monto a pagar debe ser igual al monto de la cuota."));
+					return;
+				}
+
+				if (cuota.FechaVencimiento < DateTime.Now)
+				{
+					cxc.Capital -= Pago.MontoPagado;
+					cuota.EstadoId = 3;
+					cuota.Mora = cuota.SaldoFinal * 0.05;
+					cxc.Capital += cuota.Mora;
+					await cuotasCXCServices.Guardar(ListaCuotas);
+					await cxcService.Guardar(cxc);
+					break;
+				}
+				else
+				{
+					cxc.Capital -= Pago.MontoPagado;
+					cuota.EstadoId = 2;
+					await cuotasCXCServices.Guardar(ListaCuotas);
+					await cxcService.Guardar(cxc);
+					break;
+				}
+			}
+		}
+		await pagosCXCService.Guardar(Pago);
+		ToastService.Notify(new(ToastType.Success, "Exito", $"Pago registrado correctamente."));
+		navigation.NavigateTo("/Pagos/Index");
+	}
+}

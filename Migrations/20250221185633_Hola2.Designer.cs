@@ -4,6 +4,7 @@ using EyePocket.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EyePocket.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250221185633_Hola2")]
+    partial class Hola2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -129,22 +132,22 @@ namespace EyePocket.Migrations
                     b.ToTable("Clientes");
                 });
 
-            modelBuilder.Entity("EyePocket.Models.CuentasXCobrar", b =>
+            modelBuilder.Entity("EyePocket.Models.Deudas", b =>
                 {
-                    b.Property<int>("CXCId")
+                    b.Property<int>("DeudasId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CXCId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DeudasId"));
 
-                    b.Property<double>("Capital")
-                        .HasColumnType("float");
+                    b.Property<float>("Capital")
+                        .HasColumnType("real");
 
                     b.Property<int>("EstadoId")
                         .HasColumnType("int");
 
-                    b.Property<double>("Interes")
-                        .HasColumnType("float");
+                    b.Property<float>("Interes")
+                        .HasColumnType("real");
 
                     b.Property<int>("OrdenVentaId")
                         .HasColumnType("int");
@@ -152,57 +155,16 @@ namespace EyePocket.Migrations
                     b.Property<int>("Periodos")
                         .HasColumnType("int");
 
-                    b.HasKey("CXCId");
+                    b.Property<double>("SaldoPendiente")
+                        .HasColumnType("float");
+
+                    b.HasKey("DeudasId");
 
                     b.HasIndex("EstadoId");
 
                     b.HasIndex("OrdenVentaId");
 
-                    b.ToTable("CuentasXCobrar");
-                });
-
-            modelBuilder.Entity("EyePocket.Models.CuotasCXC", b =>
-                {
-                    b.Property<int>("CuotaCXCID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CuotaCXCID"));
-
-                    b.Property<int>("CXCId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CuentasXCobrarCXCId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EstadoId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("FechaVencimiento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("Interes")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Mora")
-                        .HasColumnType("float");
-
-                    b.Property<int>("NumeroCuota")
-                        .HasColumnType("int");
-
-                    b.Property<double>("PagoCapital")
-                        .HasColumnType("float");
-
-                    b.Property<double>("SaldoFinal")
-                        .HasColumnType("float");
-
-                    b.HasKey("CuotaCXCID");
-
-                    b.HasIndex("CuentasXCobrarCXCId");
-
-                    b.HasIndex("EstadoId");
-
-                    b.ToTable("CuotasCXC");
+                    b.ToTable("Deudas");
                 });
 
             modelBuilder.Entity("EyePocket.Models.Estados", b =>
@@ -220,23 +182,6 @@ namespace EyePocket.Migrations
                     b.HasKey("EstadoId");
 
                     b.ToTable("Estados");
-
-                    b.HasData(
-                        new
-                        {
-                            EstadoId = 1,
-                            Nombre = "Pendiente"
-                        },
-                        new
-                        {
-                            EstadoId = 2,
-                            Nombre = "Pagado"
-                        },
-                        new
-                        {
-                            EstadoId = 3,
-                            Nombre = "Vencido"
-                        });
                 });
 
             modelBuilder.Entity("EyePocket.Models.MetodosPago", b =>
@@ -335,8 +280,6 @@ namespace EyePocket.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CXCId");
 
                     b.ToTable("PagosCXC");
                 });
@@ -559,7 +502,7 @@ namespace EyePocket.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("EyePocket.Models.CuentasXCobrar", b =>
+            modelBuilder.Entity("EyePocket.Models.Deudas", b =>
                 {
                     b.HasOne("EyePocket.Models.Estados", "Estados")
                         .WithMany()
@@ -578,21 +521,6 @@ namespace EyePocket.Migrations
                     b.Navigation("OrdenVenta");
                 });
 
-            modelBuilder.Entity("EyePocket.Models.CuotasCXC", b =>
-                {
-                    b.HasOne("EyePocket.Models.CuentasXCobrar", null)
-                        .WithMany("ListaCuotasCXC")
-                        .HasForeignKey("CuentasXCobrarCXCId");
-
-                    b.HasOne("EyePocket.Models.Estados", "Estado")
-                        .WithMany()
-                        .HasForeignKey("EstadoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Estado");
-                });
-
             modelBuilder.Entity("EyePocket.Models.OrdenVenta", b =>
                 {
                     b.HasOne("EyePocket.Models.Clientes", "Clientes")
@@ -602,17 +530,6 @@ namespace EyePocket.Migrations
                         .IsRequired();
 
                     b.Navigation("Clientes");
-                });
-
-            modelBuilder.Entity("EyePocket.Models.PagosCXC", b =>
-                {
-                    b.HasOne("EyePocket.Models.CuentasXCobrar", "Deuda")
-                        .WithMany()
-                        .HasForeignKey("CXCId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Deuda");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -664,11 +581,6 @@ namespace EyePocket.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("EyePocket.Models.CuentasXCobrar", b =>
-                {
-                    b.Navigation("ListaCuotasCXC");
                 });
 #pragma warning restore 612, 618
         }

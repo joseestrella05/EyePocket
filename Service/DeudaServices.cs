@@ -10,25 +10,25 @@ public class DeudaService(IDbContextFactory<ApplicationDbContext> DbFactory)
     public async Task<bool> Existe(int id)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Deudas.AnyAsync(c => c.DeudasId == id);
+        return await contexto.CuentasXCobrar.AnyAsync(c => c.CXCId == id);
     }
-    private async Task<bool> Insertar(Deudas deuda)
+    private async Task<bool> Insertar(CuentasXCobrar deuda)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        contexto.Deudas.Add(deuda);
+        contexto.CuentasXCobrar.Add(deuda);
         return await contexto.SaveChangesAsync() > 0;
     }
-    private async Task<bool> Modificar(Deudas deuda)
+    private async Task<bool> Modificar(CuentasXCobrar deuda)
     {
         await using var _context = await DbFactory.CreateDbContextAsync();
-        var local = _context.Deudas.Local
-            .FirstOrDefault(c => c.DeudasId == deuda.DeudasId);
+        var local = _context.CuentasXCobrar.Local
+            .FirstOrDefault(c => c.CXCId == deuda.CXCId);
         _context.Entry(deuda).State = EntityState.Modified;
         return await _context.SaveChangesAsync() > 0;
     }
-    public async Task<bool> Guardar(Deudas deuda)
+    public async Task<bool> Guardar(CuentasXCobrar deuda)
     {
-        if (!await Existe(deuda.DeudasId))
+        if (!await Existe(deuda.CXCId))
             return await Insertar(deuda);
         else
             return await Modificar(deuda);
@@ -36,23 +36,25 @@ public class DeudaService(IDbContextFactory<ApplicationDbContext> DbFactory)
     public async Task<bool> Eliminar(int id)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        var Clientes = await contexto.Deudas
-            .Where(c => c.DeudasId == id).ExecuteDeleteAsync();
+        var Clientes = await contexto.CuentasXCobrar
+            .Where(c => c.CXCId == id).ExecuteDeleteAsync();
         return Clientes > 0;
     }
-    public async Task<Deudas?> Buscar(int id)
+    public async Task<CuentasXCobrar?> Buscar(int id)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Deudas
+        return await contexto.CuentasXCobrar
             .Include(c => c.OrdenVenta)
             .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.DeudasId == id);
+            .FirstOrDefaultAsync(c => c.CXCId == id);
     }
 
-    public async Task<List<Deudas>> Listar(Expression<Func<Deudas, bool>> criterio)
+    public async Task<List<CuentasXCobrar>> Listar(Expression<Func<CuentasXCobrar, bool>> criterio)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Deudas
+        return await contexto.CuentasXCobrar
+        .Include(x => x.Estados)
+        .Include(x => x.ListaCuotasCXC)
         .Include(c => c.OrdenVenta)
           .ThenInclude (c => c.Clientes)
         .Where(criterio)
