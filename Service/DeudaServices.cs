@@ -12,13 +12,34 @@ public class DeudaService(IDbContextFactory<ApplicationDbContext> DbFactory)
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.CuentasXCobrar.AnyAsync(c => c.CXCId == id);
     }
-    private async Task<bool> Insertar(CuentasXCobrar deuda)
-    {
-        await using var contexto = await DbFactory.CreateDbContextAsync();
-        contexto.CuentasXCobrar.Add(deuda);
-        return await contexto.SaveChangesAsync() > 0;
-    }
-    private async Task<bool> Modificar(CuentasXCobrar deuda)
+	private async Task<bool> Insertar(CuentasXCobrar deuda)
+	{
+		await using var contexto = await DbFactory.CreateDbContextAsync();
+
+		// Cargar la entidad OrdenVenta antes de insertarla en CuentasXCobrar
+		deuda.OrdenVenta = await contexto.OrdenVenta
+			.FirstOrDefaultAsync(o => o.OrdenVentaId == deuda.OrdenVentaId);
+
+		// Verificar si OrdenVenta se ha cargado correctamente
+		if (deuda.OrdenVenta == null)
+		{
+			// Lanzar excepción si no se encuentra la OrdenVenta
+			throw new Exception("⚠ ERROR: No se encontró la OrdenVenta en la base de datos.");
+		}
+
+		// Verificar si NFC tiene un valor válido
+		if (string.IsNullOrWhiteSpace(deuda.OrdenVenta.NFC))
+		{
+			// Lanzar excepción si NFC es nulo o vacío
+			throw new Exception("⚠ ERROR: El campo NFC es NULL o vacío antes de guardar.");
+		}
+
+		// Agregar la deuda al contexto y guardar los cambios
+		contexto.CuentasXCobrar.Add(deuda);
+		return await contexto.SaveChangesAsync() > 0;
+	}
+
+	private async Task<bool> Modificar(CuentasXCobrar deuda)
     {
         await using var _context = await DbFactory.CreateDbContextAsync();
         var local = _context.CuentasXCobrar.Local
