@@ -10,7 +10,7 @@ namespace EyePocket.Models
 
         public int OrdenVentaId { get; set; }
         [ForeignKey("OrdenVentaId")]
-        public OrdenVenta? OrdenVenta { get; set; }
+        public OrdenVenta? OrdenVenta { get; set; } = new();
 
         public int EstadoId { get; set; }
         [ForeignKey("EstadoId")]
