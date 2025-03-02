@@ -5,7 +5,7 @@ using EyePocket.Data;
 
 namespace EyePocket.Service;
 
-public class DeudaService(IDbContextFactory<ApplicationDbContext> DbFactory)
+public class CuentasXCobrarService(IDbContextFactory<ApplicationDbContext> DbFactory)
 {
     public async Task<bool> Existe(int id)
     {

@@ -1,6 +1,6 @@
 ﻿@page "/Pagos/Edit/{PagoID:int}"
 @inject PagosCXCService pagosCXCService
-@inject DeudaService cxcService
+@inject CuentasXCobrarService cxcService
 @inject NavigationManager navigation
 
 <PageTitle>Editando Pago | @Pago.Deuda?.OrdenVenta?.Clientes?.Nombre</PageTitle>
