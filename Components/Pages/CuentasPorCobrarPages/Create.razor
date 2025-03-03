@@ -1,4 +1,4 @@
-﻿@page "/Deudas/Create"
+﻿@page "/Cuentas-Por-Cobrar/Create"
 @rendermode InteractiveServer
 @inject OrdenVentaService OrdenVentaServices
 @inject CuentasXCobrarService DeudaServices
@@ -6,23 +6,27 @@
 @inject NavigationManager navigation
 
 <PageTitle>Crear Cuenta x Cobrar</PageTitle>
-<div class="text-left">
-	<h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-person-plus m-1"></i>Nueva Cuenta X Cobrar</h2>
+<div class="container mb-4">
+	<div class="card">
+		<div class="text-left">
+			<h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-cash-stack m-1"></i>Nueva Cuenta x Cobrar</h2>
+		</div>
+	</div>
 </div>
 
 <EditForm Model="CuentaXCobrar" OnValidSubmit="Guardar">
 	<DataAnnotationsValidator />
-	<div class="container">
+	<div class="contenedor">
 		<div class="card">
 			<div class="card-body">
 
-				<div class="section-title">Complete la informacion</div>
+				<div class="section-title">Complete la información</div>
 
-				<div class="row">
+				<div class="row mb-3">
 					<div class="col">
 						<label class="form-label"><strong>Orden de Venta *</strong></label>
-						<InputSelect required class="form-select" @bind-Value="CuentaXCobrar.OrdenVentaId" @onchange="SeleccionarFactura">
-							<option selected disabled value="0">-- Seleccione una orden --</option>
+						<InputSelect required class="form-select" @bind-Value="CuentaXCobrar.OrdenVentaId">
+							<option selected disabled value="0">-- Seleccione una Orden de Venta--</option>
 							@foreach (var ordenVenta in ListaOrdenVenta)
 							{
 								<option value="@ordenVenta.OrdenVentaId">Codigo: @ordenVenta.NumeroFactura -- Deudor: @ordenVenta.Clientes?.Nombre -- Capital: RD$@ordenVenta.MontoTotal.ToString("N2")</option>
@@ -31,8 +35,7 @@
 					</div>
 				</div>
 
-				<br />
-				<div class="row">
+				<div class="row mb-3">
 					<div class="col">
 						<label><strong>% de interes *</strong></label>
 						<InputNumber class="form-control" @bind-Value="CuentaXCobrar.Interes" placeholder="123"></InputNumber>
@@ -43,10 +46,9 @@
 					</div>
 				</div>
 
-				<br/>
 				<div class="text-center">
-					<button type="submit" class="btn btn-success">Guardar</button>
-					<a href="/Deudas/Index" class="btn btn-secondary">Volver</a>
+					<button type="submit" class="btn btn-success bi bi-floppy">   Guardar</button>
+					<a href="/Cuentas-Por-Cobrar/Index" class="btn btn-secondary bi bi-arrow-left-circle">   Volver</a>
 				</div>
 			</div>
 		</div>
@@ -59,7 +61,7 @@
 	background-color: #f5f5f5;
 	}
 
-	.container {
+	.contenedor {
 	max-width: 800px;
 	margin: auto;
 	padding: 10px;
@@ -160,33 +162,6 @@
 		await CalcularCuotas();
 
 		ToastService.Notify(new(ToastType.Success, "Éxito", $"Cuenta X Cobrar con ID: {CuentaXCobrar.CXCId} creada correctamente."));
-		navigation.NavigateTo("/Deudas/Index");
-	}
-
-	private async Task FiltrarFacturas(ChangeEventArgs e)
-	{
-		if (int.TryParse(e.Value?.ToString(), out int clienteIdSeleccionado))
-		{
-			ClienteId = clienteIdSeleccionado;
-			ListaOrdenVenta = await OrdenVentaServices.Listar(o => o.ClienteId == ClienteId);
-			CuentaXCobrar.OrdenVentaId = 0;
-			StateHasChanged();
-		}
-	}
-
-	private void SeleccionarFactura(ChangeEventArgs e)
-	{
-		if (int.TryParse(e.Value?.ToString(), out int facturaSeleccionada))
-		{
-			var factura = ListaOrdenVenta.FirstOrDefault(f => f.OrdenVentaId == facturaSeleccionada);
-
-
-			CuentaXCobrar.Capital = factura.MontoTotal;
-
-			if (ClienteId == 0 && factura.Clientes != null)
-			{
-				ClienteId = factura.Clientes.ClienteId;
-			}
-		}
+		navigation.NavigateTo("/Cuentas-Por-Cobrar/Index");
 	}
 }
