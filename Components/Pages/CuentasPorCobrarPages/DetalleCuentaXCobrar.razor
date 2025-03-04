@@ -1,0 +1,119 @@
+﻿@page "/Detalle-Cuenta-Por-Cobrar/{cxcid:int}"
+@inject CuentasXCobrarService cxcService
+@inject CuotasCXCService cuotasCXCService
+@inject ToastService toastService
+
+@rendermode InteractiveServer
+
+<PageTitle>Detalles de la CxC | @CXC.OrdenVenta?.Clientes?.Nombre</PageTitle>
+<div class="container mb-4">
+	<div class="card">
+		<div class="row" style="background-color:white; padding:10px; margin:10px;">
+			<div class="col">
+				<div class="text-left">
+					<h2 class="text-black"><i class="bi bi-cash-stack"></i> Detalles de las Cuotas</h2>
+				</div>
+			</div>
+			<div class="col text-end">
+				<a href="/Cuentas-Por-Cobrar/Index" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> Volver</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+	<div class="card">
+		<div class="card-body">
+			<table class="table table-sm table-striped table-hover">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Estado</th>
+						<th>Cuota</th>
+						<th>Capital</th>
+						<th>Interés</th>
+						<th>Balance</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var cuota in ListaCuotas)
+					{
+						if (CXC.CXCId != cuota.CXCId)
+						{
+							continue;
+						}
+
+						<tr>
+							<td>@cuota.NumeroCuota</td>
+							<td>
+								@switch (cuota.EstadoId)
+								{
+									case 1:
+										<span class="badge text-bg-danger">Pendiente</span>
+										break;
+									case 2:
+										<span class="badge btn-success">Pagado</span>
+										break;
+									case 3:
+										<span class="badge text-bg-warning">Pagado Tard&iacute;o</span>
+										break;
+									default:
+										<span class="badge text-bg-secondary">N/A</span>
+										break;
+								}
+							</td>
+							<td>RD$@((cuota.PagoCapital + cuota.Interes).ToString("N2"))</td>
+							<td>RD$@cuota.PagoCapital.ToString("N2")</td>
+							<td>RD$@cuota.Interes.ToString("N2")</td>
+							@if (cuota.SaldoFinal <= 0)
+							{
+								<td>RD$0.00</td>
+							}
+							else
+							{
+								<td>RD$@cuota.SaldoFinal.ToString("N2")</td>
+							}
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<style>
+	body {
+		background-color: #f5f5f5;
+	}
+
+	.btn-success {
+		background-color: #0d5c63;
+		border: none;
+	}
+</style>
+
+@code {
+	[Parameter]
+	public int cxcid { get; set; }
+	public string searchBarValue { get; set; } = string.Empty;
+	public string valorFiltro { get; set; } = string.Empty;
+	public DateTime? Desde { get; set; } = null;
+	public DateTime? Hasta { get; set; } = null;
+	public CuentasXCobrar CXC { get; set; } = new CuentasXCobrar();
+	public List<CuotasCXC> ListaCuotas { get; set; } = new List<CuotasCXC>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		CXC = await cxcService.Buscar(cxcid);
+		ListaCuotas = await cuotasCXCService.Listar(C => true);
+	}
+
+	//NOTIFICACIONES
+	public ToastType Tipo { get; set; }
+	public string Mensaje { get; set; } = string.Empty;
+	public string Titulo { get; set; } = string.Empty;
+
+	public void Toast(ToastType tipo, string titulo, string cuerpo)
+	=> toastService.Notify(new(tipo, titulo, cuerpo));
+
+}
