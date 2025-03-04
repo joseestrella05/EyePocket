@@ -1,38 +1,40 @@
 ﻿@page "/Pagos/Create"
 @inject PagosCXCService pagosCXCService
-@inject DeudaService cxcService
+@inject CuentasXCobrarService cxcService
 @inject CuotasCXCService cuotasCXCServices
 @inject NavigationManager navigation
 
 <PageTitle>Crear pagos</PageTitle>
-<div class="text-left">
-	<h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-person-plus m-1"></i>Nuevo Pago</h2>
+<div class="container">
+	<div class="card">
+		<div class="text-left">
+			<h2 class="text-black" style="background-color:white;"><i class="bi bi-wallet2 m-3"></i>Nuevo Pago</h2>
+		</div>
+	</div>
 </div>
 
-<EditForm Model="Pago" OnValidSubmit="Guardar">
-	<div class="container">
-		<div class="card">
-			<div class="card-body">
-				<div class="section-title">Datos del pago</div>
-				<br />
+<div class="contenedor">
+	<div class="card">
+		<div class="card-body">
+			<div class="section-title mb-3">Datos del pago</div>
 
-				<div class="row">
-					<div class="col">
-						<label><strong>Cuenta X Cobrar *</strong></label>
-						<div class="input-group mb-3">
-							<InputSelect class="form-select" aria-label="Floating label select example" @bind-Value="Pago.CXCId">
-								<option value="0" selected disabled>-- Selecciona una CXC --</option>
-								@foreach (var cxc in ListaCXC)
-								{
-									<option value="@cxc.CXCId">
-										ID: @cxc.CXCId -- Deudor: @cxc.OrdenVenta?.Clientes?.Nombre --  Balance: RD$@cxc.Capital.ToString("N2")
-									</option>
-								}
-							</InputSelect>
-							<button type="button" @onclick="BuscarCuota" class="btn btn-lg btn-success bi bi-search"></button>
-						</div>
+			<EditForm Model="Pago" OnValidSubmit="Guardar">
+				<div class="mb-3">
+					<label><strong>Cuenta X Cobrar *</strong></label>
+					<div class="input-group">
+						<InputSelect class="form-select" @bind-Value="Pago.CXCId">
+							<option value="0" selected disabled>-- Selecciona una Cuenta x Cobrar</option>
+							@foreach (var cxc in ListaCXC)
+							{
+								<option value="@cxc.CXCId">
+									ID: @cxc.CXCId -- Deudor: @cxc.OrdenVenta?.Clientes?.Nombre --  Balance: RD$@cxc.Capital.ToString("N2")
+								</option>
+							}
+						</InputSelect>
+						<button type="button" @onclick="BuscarCuota" class="btn bi bi-calculator" style="color: #fff; background: #0d5c63;" onmouseover="this.style.background='#0a454a'">
+							Calcular
+						</button>
 					</div>
-
 				</div>
 
 				<div class="mb-3">
@@ -45,46 +47,42 @@
 					</InputSelect>
 				</div>
 
-				<div>
+				<div class="mb-3">
 					<label><strong>Monto a Pagar *</strong></label>
 					<div class="input-group mb-3">
 						<span class="input-group-text">RD$</span>
-						<InputNumber class="form-control" placeholder="RD$ 0.00" @bind-Value="Pago.MontoPagado"></InputNumber>
+						<InputNumber class="form-control" placeholder="RD$ 0.00" @bind-Value="Pago.MontoPagado" />
 						<span class="input-group-text">Cuota</span>
-						<InputNumber class="form-control" readonly disabled @bind-Value="MontoAPagar"></InputNumber>
+						<InputText class="form-control" @bind-Value="MontoAPagar" @bind-Value:format="N2" readonly disabled />
 					</div>
 				</div>
 
-				<div class="row">
-
+				<div class="row mb-3">
 					<div class="col">
 						<label><strong>Descripción</strong></label>
 						<InputText class="form-control" @bind-Value="Pago.Descripcion" placeholder="Descripción"></InputText>
 					</div>
-
 					<div class="col">
 						<label><strong>Fecha de pago</strong></label>
 						<InputDate class="form-control" readonly disabled @bind-Value="Pago.FechaPago"></InputDate>
 					</div>
-
 				</div>
 
-			</div>
-
-			<div class="text-center">
-				<button class="btn btn-success">Guardar</button>
-				<a href="/Pagos/Index" class="btn btn-secondary">Volver</a>
-			</div>
+				<div class="text-center">
+					<button class="btn btn-success bi bi-floppy">   Guardar</button>
+					<a href="/Pagos/Index" class="btn btn-secondary bi bi-arrow-left-circle">   Volver</a>
+				</div>
+			</EditForm>
 		</div>
 	</div>
-</EditForm>
+</div>
 
 <style>
 	body {
 		background-color: #f5f5f5;
 	}
 
-	.container {
+	.contenedor {
 		max-width: 800px;
 		margin: auto;
 		padding: 10px;
@@ -131,7 +129,9 @@
 	public PagosCXC Pago { get; set; } = new PagosCXC();
 	public List<CuentasXCobrar> ListaCXC { get; set; } = new();
 	public List<CuotasCXC> ListaCuotas { get; set; } = new();
-	public double MontoAPagar { get; set; }
+	public string? MontoAPagar { get; set; }
+
+	public double Mora { get; set; } = 5 / 100;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -144,20 +144,35 @@
 		}
 	}
 
-	private async Task BuscarCuota()
+	private void BuscarCuota()
 	{
+		var cuotaCalculada = 0.0;
+		if (Pago.CXCId == 0)
+		{
+			ToastService.Notify(new(ToastType.Danger, "Error", $"Seleccione una CxC."));
+			return;
+		}
+
 		foreach (var cxc in ListaCXC)
 		{
+
 			if (Pago.CXCId != cxc.CXCId)
 				continue;
+
+			if (cxc.EstadoId != 1)
+			{
+				ToastService.Notify(new(ToastType.Warning, "Aviso", $"Esta CxC ya ha sido saldada, por favor seleccione otra."));
+				return;
+			}
 
 			foreach (var cuota in ListaCuotas)
 			{
 				if (cuota.CXCId != cxc.CXCId)
 					continue;
 
-				MontoAPagar = cuota.PagoCapital + cuota.Interes;
-				MontoAPagar = Math.Round(MontoAPagar, 2);
+				cuotaCalculada = cuota.PagoCapital + cuota.Interes;
+				cuotaCalculada = Math.Round(cuotaCalculada, 2);
+				MontoAPagar = cuotaCalculada.ToString("N2");
 				break;
 			}
 		}
@@ -182,19 +197,23 @@
 			return;
 		}
 
-		// NOTA: Supongo que esto debe de ir en el servicio de pagos pero no se en vrd, resuelvan.
+		// NOTA: Supongo que esto debe de ir en el servicio de pagos aunque no estoy muy seguro, resuelvan.
 		foreach (var cxc in ListaCXC)
 		{
 			if (Pago.CXCId != cxc.CXCId)
 				continue;
+
+			if (cxc.EstadoId != 1)
+			{
+				ToastService.Notify(new(ToastType.Warning, "Aviso", $"Esta CxC ya ha sido saldada, por favor seleccione otra."));
+				return;
+			}
 
 			foreach (var cuota in ListaCuotas)
 			{
 				if (cuota.CXCId != cxc.CXCId)
 					continue;
 
-				if (cuota.EstadoId == 2)
-					continue;
 
 				if (Pago.CXCId != cuota.CXCId)
 				{
@@ -202,23 +221,32 @@
 					return;
 				}
 
+				if (cuota.EstadoId != 1)
+					continue;
+
 				var cuotaAPagar = cuota.Interes + cuota.PagoCapital;
 				cuotaAPagar = Math.Round(cuotaAPagar, 2);
 
 				if (Math.Round(Pago.MontoPagado, 2) != cuotaAPagar)
 				{
 					// NOTA: Aunque ponga una validacion de que el pago debe ser el mismo de la cuota, no
-					// se si se deberia poner el monto de la cuota automaticamente en el campo Monto a Pagar.
+					// se si se deberia poner el monto de la cuota automaticamente en el campo "Monto a Pagar"
+					// en vez de buscar la cuota para escribirla manualmente en el campo.
 
-					ToastService.Notify(new(ToastType.Danger, "Error", $"El monto a pagar debe ser igual al monto de la cuota."));
+					ToastService.Notify(new(ToastType.Warning, "Aviso", $"El monto a pagar debe ser igual al monto de la cuota."));
 					return;
 				}
 
 				if (cuota.FechaVencimiento < DateTime.Now)
 				{
 					cxc.Capital -= Pago.MontoPagado;
+					if (cxc.Capital <= 0)
+					{
+						cxc.Capital = 0;
+						cxc.EstadoId = 2;
+					}
 					cuota.EstadoId = 3;
-					cuota.Mora = cuota.SaldoFinal * 0.05;
+					cuota.Mora = cuota.SaldoFinal * Mora;
 					cxc.Capital += cuota.Mora;
 					await cuotasCXCServices.Guardar(ListaCuotas);
 					await cxcService.Guardar(cxc);
@@ -227,6 +255,11 @@
 				else
 				{
 					cxc.Capital -= Pago.MontoPagado;
+					if (cxc.Capital <= 0)
+					{
+						cxc.Capital = 0;
+						cxc.EstadoId = 2;
+					}
 					cuota.EstadoId = 2;
 					await cuotasCXCServices.Guardar(ListaCuotas);
 					await cxcService.Guardar(cxc);

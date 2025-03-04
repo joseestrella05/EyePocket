@@ -1,36 +1,38 @@
-﻿@page "/Deudas/Index"
-@inject DeudaService DeudaService
+﻿@page "/Cuentas-Por-Cobrar/Index"
+@inject CuentasXCobrarService DeudaService
 @inject CuotasCXCService cuotasCXCService
 @inject ToastService toastService
 
 @rendermode InteractiveServer
 
-<PageTitle>Clientes</PageTitle>
-<div class="row" style="background-color:white; padding:10px; margin:10px;">
-	<div class="col">
-
-		<div class="text-left">
-			<h2 class="text-black"><i class="bi bi-plus-circle"></i> Cuentas x Cobrar</h2>
+<PageTitle>Cuentas x Cobrar</PageTitle>
+<div class="container mb-4">
+	<div class="card">
+		<div class="row" style="background-color:white; padding:10px; margin:10px;">
+			<div class="col">
+				<div class="text-left">
+					<h2 class="text-black"><i class="bi bi-cash-stack"></i> Cuentas x Cobrar</h2>
+				</div>
+			</div>
+			<div class="col text-end">
+				<a href="/Cuentas-Por-Cobrar/Create" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Nueva CxC</a>
+			</div>
 		</div>
-	</div>
-	<div class="col text-end">
-		<a href="/Deudas/Create" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Crear nueva deuda</a>
 	</div>
 </div>
 
 <div class="container">
 	<div class="card">
 		<div class="card-body">
-			<div class="row">
+			<div class="row mb-3">
 				<div class="col-4">
-					<div class="input-group" style="width: 250px">
+					<div class="input-group">
 						<div class="form-floating">
 							<InputSelect class="form-select" id="floatingSelect" aria-label="Floating label select example" @bind-Value="@valorFiltro">
 								<option value="" selected disabled>--- Selecciona ---</option>
-								<option value="idcliente">ID Deuda</option>
-								<option value="fechaingreso">Fecha de pago</option>
-								<option value="nombres">Cliente</option>
-								<option value="email">Descripcion</option>
+								<option value="idcxc">ID CxC</option>
+								<option value="cliente">Cliente</option>
+								<option value="numerofactura">No. de Factura</option>
 							</InputSelect>
 							<label for="floatingSelect"><strong>Filtrar en base a...</strong></label>
 						</div>
@@ -41,9 +43,9 @@
 
 				@*Btn Buscar*@
 				<div class="col">
-					<div class="input-group" style="width: 500px">
+					<div class="input-group" style="width: 400px">
 						@*textbox buscar*@
-						<div class="form-floating d-flex align-items-center">
+						<div class="form-floating">
 							<InputText @bind-Value="@searchBarValue" class="form-control" placeholder="" id="floatingSearch" />
 							<label for="floatingSearch">Buscar</label>
 						</div>
@@ -52,33 +54,11 @@
 				</div>
 			</div>
 
-			@if (valorFiltro == "fechaingreso")
-			{
-				<br />
-				<div class="row">
-					<div class="col">
-						<div class="form-floating">
-							<InputDate id="desde" class="form-control" @bind-Value=Desde></InputDate>
-							<label for="desde"><strong>Fecha Inicial</strong></label>
-						</div>
-					</div>
-
-					<div class="col">
-						<div class="form-floating">
-							<InputDate id="hasta" class="form-control" @bind-Value=Hasta></InputDate>
-							<label for="hasta"><strong>Fecha Final</strong></label>
-						</div>
-					</div>
-				</div>
-			}
-
-			<br />
-
-			<table class="table table-light table-hover">
-				<thead class="table table-striped ">
-					<tr class="text-center ">
+			<table class="table table-sm table-striped table-hover">
+				<thead>
+					<tr>
 						<th>ID</th>
-						<th>Numero factura</th>
+						<th>No. de factura</th>
 						<th>Cliente</th>
 						<th>Monto de Orden</th>
 						<th>% de Interés</th>
@@ -91,7 +71,7 @@
 				<tbody>
 					@foreach (var cxc in ListaDeudas)
 					{
-						<tr class="text-center text-white">
+						<tr>
 							<td>@cxc.CXCId</td>
 							<td>@cxc.OrdenVenta?.NumeroFactura</td>
 							<td>@cxc.OrdenVenta?.Clientes?.Nombre</td>
@@ -108,7 +88,7 @@
 										<span class="badge btn-success">Pagado</span>
 										break;
 									case 3:
-										<span class="badge text-bg-warning">Pagada Tard&iacute;o</span>
+										<span class="badge text-bg-warning">Pagado Tard&iacute;o</span>
 										break;
 									default:
 										<span class="badge text-bg-secondary">N/A</span>
@@ -118,14 +98,14 @@
 							<td>@($"({cxc.OrdenVenta?.Clientes?.Telefono?[..3]}) {cxc.OrdenVenta?.Clientes?.Telefono?[3..6]}-{cxc.OrdenVenta?.Clientes?.Telefono?[6..]}")</td>
 
 							@*Botones*@
-							<td class="text-center">
-								<a href="/Deudas/Details/@cxc.CXCId" class="btn btn-outline-dark bi-eye"></a>
-								<button type="button" @onclick="() => MostrarModal(cxc.CXCId, cxc.OrdenVenta?.Clientes?.Nombre)" class="btn btn-outline-danger bi bi-trash"></button>
+							<td>
+								<a href="/Detalle-Cuenta-Por-Cobrar/@cxc.CXCId" class="btn btn-sm btn-outline-dark bi-eye"></a>
+								<button type="button" @onclick="() => MostrarModal(cxc.CXCId, cxc.OrdenVenta?.Clientes?.Nombre)" class="btn btn-sm btn-outline-danger bi bi-trash"></button>
 							</td>
 						</tr>
 					}
 				</tbody>
-				<caption>Cant. De deudas: @ListaDeudas.Count</caption>
+				<caption>Cant. de Cuentas x Cobrar: @ListaDeudas.Count</caption>
 			</table>
 		</div>
 	</div>
@@ -164,6 +144,7 @@
 		border: none;
 	}
 </style>
+
 @code {
 	public string searchBarValue { get; set; } = string.Empty;
 	public string valorFiltro { get; set; } = string.Empty;
@@ -252,12 +233,32 @@
 
 		switch (valorFiltro)
 		{
-			case "idcliente":
+			case "cliente":
 				if (string.IsNullOrEmpty(searchBarValue))
 				{
 					TipoNotificacion = ToastType.Warning;
 					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "Debe proveer un ID de deuda para buscar";
+					MensajeNotificacion = "Debe proveer un nombre para buscar";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				if (searchBarValue.All(char.IsDigit))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "El criterio de búsqueda solo puede alojar letras";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				ListaDeudas = await DeudaService.Listar(lt => lt.OrdenVenta.Clientes.Nombre == searchBarValue);
+				break;
+
+			case "idcxc":
+				if (string.IsNullOrEmpty(searchBarValue))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "Debe proveer el ID de la CxC para buscar";
 					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 					return;
 				}
@@ -265,12 +266,32 @@
 				{
 					TipoNotificacion = ToastType.Warning;
 					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "El criterio de búsqueda solo puede alojar numeros.";
+					MensajeNotificacion = "El criterio de búsqueda solo puede alojar números.";
 					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 					return;
 				}
 				if (int.TryParse(searchBarValue, out int id))
 					ListaDeudas = await DeudaService.Listar(lt => lt.CXCId == id);
+				break;
+
+			case "numerofactura":
+				if (string.IsNullOrEmpty(searchBarValue))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "Debe proveer el número de la factura para buscar";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				if (!searchBarValue.All(char.IsDigit))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "El criterio de búsqueda solo puede alojar números.";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				ListaDeudas = await DeudaService.Listar(lt => lt.OrdenVenta.NumeroFactura == searchBarValue);
 				break;
 
 			default:

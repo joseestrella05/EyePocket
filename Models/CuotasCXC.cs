@@ -9,7 +9,9 @@ public class CuotasCXC
 	public int CuotaCXCID { get; set; }
 
 
+	[ForeignKey(nameof(CxC))]
 	public int CXCId { get; set; }
+	private CuentasXCobrar? CxC { get; set; }
 
 
 	public int NumeroCuota { get; set; } = 1;

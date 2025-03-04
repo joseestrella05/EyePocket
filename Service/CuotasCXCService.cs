@@ -105,29 +105,43 @@ public class CuotasCXCService(IDbContextFactory<ApplicationDbContext> DbFactory)
 			.ToListAsync();
 	}
 
-	public Task<List<CuotasCXC>> CalcularCuotas(CuentasXCobrar cuenta)
+	public async Task<List<CuotasCXC>> CalcularCuotas(CuentasXCobrar cxc)
 	{
-		List<CuotasCXC> listaCuotas = new List<CuotasCXC>();
-		double saldo = cuenta.Capital;
-		double tasaMensual = cuenta.Interes / 100 / 12;
-		double cuota = cuenta.Capital * (tasaMensual / (1 - Math.Pow(1 + tasaMensual, -cuenta.Periodos)));
+		var listaCuotas = new List<CuotasCXC>();
+		double saldo = cxc.Capital;
+		double tasaMensual = cxc.Interes / 100 / 12;
 
-		for (int mes = 1; mes <= cuenta.Periodos; mes++)
+		double cuota = saldo * (tasaMensual / (1 - Math.Pow(1 + tasaMensual, - cxc.Periodos)));
+		cuota = Math.Round(cuota, 2); // Redondeamos para evitar errores de precisión
+
+		for (int mes = 1; mes <= cxc.Periodos; mes++)
 		{
+			double interes = Math.Round(saldo * tasaMensual, 2);
+			double pagoCapital = Math.Round(cuota - interes, 2);
+			double saldoFinal = Math.Round(saldo - pagoCapital, 2);
+
+			// Ajuste en la última cuota para que saldoFinal sea exactamente cero
+			if (mes == cxc.Periodos)
+			{
+				pagoCapital = saldo;
+				saldoFinal = 0;
+			}
+
 			var cuotaAux = new CuotasCXC
 			{
-				CXCId = cuenta.CXCId,
-				Interes = saldo * tasaMensual,
-				PagoCapital = cuota - (saldo * tasaMensual),
-				SaldoFinal = saldo - (cuota - (saldo * tasaMensual)),
+				CXCId = cxc.CXCId,
+				Interes = interes,
+				PagoCapital = pagoCapital,
+				SaldoFinal = saldoFinal,
 				FechaVencimiento = DateTime.Now.AddMonths(mes),
 				NumeroCuota = mes,
 				EstadoId = 1
 			};
-			saldo = cuotaAux.SaldoFinal;
+
+			saldo = saldoFinal;
 			listaCuotas.Add(cuotaAux);
 		}
-
-		return Task.FromResult(listaCuotas);
+		return listaCuotas;
 	}
+
 }
