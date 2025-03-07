@@ -1,0 +1,77 @@
+﻿@page "/CXP/Details/{CuentaId:int}"
+@inject CXPServices cxpservice
+@inject EstadoCXPService estadoCXPService
+@inject MetodoPagoService metodoPagoService
+@inject NavigationManager navigation
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <div class="section-title">Datos de la cuenta</div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold">Cuenta ID:</label>
+                    <span>@cxp.CuentaId</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold">Sueldo Pendiente:</label>
+                    <span>@cxp.SaldoPendiente</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold">Ultimo Pago:</label>
+                    <span>@cxp.UltimoPago</span>
+                </div>
+            </div>
+
+            <div class="section-title">Otros datos de la cuenta</div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold">Estado:</label>
+                    <span>@Estado.descripcion</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold"></label>
+                    <label class="font-weight-bold">Metodo Pago:</label>
+                    <span>@MetodoPago.Descripcion</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-3">
+        <a href="/CXPS/Index" class="btn btn-secondary">Volver</a>
+    </div>
+</div>
+
+@code {
+
+
+    [Parameter]
+    public int CuentaId { get; set; }
+    public CXP cxp { get; set; } = new CXP();
+    public MetodoPago MetodoPago { get; set; } = new MetodoPago();
+    public EstadoCXP Estado { get; set; } = new EstadoCXP();
+    [Inject] protected ToastService ToastService { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        cxp = await cxpservice.Buscar(CuentaId) ?? new CXP();
+        MetodoPago = await metodoPagoService.Buscar(CuentaId) ?? new MetodoPago();
+        Estado = await estadoCXPService.Buscar(CuentaId) ?? new EstadoCXP();
+    }
+
+
+
+
+}
