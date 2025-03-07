@@ -2,6 +2,7 @@
 @using EyePocket.Services
 @inject ProductosService productoService
 @inject ToastService toastService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Facturación</PageTitle>
 
@@ -338,7 +339,7 @@
                                         <label for="total">Total a Pagar</label>
                                         <input type="text" id="total" value="@Total.ToString("0.00")" class="form-control" disabled readonly>
                                     </div>  
-                                     
+
                                     <div class="form-group w-40 mb-4">
                                         <label for="efectivo">Monto en Efectivo</label>
                                         <input type="number" id="efectivo" @bind-value="Efectivo" @bind-value:event="oninput" placeholder="Ingrese el monto en efectivo" class="form-control">
@@ -350,7 +351,7 @@
                                     </div>
 
                                     <div class="col-12 d-flex justify-content-left" style="margin-top: 16px;">
-                                        <button class="btn btn-success bi bi-currency-dollar" @onclick="MostrarModalPagoEfectivo">Confirmar Pago</button>
+                                        <button class="btn btn-success bi bi-currency-dollar" @onclick="ConfirmarPagoEfectivo">Confirmar Pago</button>
                                         <button class="btn btn-danger bi bi-arrow-left-circle" @onclick="CerrarModalPagoEfectivo">Cancelar</button>
                                     </div>
                                 </div>
@@ -385,14 +386,14 @@
 
     private void MostrarModalCobro() => mostrarModalCobro = true;
     private void CerrarModalCobro() => mostrarModalCobro = false;   
-  
+
 
     private void MostrarModalPagoaCredito()
     {
         mostrarModalCobro = false;
         mostrarModalPagoaCredito = true;
     } 
-    
+
 
     private void CerrarModalPagoaCredito()
     {
@@ -409,7 +410,7 @@
     private void CerrarModalPagoTarjeta()
     {
         mostrarModalCobro = true;
-         mostrarModalPagoTarjeta = false;
+        mostrarModalPagoTarjeta = false;
     }
 
     private void MostrarModalPagoEfectivo()
@@ -417,6 +418,14 @@
         mostrarModalCobro = false;
         mostrarModalPagoEfectivo = true;
     }
+
+    private async Task ConfirmarPagoEfectivo()
+    {
+        MostrarToast(ToastType.Success, "Éxito", "Los datos se guardaron con éxito");
+        await Task.Delay(2000); 
+        NavigationManager.NavigateTo("/Ventas/Facturacion/Index", true);
+    }
+
 
     private void CerrarModalPagoEfectivo()
     {
