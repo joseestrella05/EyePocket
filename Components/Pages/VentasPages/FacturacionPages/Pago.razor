@@ -1,169 +1,104 @@
 ﻿@page "/Ventas/Factura"
+@inject NavigationManager navigation
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Factura</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
+<PageTitle>Factura</PageTitle>
 
-        .invoice {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            border: 1px solid #ccc;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
+<div class="text-left">
+    <h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-receipt m-1"></i> Factura</h2>
+</div>
 
-        .invoice-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-            .invoice-header h1 {
-                margin: 0;
-                font-size: 24px;
-            }
-
-        .invoice-details {
-            margin-bottom: 20px;
-        }
-
-            .invoice-details p {
-                margin: 5px 0;
-            }
-
-        .invoice-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-            .invoice-table th, .invoice-table td {
-                border: 1px solid #ccc;
-                padding: 10px;
-                text-align: center;
-            }
-
-            .invoice-table th {
-                background-color: #f9f9f9;
-            }
-
-        .invoice-total {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-
-            .invoice-total p {
-                margin: 5px 0;
-            }
-
-        .invoice-contact-payment {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .invoice-contact, .invoice-payment {
-            width: 48%;
-        }
-
-            .invoice-contact p, .invoice-payment p {
-                margin: 5px 0;
-            }
-    </style>
-</head>
-<body>
-    <div class="invoice">
-        <div class="invoice-header">
-            <h1>FACTURA</h1>
-        </div>
-        <div class="invoice-details">
-            <p>Factura n°: 01234</p>
-            <p>Fecha: 14 de julio de 2023</p>
-            <p>Cliente: Ricardo Soto</p>
-        </div>
-        <table class="invoice-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Código</th>
-                    <th>Descripción</th>
-                    <th>Cantidad</th>
-                    <th>Precio</th>
-                    <th>Descuento</th>
-                    <th>Subtotal</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>001</td>
-                    <td>Producto A</td>
-                    <td>1</td>
-                    <td>$100</td>
-                    <td>0%</td>
-                    <td>$100</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>002</td>
-                    <td>Producto B</td>
-                    <td>4</td>
-                    <td>$200</td>
-                    <td>10%</td>
-                    <td>$720</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>003</td>
-                    <td>Producto C</td>
-                    <td>3</td>
-                    <td>$300</td>
-                    <td>5%</td>
-                    <td>$855</td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>004</td>
-                    <td>Producto D</td>
-                    <td>2</td>
-                    <td>$100</td>
-                    <td>0%</td>
-                    <td>$200</td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="invoice-total">
-            <p>Subtotal: $1875</p>
-            <p>Impuestos: $100</p>
-            <p><strong>TOTAL: $1975</strong></p>
-        </div>
-        <div class="invoice-contact-payment">
-            <div class="invoice-contact">
-                <p><strong>Contacto:</strong></p>
-                <p>603 9126 - 3631</p>
-                <p>Santiago@santiago.com</p>
-                <p>www.santiago.com</p>
-                <p>Calle Calendario 125, Calendario Lugar</p>
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <div class="invoice-header text-center">
+                <h1>FACTURA</h1>
             </div>
-            <div class="invoice-payment">
-                <p><strong>Información de pago:</strong></p>
-                <p>Nombre del tercero</p>
-                <p>Nombre de cuentas</p>
-                <p>Alto de cuenta</p>
-                <p>Fecha de pago</p>
-                <p>6125 4547 5901</p>
-                <p>Fundación sobre</p>
-                <p>$ 16 de julio de 2023</p>
+            <div class="invoice-details">
+                <p>Factura n°: </p>
+                <p>Fecha: </p>
+                <p>Cliente: </p>
+            </div>
+            <table class="invoice-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Código</th>
+                        <th>Descripción</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Descuento</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="invoice-total text-right">
+                <p>Subtotal: $</p>
+                <p>Descuento Total: $</p>
+                <p><strong>TOTAL: $</strong></p>
+            </div>
+            <div class="invoice-contact-payment d-flex justify-content-between">
+                <div class="invoice-contact">
+                    <p><strong>Contacto:</strong></p>
+                    <p>(809) 126 - 3631</p>
+                    <p>EyePocket@gmail.com</p>
+                    <p>www.EyePocket.com</p>
+                    <p>Calle Duarte</p>
+                </div>
+                <div class="invoice-payment">
+                    <p><strong>Información de pago:</strong></p>
+                    <p>Nombre del tercero</p>
+                    <p>Nombre de cuentas</p>
+                    <p>Alto de cuenta</p>
+                    <p>Fecha de pago</p>
+                    <p>6125 4547 5901</p>
+                </div>
             </div>
         </div>
     </div>
-</body>
-</html>
+    <div class="text-center mt-3">
+        <button class="btn btn-primary" @onclick="Volver">Volver</button>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 800px;
+        margin: auto;
+        padding: 10px;
+    }
+
+    .card {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+    }
+
+    .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+        .invoice-table th, .invoice-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .invoice-table th {
+            background-color: #f9f9f9;
+        }
+
+    .btn-primary {
+        background-color: #0d5c63;
+        border: none;
+    }
+</style>
+
+@code {
+    private void Volver()
+    {
+        navigation.NavigateTo("/Ventas");
+    }
+}
+
