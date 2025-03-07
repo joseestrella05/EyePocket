@@ -151,12 +151,11 @@
                             <button class="btn btn-success w-50 mt-4 rounded-pill" @onclick="Cobrar">
                                 <i class="bi bi-cash"></i> Cobrar
                             </button>
-
-                            <a href="/Ventas/Factura">
-                                <button class="btn btn-success w-100 mt-2 rounded-pill">
-                                    <i class="bi bi-printer"></i> Imprimir
-                                </button>
-                            </a>
+                          
+                            <button class="btn btn-success w-50 mt-2 rounded-pill"  @onclick="MostrarModalFactura">
+                                <i class="bi bi-printer"></i> Imprimir
+                            </button>
+                            
 
 
                             <button class="btn btn-danger w-50 mt-2 rounded-pill" @onclick="CerrarModalCobro">
@@ -364,6 +363,82 @@
     </div>
 }
 
+@if (mostrarModalFactura)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #004b55;">
+                    <h5 class="modal-title fw-bold text-white">Factura</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModalFactura"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="invoice-header text-center">
+                        <h1>FACTURA</h1>
+                    </div>
+                    <div class="invoice-details">
+                        <p>Factura n°: 001</p>
+                        <p>Fecha: @DateTime.Now.ToString("dd/MM/yyyy")</p>
+                        <p>Cliente: Nombre del Cliente</p>
+                    </div>
+                    <table class="invoice-table table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Código</th>
+                                <th>Descripción</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Descuento</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < ListaFacturas.Count; i++)
+                            {
+                                var factura = ListaFacturas[i];
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td>@factura.Productos?.Codigo</td>
+                                    <td>@factura.Productos?.Nombre</td>
+                                    <td>@factura.Cantidad</td>
+                                    <td>@factura.Productos?.Precio</td>
+                                    <td>@factura.Productos?.Descuento</td>
+                                    <td>@factura.Subtotal</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div class="invoice-total text-right">
+                        <p>Subtotal: $@ListaFacturas.Sum(f => f.Subtotal)</p>
+                        <p>Descuento Total: $0.00</p>
+                        <p><strong>TOTAL: $@ListaFacturas.Sum(f => f.Subtotal)</strong></p>
+                    </div>
+                    <div class="invoice-contact-payment d-flex justify-content-between">
+                        <div class="invoice-contact">
+                            <p><strong>Contacto:</strong></p>
+                            <p>(809) 126 - 3631</p>
+                            <p>EyePocket@gmail.com</p>
+                            <p>www.EyePocket.com</p>
+                            <p>Calle Duarte</p>
+                        </div>
+                        <div class="invoice-payment">
+                            <p><strong>Información de pago:</strong></p>
+                            <p>Nombre del tercero</p>
+                            <p>Nombre de cuentas</p>
+                            <p>Alto de cuenta</p>
+                            <p>Fecha de pago</p>
+                            <p>6125 4547 5901</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CerrarModalFactura">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 
 @code {
@@ -374,7 +449,7 @@
     private double Efectivo { get; set; } = 0.00;
     private double Total => ListaFacturas.Sum(f => f.Subtotal);
     private double Cambio => Efectivo > 0 ? Math.Max(Efectivo - Total, 0) : 0.00;
-
+    private bool mostrarModalFactura = false;
 
 
     private bool mostrarModalConfirmacion = false;
@@ -383,6 +458,9 @@
     private bool mostrarModalPagoaCredito = false;
     private bool mostrarModalPagoEfectivo = false;
     private string? codigoProductoAEliminar;
+
+    private void MostrarModalFactura() => mostrarModalFactura = true;
+    private void CerrarModalFactura() => mostrarModalFactura = false;
 
     private void MostrarModalCobro() => mostrarModalCobro = true;
     private void CerrarModalCobro() => mostrarModalCobro = false;   
