@@ -1,0 +1,72 @@
+﻿<div class="modal show d-block" style="background: rgba(0,0,0,0.5); height: 100vh; display: flex; justify-content: center; align-items: center;">
+	<div class="modal-dialog" style="max-width: 60vw; max-height: 60vh;">
+		<div class="modal-content" style="max-height: 100%; display: flex; flex-direction: column;">
+			<div class="modal-header">
+				<h5 class="modal-title">Seleccionar Orden de Venta</h5>
+				<button type="button" class="close" @onclick="CerrarModal">×</button>
+			</div>
+			<div class="modal-body" style="overflow-y: auto; flex-grow: 1;">
+				<div class="row">
+					<div class="col">
+						<InputSelect class="form-select" @bind-Value="@filtro">
+							<option value="" selected disabled>- Selecciona un filtro ---</option>
+							<option value="idcxc">ID CxC</option>
+							<option value="cliente">Cliente</option>
+							<option value="numerofactura">No. de Factura</option>
+						</InputSelect>
+					</div>
+					<div class="col">
+						<InputText @bind-Value="@searchBarValue" class="form-control" />
+					</div>
+				</div>
+
+				<table class="table mt-3">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Cliente</th>
+							<th>No. Factura</th>
+							<th>Monto</th>
+							<th>Acción</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var orden in ListaOrdenVentas.Where(o => o.Clientes.Nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)))
+						{
+							<tr>
+								<td>@orden.OrdenVentaId</td>
+								<td>@orden.Clientes.Nombre</td>
+								<td>@orden.NumeroFactura</td>
+								<td>@orden.MontoTotal</td>
+								<td>
+									<button class="btn btn-success" @onclick="() => SeleccionarOrden(orden)">Seleccionar</button>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public List<OrdenVenta> ListaOrdenVentas { get; set; } = [];
+
+	[Parameter]
+	public EventCallback<OrdenVenta> SeleccionarOrdenOn { get; set; }
+
+	private bool mostrarModal { get; set; } = false;
+	private string filtro { get; set; } = string.Empty;
+	public string searchBarValue { get; set; } = string.Empty;
+
+	private void AbrirModal() => mostrarModal = true;
+	private void CerrarModal() => mostrarModal = false;
+
+	private void SeleccionarOrden(OrdenVenta orden)
+	{
+		SeleccionarOrdenOn.InvokeAsync(orden);
+		CerrarModal();
+	}
+}

@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace EyePocket.Migrations
 {
     /// <inheritdoc />
@@ -81,6 +83,19 @@ namespace EyePocket.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Estados", x => x.EstadoId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MetodosPago",
+                columns: table => new
+                {
+                    MetodoPagoId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MetodosPago", x => x.MetodoPagoId);
                 });
 
             migrationBuilder.CreateTable(
@@ -255,33 +270,107 @@ namespace EyePocket.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Deudas",
+                name: "CuentasXCobrar",
                 columns: table => new
                 {
-                    DeudasId = table.Column<int>(type: "int", nullable: false)
+                    CXCId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SaldoPendiente = table.Column<float>(type: "real", nullable: false),
-                    Periodos = table.Column<int>(type: "int", nullable: false),
-                    Capital = table.Column<float>(type: "real", nullable: false),
-                    Interes = table.Column<float>(type: "real", nullable: false),
                     OrdenVentaId = table.Column<int>(type: "int", nullable: false),
-                    EstadoId = table.Column<int>(type: "int", nullable: false)
+                    EstadoId = table.Column<int>(type: "int", nullable: false),
+                    Periodos = table.Column<int>(type: "int", nullable: false),
+                    Capital = table.Column<double>(type: "float", nullable: false),
+                    Interes = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Deudas", x => x.DeudasId);
+                    table.PrimaryKey("PK_CuentasXCobrar", x => x.CXCId);
                     table.ForeignKey(
-                        name: "FK_Deudas_Estados_EstadoId",
+                        name: "FK_CuentasXCobrar_Estados_EstadoId",
                         column: x => x.EstadoId,
                         principalTable: "Estados",
                         principalColumn: "EstadoId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Deudas_OrdenVenta_OrdenVentaId",
+                        name: "FK_CuentasXCobrar_OrdenVenta_OrdenVentaId",
                         column: x => x.OrdenVentaId,
                         principalTable: "OrdenVenta",
                         principalColumn: "OrdenVentaId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CuotasCXC",
+                columns: table => new
+                {
+                    CuotaCXCID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CXCId = table.Column<int>(type: "int", nullable: false),
+                    NumeroCuota = table.Column<int>(type: "int", nullable: false),
+                    FechaVencimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Interes = table.Column<double>(type: "float", nullable: false),
+                    PagoCapital = table.Column<double>(type: "float", nullable: false),
+                    SaldoFinal = table.Column<double>(type: "float", nullable: false),
+                    Mora = table.Column<double>(type: "float", nullable: false),
+                    EstadoId = table.Column<int>(type: "int", nullable: false),
+                    CuentasXCobrarCXCId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CuotasCXC", x => x.CuotaCXCID);
+                    table.ForeignKey(
+                        name: "FK_CuotasCXC_CuentasXCobrar_CuentasXCobrarCXCId",
+                        column: x => x.CuentasXCobrarCXCId,
+                        principalTable: "CuentasXCobrar",
+                        principalColumn: "CXCId");
+                    table.ForeignKey(
+                        name: "FK_CuotasCXC_Estados_EstadoId",
+                        column: x => x.EstadoId,
+                        principalTable: "Estados",
+                        principalColumn: "EstadoId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PagosCXC",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CXCId = table.Column<int>(type: "int", nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FechaPago = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MetodoPagoId = table.Column<int>(type: "int", nullable: false),
+                    MontoPagado = table.Column<double>(type: "float", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PagosCXC", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PagosCXC_CuentasXCobrar_CXCId",
+                        column: x => x.CXCId,
+                        principalTable: "CuentasXCobrar",
+                        principalColumn: "CXCId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Estados",
+                columns: new[] { "EstadoId", "Nombre" },
+                values: new object[,]
+                {
+                    { 1, "Pendiente" },
+                    { 2, "Pagado" },
+                    { 3, "Vencido" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "MetodosPago",
+                columns: new[] { "MetodoPagoId", "Descripcion" },
+                values: new object[,]
+                {
+                    { 1, "Tarjeta" },
+                    { 2, "Efectivo" },
+                    { 3, "Cheque" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -324,19 +413,34 @@ namespace EyePocket.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Deudas_EstadoId",
-                table: "Deudas",
+                name: "IX_CuentasXCobrar_EstadoId",
+                table: "CuentasXCobrar",
                 column: "EstadoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Deudas_OrdenVentaId",
-                table: "Deudas",
+                name: "IX_CuentasXCobrar_OrdenVentaId",
+                table: "CuentasXCobrar",
                 column: "OrdenVentaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CuotasCXC_CuentasXCobrarCXCId",
+                table: "CuotasCXC",
+                column: "CuentasXCobrarCXCId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CuotasCXC_EstadoId",
+                table: "CuotasCXC",
+                column: "EstadoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrdenVenta_ClienteId",
                 table: "OrdenVenta",
                 column: "ClienteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PagosCXC_CXCId",
+                table: "PagosCXC",
+                column: "CXCId");
         }
 
         /// <inheritdoc />
@@ -358,7 +462,13 @@ namespace EyePocket.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Deudas");
+                name: "CuotasCXC");
+
+            migrationBuilder.DropTable(
+                name: "MetodosPago");
+
+            migrationBuilder.DropTable(
+                name: "PagosCXC");
 
             migrationBuilder.DropTable(
                 name: "Productos");
@@ -371,6 +481,9 @@ namespace EyePocket.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "CuentasXCobrar");
 
             migrationBuilder.DropTable(
                 name: "Estados");
