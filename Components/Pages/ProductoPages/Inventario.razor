@@ -1,6 +1,7 @@
 ﻿@page "/Productos/Inventario"
 @inject InventarioService inventarioService
 @inject ProductosService productosService
+@inject MermasService mermasService
 @inject ToastService toastService
 
 @rendermode InteractiveServer
@@ -28,63 +29,71 @@
     <div class="modal-backdrop fade show" @onclick="CerrarModal"></div>
 }
 
-<div class="row" style="background-color:white; padding:10px; margin:10px;">
-    <div class="col">
-        <div class="text-left">
+<div class="container-fluid p-3">
+    <div class="row mb-3">
+        <div class="col">
             <h2 class="text-black"><i class="bi bi-clipboard m-1"></i> Inventario</h2>
         </div>
+        <div class="col text-end">
+            <a href="/Inventario/Entrada" class="btn btn-secondary">Entrada</a>
+            <a href="/Inventario/Salida" class="btn btn-primary">Salida</a>
+            <a href="/Mermas/Index" class="btn btn-info">Historial Mermas</a>
+        </div>
     </div>
-    <div class="col">
-        <a href="/Inventario/Entrada" class="btn btn-secondary">Entrada</a>
-        <a href="/Inventario/Salida" class="btn btn-primary">Salida</a>
-    </div>
-</div>
 
-<div class="container">
-    <div class="card">
+    <div class="card shadow-lg w-100">
         <div class="card-body">
-            <table class="table table-light table-hover">
-                <thead class="table table-striped">
-                    <tr class="text-center">
-                        <th>Codigo</th>
-                        <th>Producto</th>
-                        <th>Stock</th>
-                        <th>Entradas</th>
-                        <th>Salidas</th>
-                        <th>Precio</th>
-                        <th>Importe Inventario</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var inventario in ListaInventario)
-                    {
-                        var importeInventario = inventario.Stock * inventario.Producto.Precio;
-
-                        <tr class="text-center text-white">
-                            <td>@inventario.Producto.Codigo</td>
-                            <td>@inventario.Producto.Nombre</td>
-                            <td>@inventario.Stock</td>
-                            <td>@inventario.Entradas</td>
-                            <td>@inventario.Salidas</td>
-                            <td>@inventario.Producto.Precio</td>
-                            <td>@importeInventario.ToString("C2")</td>  
-                            <td class="text-center">
-                                <button type="button" @onclick="() => MostrarModal(inventario.InventarioId)" class="btn btn-outline-danger bi bi-trash"></button>
-                                <button type="button" @onclick="() => AgregarEntrada(inventario.InventarioId)" class="btn btn-outline-success bi bi-plus-circle"></button>
-                                <button type="button" @onclick="() => RegistrarSalida(inventario.InventarioId)" class="btn btn-outline-warning bi bi-dash-circle"></button>
-                            </td>
+            <div class="table-responsive overflow-x-auto">
+                <table class="table table-light table-hover w-100">
+                    <thead class="table table-striped text-center">
+                        <tr>
+                            <th>Código</th>
+                            <th>Producto</th>
+                            <th>Stock</th>
+                            <th>Mermas</th> <!-- Nueva columna -->
+                            <th>Stock Disponible</th> <!-- Nueva columna -->
+                            <th>Entradas</th>
+                            <th>Salidas</th>
+                            <th>Precio</th>
+                            <th>Importe Inventario</th>
+                            <th>Acciones</th>
                         </tr>
-                    }
-                </tbody>
-                <caption>Total Inventario: @ListaInventario.Count</caption>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var inventario in ListaInventario)
+                        {
+                            var totalMermas = MermasPorProducto.TryGetValue(inventario.ProductoId, out var mermas) ? mermas : 0;
+                            var stockDisponible = inventario.Stock - totalMermas;
+                            var importeInventario = stockDisponible * inventario.Producto.Precio;
+
+                            <tr class="text-center">
+                                <td>@inventario.Producto.Codigo</td>
+                                <td>@inventario.Producto.Nombre</td>
+                                <td>@inventario.Stock</td>
+                                <td>@totalMermas</td> <!-- Nueva columna -->
+                                <td>@stockDisponible</td> <!-- Nueva columna -->
+                                <td>@inventario.Entradas</td>
+                                <td>@inventario.Salidas</td>
+                                <td>@inventario.Producto.Precio.ToString("C2")</td>
+                                <td>@importeInventario.ToString("C2")</td>
+                                <td>
+                                    <button type="button" @onclick="() => MostrarModal(inventario.InventarioId)" class="btn btn-outline-danger bi bi-trash"></button>
+                                    <button type="button" @onclick="() => AgregarEntrada(inventario.InventarioId)" class="btn btn-outline-success bi bi-plus-circle"></button>
+                                    <button type="button" @onclick="() => RegistrarSalida(inventario.InventarioId)" class="btn btn-outline-warning bi bi-dash-circle"></button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <caption>Total Inventario: @ListaInventario.Count</caption>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
 @code {
-    public List<Inventarios> ListaInventario { get; set; } = new List<Inventarios>();
+    public List<Inventarios> ListaInventario { get; set; } = new();
+    private Dictionary<int, int> MermasPorProducto { get; set; } = new(); // Nueva estructura
     private bool mostrarModal = false;
     private int InventarioIdSeleccionado { get; set; }
 
@@ -105,7 +114,7 @@
         if (InventarioIdSeleccionado > 0)
         {
             await inventarioService.Eliminar(InventarioIdSeleccionado);
-            ListaInventario = await inventarioService.Listar(i => true);
+            await CargarInventario();
             CerrarModal();
             toastService.Notify(new(ToastType.Success, "Éxito", "Inventario eliminado correctamente"));
         }
@@ -113,15 +122,10 @@
 
     private async Task AgregarEntrada(int inventarioId)
     {
-        var exito = await inventarioService.RegistrarEntrada(inventarioId, 1); 
+        var exito = await inventarioService.RegistrarEntrada(inventarioId, 1);
         if (exito)
         {
-            var inventario = await inventarioService.BuscarId(inventarioId);
-            var inventarioExistente = ListaInventario.FirstOrDefault(i => i.InventarioId == inventarioId);
-            if (inventarioExistente != null && inventario != null)
-            {
-                inventarioExistente.Stock = inventario.Stock;
-            }
+            await CargarInventario();
             toastService.Notify(new(ToastType.Success, "Éxito", "Entrada registrada correctamente"));
         }
         else
@@ -132,15 +136,10 @@
 
     private async Task RegistrarSalida(int inventarioId)
     {
-        var exito = await inventarioService.RegistrarSalida(inventarioId, 1); 
+        var exito = await inventarioService.RegistrarSalida(inventarioId, 1);
         if (exito)
         {
-            var inventario = await inventarioService.BuscarId(inventarioId);
-            var inventarioExistente = ListaInventario.FirstOrDefault(i => i.InventarioId == inventarioId);
-            if (inventarioExistente != null && inventario != null)
-            {
-                inventarioExistente.Stock = inventario.Stock;  
-            }
+            await CargarInventario();
             toastService.Notify(new(ToastType.Success, "Éxito", "Salida registrada correctamente"));
         }
         else
@@ -151,6 +150,27 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ListaInventario = await inventarioService.Listar(i => true);
+        await CargarInventario();
     }
+
+    private async Task CargarInventario()
+    {
+        ListaInventario = await inventarioService.Listar(i => true);
+        var listaMermas = await mermasService.Listar(m => true);
+
+        // Calcular mermas por producto asegurando que no se exceda el stock
+        MermasPorProducto = listaMermas
+            .GroupBy(m => m.ProductoId)
+            .ToDictionary(g => g.Key, g =>
+            {
+                var stockDisponible = ListaInventario.FirstOrDefault(i => i.ProductoId == g.Key)?.Stock ?? 0;
+                var totalMermas = g.Sum(m => m.Cantidad);
+
+                // Evitar que las mermas superen el stock disponible
+                return Math.Min(totalMermas, stockDisponible);
+            });
+
+        StateHasChanged(); // Actualizar UI
+    }
+
 }
