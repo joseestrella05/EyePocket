@@ -10,7 +10,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<Estados> Estados { get; set; }
 
-
+    public DbSet<Mermas> Mermas { get; set; }
     public DbSet<Productos> Productos { get; set; }
 
     public DbSet<Tickets> Tickets { get; set; }
