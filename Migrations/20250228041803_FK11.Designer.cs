@@ -4,6 +4,7 @@ using EyePocket.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EyePocket.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250228041803_FK11")]
+    partial class FK11
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,9 +175,6 @@ namespace EyePocket.Migrations
                     b.Property<int>("CXCId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CuentasXCobrarCXCId")
-                        .HasColumnType("int");
-
                     b.Property<int>("EstadoId")
                         .HasColumnType("int");
 
@@ -182,9 +182,6 @@ namespace EyePocket.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<double>("Interes")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Mora")
                         .HasColumnType("float");
 
                     b.Property<int>("NumeroCuota")
@@ -198,7 +195,7 @@ namespace EyePocket.Migrations
 
                     b.HasKey("CuotaCXCID");
 
-                    b.HasIndex("CuentasXCobrarCXCId");
+                    b.HasIndex("CXCId");
 
                     b.HasIndex("EstadoId");
 
@@ -220,23 +217,6 @@ namespace EyePocket.Migrations
                     b.HasKey("EstadoId");
 
                     b.ToTable("Estados");
-
-                    b.HasData(
-                        new
-                        {
-                            EstadoId = 1,
-                            Nombre = "Pendiente"
-                        },
-                        new
-                        {
-                            EstadoId = 2,
-                            Nombre = "Pagado"
-                        },
-                        new
-                        {
-                            EstadoId = 3,
-                            Nombre = "Vencido"
-                        });
                 });
 
             modelBuilder.Entity("EyePocket.Models.MetodosPago", b =>
@@ -384,35 +364,6 @@ namespace EyePocket.Migrations
                     b.HasKey("ProductoId");
 
                     b.ToTable("Productos");
-                });
-
-            modelBuilder.Entity("EyePocket.Models.Provedores", b =>
-                {
-                    b.Property<int>("ProvedorId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProvedorId"));
-
-                    b.Property<string>("Correo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Direccion")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telefono")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ProvedorId");
-
-                    b.ToTable("Provedores");
                 });
 
             modelBuilder.Entity("EyePocket.Models.Tickets", b =>
@@ -611,7 +562,8 @@ namespace EyePocket.Migrations
                 {
                     b.HasOne("EyePocket.Models.CuentasXCobrar", null)
                         .WithMany("ListaCuotasCXC")
-                        .HasForeignKey("CuentasXCobrarCXCId");
+                        .HasForeignKey("CXCId")
+                        .IsRequired();
 
                     b.HasOne("EyePocket.Models.Estados", "Estado")
                         .WithMany()

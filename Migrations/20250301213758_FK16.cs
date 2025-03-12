@@ -5,7 +5,7 @@
 namespace EyePocket.Migrations
 {
     /// <inheritdoc />
-    public partial class inicial : Migration
+    public partial class FK16 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

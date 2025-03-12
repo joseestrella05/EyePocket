@@ -9,7 +9,10 @@ public class OrdenVenta
     public int OrdenVentaId { get; set; }
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
-    public DateTime FechaEmision { get; set; }
+    public DateTime FechaEmision { get; set; } = DateTime.Now;
+
+    [Required(ErrorMessage = "Este campo es obligatorio.")]
+    public DateTime FechaVencimiento { get; set; } = DateTime.Now;
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
     public string? NumeroFactura { get;set; }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EyePocket.Migrations
 {
     /// <inheritdoc />
-    public partial class inicial2 : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -51,6 +51,26 @@ namespace EyePocket.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Clientes",
+                columns: table => new
+                {
+                    ClienteId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Apellido = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Cedula = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Direccion = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Telefono = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FechaIngreso = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Activo = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Clientes", x => x.ClienteId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Estados",
                 columns: table => new
                 {
@@ -61,6 +81,46 @@ namespace EyePocket.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Estados", x => x.EstadoId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Productos",
+                columns: table => new
+                {
+                    ProductoId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Codigo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Precio = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Costo = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Categoria = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Proveedor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Descuento = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    FechaIngreso = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Productos", x => x.ProductoId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Tickets",
+                columns: table => new
+                {
+                    TicketId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NombreCliente = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NombreAgente = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Asunto = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Estado = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Prioridad = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tickets", x => x.TicketId);
                 });
 
             migrationBuilder.CreateTable(
@@ -170,28 +230,57 @@ namespace EyePocket.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Clientes",
+                name: "OrdenVenta",
                 columns: table => new
                 {
-                    ClienteId = table.Column<int>(type: "int", nullable: false)
+                    OrdenVentaId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Apellido = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Cedula = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Direccion = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Telefono = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FechaIngreso = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FechaEmision = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    FechaVencimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    NumeroFactura = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MontoTotal = table.Column<double>(type: "float", nullable: false),
+                    Estado = table.Column<bool>(type: "bit", nullable: false),
+                    NFC = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClienteId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrdenVenta", x => x.OrdenVentaId);
+                    table.ForeignKey(
+                        name: "FK_OrdenVenta_Clientes_ClienteId",
+                        column: x => x.ClienteId,
+                        principalTable: "Clientes",
+                        principalColumn: "ClienteId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Deudas",
+                columns: table => new
+                {
+                    DeudasId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SaldoPendiente = table.Column<float>(type: "real", nullable: false),
+                    Periodos = table.Column<int>(type: "int", nullable: false),
+                    Capital = table.Column<float>(type: "real", nullable: false),
+                    Interes = table.Column<float>(type: "real", nullable: false),
+                    OrdenVentaId = table.Column<int>(type: "int", nullable: false),
                     EstadoId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Clientes", x => x.ClienteId);
+                    table.PrimaryKey("PK_Deudas", x => x.DeudasId);
                     table.ForeignKey(
-                        name: "FK_Clientes_Estados_EstadoId",
+                        name: "FK_Deudas_Estados_EstadoId",
                         column: x => x.EstadoId,
                         principalTable: "Estados",
                         principalColumn: "EstadoId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Deudas_OrdenVenta_OrdenVentaId",
+                        column: x => x.OrdenVentaId,
+                        principalTable: "OrdenVenta",
+                        principalColumn: "OrdenVentaId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -235,9 +324,19 @@ namespace EyePocket.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Clientes_EstadoId",
-                table: "Clientes",
+                name: "IX_Deudas_EstadoId",
+                table: "Deudas",
                 column: "EstadoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Deudas_OrdenVentaId",
+                table: "Deudas",
+                column: "OrdenVentaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrdenVenta_ClienteId",
+                table: "OrdenVenta",
+                column: "ClienteId");
         }
 
         /// <inheritdoc />
@@ -259,7 +358,13 @@ namespace EyePocket.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Clientes");
+                name: "Deudas");
+
+            migrationBuilder.DropTable(
+                name: "Productos");
+
+            migrationBuilder.DropTable(
+                name: "Tickets");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -269,6 +374,12 @@ namespace EyePocket.Migrations
 
             migrationBuilder.DropTable(
                 name: "Estados");
+
+            migrationBuilder.DropTable(
+                name: "OrdenVenta");
+
+            migrationBuilder.DropTable(
+                name: "Clientes");
         }
     }
 }
