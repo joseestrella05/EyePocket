@@ -15,17 +15,18 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
 	public DbSet<Productos> Productos { get; set; }
 
+
 	public DbSet<OrdenVenta> OrdenVenta { get; set; }
 	public DbSet<Tickets> Tickets { get; set; }
 
 	public DbSet<MetodosPago> MetodosPago { get; set; }
 	public DbSet<PagosCXC> PagosCXC { get; set; }
 	public DbSet<CuotasCXC> CuotasCXC { get; set; }
-
+  public DbSet<Inventarios> Inventarios { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		base.OnModelCreating(modelBuilder); // Asegura que Identity esté bien configurado
+		base.OnModelCreating(modelBuilder); // Asegura que Identity estï¿½ bien configurado
 
 		modelBuilder.Entity<IdentityUserLogin<string>>()
 			.HasKey(login => new { login.LoginProvider, login.ProviderKey });
@@ -42,4 +43,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 			new Estados { EstadoId = 3, Nombre = "Vencido" }
 		);
 	}
+
+
+
+
+
 }
