@@ -13,5 +13,7 @@ public class Inventarios
    
     public double importe { get; set; }
     public DateTime FechaRegistro { get; set; } = DateTime.Now;
+
+    public List<Mermas> Mermas { get; set; } = new List<Mermas>();
 }
 

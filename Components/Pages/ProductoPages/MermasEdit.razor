@@ -1,0 +1,102 @@
+﻿@page "/Mermas/Edit/{id:int}"
+@inject InventarioService inventarioService
+@inject ProductosService productosService
+@inject MermasService mermasService
+@inject ToastService toastService
+@inject NavigationManager navigationManager
+
+<PageTitle>Editar Merma</PageTitle>
+
+<h3>Editar Merma de Producto</h3>
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+
+            @if (Merma != null)
+            {
+                <!-- Nombre del Producto -->
+                <div class="mb-3">
+                    <label class="form-label">Producto</label>
+                    <input type="text" class="form-control" value="@ProductoNombre" readonly />
+                </div>
+
+                <!-- Cantidad en Inventario -->
+                <div class="mb-3">
+                    <label class="form-label">Cantidad en Inventario</label>
+                    <input type="number" class="form-control" value="@CantidadEnInventario" readonly />
+                </div>
+
+                <!-- Cantidad de Merma -->
+                <div class="mb-3">
+                    <label class="form-label">Cantidad a Reportar</label>
+                    <input type="number" class="form-control" @bind="Merma.Cantidad" min="1" />
+                </div>
+
+                <!-- Motivo de Merma -->
+                <div class="mb-3">
+                    <label class="form-label">Motivo</label>
+                    <textarea class="form-control" @bind="Merma.Motivo"></textarea>
+                </div>
+
+                <button class="btn btn-success" @onclick="ActualizarMerma">Actualizar</button>
+                <button class="btn btn-secondary" @onclick="Volver">Cancelar</button>
+            }
+            else
+            {
+                <p class="text-danger">Merma no encontrada.</p>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Mermas? Merma { get; set; }
+    private string ProductoNombre { get; set; } = "";
+    private int CantidadEnInventario { get; set; } = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Merma = await mermasService.BuscarId(Id);
+        if (Merma == null)
+        {
+            navigationManager.NavigateTo("/Mermas/Index");
+            return;
+        }
+
+        var producto = await productosService.BuscarId(Merma.ProductoId);
+        if (producto != null)
+        {
+            ProductoNombre = producto.Nombre;
+            var inventario = await inventarioService.Listar(i => i.ProductoId == producto.ProductoId);
+            CantidadEnInventario = inventario.Any() ? inventario.First().Stock : 0;
+        }
+    }
+
+    private async Task ActualizarMerma()
+    {
+        if (Merma != null && Merma.Cantidad > 0 && Merma.Cantidad <= CantidadEnInventario)
+        {
+            bool resultado = await mermasService.Modificar(Merma);
+            if (resultado)
+            {
+                toastService.Notify(new ToastMessage(ToastType.Success, "Éxito", "Merma actualizada correctamente"));
+                navigationManager.NavigateTo("/Mermas/Index");
+            }
+            else
+            {
+                toastService.Notify(new ToastMessage(ToastType.Warning, "Error", "No se pudo actualizar la merma"));
+            }
+        }
+        else
+        {
+            toastService.Notify(new ToastMessage(ToastType.Warning, "Error", "Cantidad inválida o insuficiente en inventario"));
+        }
+    }
+
+    private void Volver()
+    {
+        navigationManager.NavigateTo("/Mermas/Index");
+    }
+}
