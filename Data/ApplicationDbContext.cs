@@ -14,10 +14,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Mermas> Mermas { get; set; }
     public DbSet<Productos> Productos { get; set; }
 	public DbSet<CuentasXCobrar> CuentasXCobrar { get; set; }
-
-	public DbSet<Productos> Productos { get; set; }
 	public DbSet<Provedores> Provedores { get; set; }
-
 	public DbSet<OrdenVenta> OrdenVenta { get; set; }
 	public DbSet<Tickets> Tickets { get; set; }
 
