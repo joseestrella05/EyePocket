@@ -1,0 +1,146 @@
+﻿@page "/Mermas/Create"
+@inject InventarioService inventarioService
+@inject ProductosService productosService
+@inject MermasService mermasService
+@inject ToastService toastService
+@inject NavigationManager navigationManager
+
+<PageTitle>Registrar Merma</PageTitle>
+
+<h3>Registrar Merma de Producto</h3>
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+
+            <!-- Buscar Producto por Código o Nombre -->
+            <div class="mb-3">
+                <label class="form-label">Buscar Producto</label>
+                <input type="text" class="form-control" @bind="Busqueda" @oninput="FiltrarProductos" placeholder="Código o nombre del producto..." />
+                @if (ProductosFiltrados.Any())
+                {
+                    <ul class="list-group mt-2" style="max-height: 200px; overflow-y: auto;">
+                        @foreach (var producto in ProductosFiltrados)
+                        {
+                            <li class="list-group-item" @onclick="() => SeleccionarProducto(producto)">
+                                @producto.Codigo - @producto.Nombre
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+
+            <!-- Cantidad en Inventario -->
+            <div class="mb-3">
+                <label class="form-label">Cantidad en Inventario</label>
+                <input type="number" class="form-control" value="@CantidadEnInventario" readonly />
+            </div>
+
+            <!-- Cantidad de Merma -->
+            <div class="mb-3">
+                <label class="form-label">Cantidad a Reportar</label>
+                <input type="number" class="form-control" @bind="CantidadMerma" min="1" />
+            </div>
+
+            <!-- Motivo de Merma -->
+            <div class="mb-3">
+                <label class="form-label">Motivo</label>
+                <textarea class="form-control" @bind="Motivo"></textarea>
+            </div>
+
+            <button class="btn btn-danger" @onclick="RegistrarMerma">Registrar Merma</button>
+            <button class="btn btn-secondary" @onclick="LimpiarFormulario">Limpiar</button>
+            <button class="btn btn-primary" @onclick="Volver">Volver</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int ProductoId { get; set; }
+    private string Busqueda { get; set; } = "";
+    private int CantidadMerma { get; set; } = 1;
+    private int CantidadEnInventario { get; set; } = 0;
+    private string Motivo { get; set; } = "";
+
+    private List<Productos> productos = new();
+    private List<Productos> ProductosFiltrados = new();
+    private Productos ProductoSeleccionado { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        productos = await productosService.Listar(a => true);
+    }
+
+    private void FiltrarProductos(ChangeEventArgs e)
+    {
+        Busqueda = e.Value.ToString();
+        ProductosFiltrados = productos.Where(p => p.Codigo.Contains(Busqueda, StringComparison.OrdinalIgnoreCase) ||
+                                                   p.Nombre.Contains(Busqueda, StringComparison.OrdinalIgnoreCase))
+                                      .ToList();
+    }
+
+    private async void SeleccionarProducto(Productos producto)
+    {
+        ProductoSeleccionado = producto;
+        ProductoId = producto.ProductoId;
+        Busqueda = producto.Nombre;
+
+        var inventario = await inventarioService.Listar(i => i.ProductoId == ProductoId);
+        CantidadEnInventario = inventario.Any() ? inventario.First().Stock : 0;
+
+        ProductosFiltrados.Clear();
+    }
+
+    private async Task RegistrarMerma()
+    {
+        if (ProductoId > 0 && CantidadMerma > 0 && CantidadMerma <= CantidadEnInventario)
+        {
+            var inventario = await inventarioService.Listar(i => i.ProductoId == ProductoId);
+            if (inventario.Any())
+            {
+                var inv = inventario.First();
+                inv.Stock -= CantidadMerma;
+                await inventarioService.Modificar(inv);
+            }
+
+            var nuevaMerma = new Mermas
+                {
+                    ProductoId = ProductoId,
+                    Cantidad = CantidadMerma,
+                    Motivo = Motivo,
+                    FechaRegistro = DateTime.Today
+                };
+
+            bool resultado = await mermasService.Insertar(nuevaMerma);
+            if (resultado)
+            {
+                toastService.Notify(new ToastMessage(ToastType.Success, "Éxito", "Merma registrada correctamente"));
+                LimpiarFormulario();
+            }
+            else
+            {
+                toastService.Notify(new ToastMessage(ToastType.Warning, "Error", "No se pudo registrar la merma"));
+            }
+        }
+        else
+        {
+            toastService.Notify(new ToastMessage(ToastType.Warning, "Error", "Cantidad inválida o insuficiente en inventario"));
+        }
+    }
+
+    private void LimpiarFormulario()
+    {
+        ProductoId = 0;
+        Busqueda = "";
+        CantidadMerma = 1;
+        CantidadEnInventario = 0;
+        Motivo = "";
+        ProductosFiltrados.Clear();
+        ProductoSeleccionado = null;
+    }
+
+    private void Volver()
+    {
+        navigationManager.NavigateTo("/Mermas/Index");
+    }
+}

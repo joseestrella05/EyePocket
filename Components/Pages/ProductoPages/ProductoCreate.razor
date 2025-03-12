@@ -1,6 +1,8 @@
 ﻿@page "/Productos/Create"
 @inject ProductosService productoService
 @inject Blazored.Toast.Services.IToastService ToastService
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
 
 
 @if (!string.IsNullOrEmpty(MensajeNotificacion))
@@ -37,7 +39,7 @@
                     <label>Categoría</label>
                     <InputSelect class="input-field" @bind-Value="producto.Categoria">
                         <option value="">Seleccione una categoria</option>
-                        @foreach (var categoria in new List<string> { "Alimentos", "Electrónica","Belleza", "Hogar", "Ferreteria", "Papeleria"})
+                        @foreach (var categoria in new List<string> { "Alimentos", "Electrónica", "Belleza", "Hogar", "Ferreteria", "Papeleria" })
                         {
                             <option value="@categoria">@categoria</option>
                         }
@@ -179,5 +181,6 @@
         producto = new Productos();
         MensajeNotificacion = string.Empty;
         StateHasChanged();
+        Navigation.NavigateTo("/Productos/Index");
     }
 }

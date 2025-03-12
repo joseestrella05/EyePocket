@@ -1,0 +1,153 @@
+﻿@page "/Mermas/Index"
+@inject MermasService mermasService
+@inject NavigationManager navigationManager
+
+@rendermode InteractiveServer
+
+<PageTitle>Historial de Mermas</PageTitle>
+
+@if (mostrarModal)
+{
+    <div class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmación</h5>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar esta merma?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" @onclick="EliminarMerma">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show" @onclick="CerrarModal"></div>
+}
+
+<div class="container-fluid p-3">
+    <div class="card shadow-lg w-100" style="min-height: 70vh;">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col">
+                    <h2 class="text-black"><i class="bi bi-trash3 m-1"></i> Historial de Mermas</h2>
+                </div>
+                <div class="col text-end">
+                    <button class="btn btn-success" @onclick="IrCrearMerma"><i class="bi bi-plus-circle"></i> Crear Merma</button>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-5">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="filtroProducto" @bind="FiltroProducto" placeholder="Nombre del producto..." />
+                        <label for="filtroProducto">Filtrar por Producto</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <input type="date" class="form-control" id="filtroFecha" @bind="FiltroFecha" />
+                        <label for="filtroFecha">Filtrar por Fecha</label>
+                    </div>
+                </div>
+                <div class="col-md-3 text-end">
+                    <button class="btn btn-primary" @onclick="CargarMermas"><i class="bi bi-search"></i> Buscar</button>
+                </div>
+            </div>
+
+            <div class="table-responsive overflow-x-auto">
+                <table class="table table-light table-hover w-100">
+                    <thead class="table-striped">
+                        <tr class="text-center">
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Motivo</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var merma in MermasFiltradas)
+                        {
+                            <tr class="text-center">
+                                <td>@merma.Producto.Nombre</td>
+                                <td>@merma.Cantidad</td>
+                                <td>@merma.Motivo</td>
+                                <td>@merma.FechaRegistro.ToShortDateString()</td>
+                                <td>
+                                    <button class="btn btn-outline-primary bi bi-pencil" @onclick="() => EditarMerma(merma.MermaId)"></button>
+                                    <button class="btn btn-outline-danger bi bi-trash" @onclick="() => MostrarModal(merma.MermaId)"></button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <caption>Total Mermas: @MermasFiltradas.Count</caption>
+                </table>
+            </div>
+
+            <button class="btn btn-secondary" @onclick="Regresar"><i class="bi bi-arrow-left"></i> Volver</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string FiltroProducto { get; set; } = "";
+    private DateTime? FiltroFecha { get; set; } = null;
+    private List<Mermas> Mermas { get; set; } = new();
+    private List<Mermas> MermasFiltradas { get; set; } = new();
+    private bool mostrarModal = false;
+    private int MermaIdSeleccionada { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarMermas();
+    }
+
+    private async Task CargarMermas()
+    {
+        Mermas = await mermasService.Listar(m =>
+            (string.IsNullOrEmpty(FiltroProducto) || m.Producto.Nombre.Contains(FiltroProducto)) &&
+            (!FiltroFecha.HasValue || m.FechaRegistro.Date == FiltroFecha.Value.Date));
+        MermasFiltradas = new List<Mermas>(Mermas);
+    }
+
+    private void MostrarModal(int mermaId)
+    {
+        MermaIdSeleccionada = mermaId;
+        mostrarModal = true;
+    }
+
+    private void CerrarModal()
+    {
+        mostrarModal = false;
+        MermaIdSeleccionada = 0;
+    }
+
+    private async Task EliminarMerma()
+    {
+        if (MermaIdSeleccionada > 0)
+        {
+            await mermasService.Eliminar(MermaIdSeleccionada);
+            Mermas.RemoveAll(m => m.MermaId == MermaIdSeleccionada);
+            MermasFiltradas.RemoveAll(m => m.MermaId == MermaIdSeleccionada);
+            CerrarModal();
+        }
+    }
+
+    private void Regresar()
+    {
+        navigationManager.NavigateTo("/Productos/Inventario");
+    }
+
+    private void IrCrearMerma()
+    {
+        navigationManager.NavigateTo("/Mermas/Create");
+    }
+
+    private void EditarMerma(int mermaId)
+    {
+        navigationManager.NavigateTo($"/Mermas/Edit/{mermaId}");
+    }
+}
