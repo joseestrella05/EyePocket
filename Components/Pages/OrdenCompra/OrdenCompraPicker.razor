@@ -1,0 +1,57 @@
+﻿﻿<div class="col-auto input-group align-items-center">
+
+    <InputSelect class="form-select" @bind-Value="ProductoId">
+        <option disabled value="0">Seleccione un producto</option>
+        @foreach (var producto in ListaProductos)
+        {
+            <option value="@producto.ProductoId">
+                @producto.Nombre --- $ @(producto.Costo.ToString("0.00"))-- $ @(producto.Precio.ToString("0.00"))--- @producto.Codigo --- @producto.Proveedor --- @producto.Categoria --- @producto.Descuento
+            </option>
+        }
+    </InputSelect>
+
+
+    <label class="col-form-label input-group-text">Cantidad</label>
+    <InputNumber class="form-control" @bind-Value="Cantidad"></InputNumber>
+    <button type="button" class="btn btn-success bi bi-plus-square" @onclick="ElegirArticulo"></button>
+</div>
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-danger">@mensaje</div>
+}
+
+@code {
+    [Parameter]
+    public List<Productos> ListaProductos { get; set; } = [];
+
+    [Parameter]
+    public int ProductoId { get; set; }
+
+    [Parameter]
+    public int Cantidad { get; set; }
+
+    [Parameter]
+    public EventCallback<(Productos productos, int Cantidad)> ProductoSeleccionado { get; set; }
+
+    public string? mensaje { get; set; } = string.Empty;
+
+    private async Task ElegirArticulo()
+    {
+        if (ProductoId > 0 && Cantidad > 0)
+        {
+            var ProdutoElegido = ListaProductos.Single(a => a.ProductoId == ProductoId);
+            if (ProdutoElegido != null)
+            {
+                
+                await ProductoSeleccionado.InvokeAsync((ProdutoElegido, Cantidad));
+                
+            }
+            else
+            {
+                mensaje = "Debe seleccionar un producto y cantidad valida";
+            }
+
+        }
+
+    }
+}
