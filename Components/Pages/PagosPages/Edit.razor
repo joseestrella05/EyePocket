@@ -24,9 +24,12 @@
 						<option value="0" disabled>-- Selecciona una CXC --</option>
 						@foreach (var cxc in ListaCXC)
 						{
-							<option value="@cxc.CXCId" readonly selected disabled>
-								Deudor: @cxc.OrdenVenta?.Clientes?.Nombre --  @($"Balance: {(cxc.Capital + (cxc.Capital * cxc.Interes / 100)):N2}")
-							</option>
+							if (cxc.CXCId == Pago.CXCId)
+							{
+								<option value="@cxc.CXCId" readonly selected disabled>
+									Deudor: @cxc.OrdenVenta?.Clientes?.Nombre --  Balance: @cxc.Capital.ToString("N2")
+								</option>
+							}
 						}
 					</InputSelect>
 				</div>

@@ -11,7 +11,7 @@
 		<div class="row" style="background-color:white; padding:10px; margin:10px;">
 			<div class="col">
 				<div class="text-left">
-					<h2 class="text-black"><i class="bi bi-cash-stack"></i> Cuentas x Cobrar</h2>
+					<h2 class="text-black"><i class="bi bi-cash-stack"></i> CxC</h2>
 				</div>
 			</div>
 			<div class="col text-end">
@@ -99,13 +99,13 @@
 
 							@*Botones*@
 							<td>
-								<a href="/Detalle-Cuenta-Por-Cobrar/@cxc.CXCId" class="btn btn-sm btn-outline-dark bi-eye"></a>
-								<button type="button" @onclick="() => MostrarModal(cxc.CXCId, cxc.OrdenVenta?.Clientes?.Nombre)" class="btn btn-sm btn-outline-danger bi bi-trash"></button>
+								<a title="ver" href="/Detalle-Cuenta-Por-Cobrar/@cxc.CXCId" class="btn btn-sm btn-outline-dark bi-eye"></a>
+								<button type="button"  @onclick="() => MostrarModal(cxc.CXCId, cxc.OrdenVenta?.Clientes?.Nombre)" class="btn btn-sm btn-outline-danger bi bi-trash"></button>
 							</td>
 						</tr>
 					}
 				</tbody>
-				<caption>Cant. de Cuentas x Cobrar: @ListaDeudas.Count</caption>
+				<caption>Cant. de CxC: @ListaDeudas.Count</caption>
 			</table>
 		</div>
 	</div>
