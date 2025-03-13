@@ -1,0 +1,186 @@
+﻿@page "/Productos/Create"
+@inject ProductosService productoService
+@inject Blazored.Toast.Services.IToastService ToastService
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+
+
+@if (!string.IsNullOrEmpty(MensajeNotificacion))
+{
+    <div class="alert alert-info">@MensajeNotificacion</div>
+}
+
+<div class="row" style="background-color:white; padding:10px; margin:10px;">
+    <div class="col">
+        <div class="text-left">
+            <h2 class="text-black"><i class="bi bi-clipboard2-plus m-1"></i> Registro de Productos</h2>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card-body">
+        <EditForm Model="@producto" OnValidSubmit="@Guardar">
+            <DataAnnotationsValidator />
+            <div class="grid-container">
+                <div class="form-group">
+                    <label>Código</label>
+                    <InputText class="input-field" @bind-Value="producto.Codigo" />
+                </div>
+                <div class="form-group">
+                    <label>Precio</label>
+                    <InputNumber class="input-field" @bind-Value="producto.Precio" />
+                </div>
+                <div class="form-group">
+                    <label>Costo</label>
+                    <InputNumber class="input-field" @bind-Value="producto.Costo" />
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <InputSelect class="input-field" @bind-Value="producto.Categoria">
+                        <option value="">Seleccione una categoria</option>
+                        @foreach (var categoria in new List<string> { "Alimentos", "Electrónica", "Belleza", "Hogar", "Ferreteria", "Papeleria" })
+                        {
+                            <option value="@categoria">@categoria</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="form-group full-width">
+                    <label>Nombre Producto</label>
+                    <InputText class="input-field" @bind-Value="producto.Nombre" />
+                </div>
+                <div class="form-group full-width">
+                    <label>Proveedor</label>
+                    <InputText class="input-field" @bind-Value="producto.Proveedor" />
+                </div>
+                <div class="form-group full-width">
+                    <label>Descripción</label>
+                    <InputText class="input-field" @bind-Value="producto.Descripcion" Rows="3" />
+                </div>
+                @* <div class="form-group">
+                    <label>Descuento</label>
+                    <InputNumber class="input-field" @bind-Value="producto.Descuento" />
+                </div> *@
+                <div class="form-group">
+                    <label>Fecha Ingreso</label>
+                    <InputDate class="input-field" @bind-Value="producto.FechaIngreso" />
+                </div>
+            </div>
+
+
+
+            <div class="buttons">
+                <button type="button" class="btn btn-secondary bi bi-x-square" @onclick="Cancelar"> Cancelar</button>
+                <button type="submit" class="btn btn-primary bi bi-plus-square"> Guardar</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+<div class="card-footer text-end">
+    <h4><strong>EyePocket</strong></h4>
+</div>
+<style>
+    body {
+        background-color: #f5f5f5;
+    }
+
+    .container {
+        margin-bottom: 20px;
+        padding: 20px;
+        background: white;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    .header-icon {
+        font-size: 28px;
+        color: black;
+    }
+
+    .header-title {
+        font-size: 22px;
+        font-weight: bold;
+        color: black;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .full-width {
+        grid-column: span 2;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-field {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .btn-cancel {
+        background-color: #a94442;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-save {
+        background-color: #004085;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+</style>
+
+@code {
+    private Productos producto = new Productos();
+    private string MensajeNotificacion = string.Empty;
+
+    private async Task Guardar()
+    {
+        if (await productoService.Guardar(producto))
+        {
+            MensajeNotificacion = "Se ha guardado el producto correctamente";
+            producto = new Productos();
+        }
+        else
+        {
+            MensajeNotificacion = "Ha ocurrido un error, el producto no se ha podido registrar";
+        }
+        StateHasChanged();
+    }
+
+    private void Cancelar()
+    {
+        producto = new Productos();
+        MensajeNotificacion = string.Empty;
+        StateHasChanged();
+        Navigation.NavigateTo("/Productos/Index");
+    }
+}

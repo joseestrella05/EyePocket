@@ -1,0 +1,132 @@
+﻿@page "/Pagos/Edit/{PagoID:int}"
+@inject PagosCXCService pagosCXCService
+@inject CuentasXCobrarService cxcService
+@inject NavigationManager navigation
+
+<PageTitle>Editando Pago | @Pago.Deuda?.OrdenVenta?.Clientes?.Nombre</PageTitle>
+<div class="container mb-4">
+	<div class="card">
+		<div>
+			<h2 class="text-black" style="background-color:white;"><i class="bi bi-wallet2 m-3"></i>Editar Pago</h2>
+		</div>
+	</div>
+</div>
+
+<div class="contenedor">
+	<div class="card">
+		<div class="card-body">
+			<div class="section-title">Datos del pago</div>
+
+			<EditForm Model="Pago" OnValidSubmit="Guardar">
+				<div class="mb-3">
+					<label><strong>Cuenta X Cobrar *</strong></label>
+					<InputSelect class="form-select" aria-label="Floating label select example" @bind-Value="Pago.CXCId">
+						<option value="0" disabled>-- Selecciona una CXC --</option>
+						@foreach (var cxc in ListaCXC)
+						{
+							<option value="@cxc.CXCId" readonly selected disabled>
+								Deudor: @cxc.OrdenVenta?.Clientes?.Nombre --  @($"Balance: {(cxc.Capital + (cxc.Capital * cxc.Interes / 100)):N2}")
+							</option>
+						}
+					</InputSelect>
+				</div>
+				<div class="mb-3">
+					<label><strong>Monto a pagar *</strong></label>
+					<InputNumber class="form-control" @bind-Value="Pago.MontoPagado" readonly disabled></InputNumber>
+				</div>
+
+				<div class="row mb-3">
+					<div class="col">
+						<label><strong>Descripción</strong></label>
+						<InputText class="form-control" @bind-Value="Pago.Descripcion" placeholder="Descripción"></InputText>
+					</div>
+					<div class="col">
+						<label><strong>Fecha de pago *</strong></label>
+						<InputDate class="form-control" readonly disabled @bind-Value="Pago.FechaPago"></InputDate>
+					</div>
+				</div>
+
+				<div class="text-center">
+					<button type="submit" class="btn btn-success bi bi-floppy">   Guardar</button>
+					<a href="/Pagos/Index" class="btn btn-secondary bi bi-arrow-left-circle">   Volver</a>
+				</div>
+			</EditForm>
+		</div>
+	</div>
+</div>
+
+<style>
+	body {
+		background-color: #f5f5f5;
+	}
+
+	.contenedor {
+		max-width: 800px;
+		margin: auto;
+		padding: 10px;
+	}
+
+	.card {
+		background: white;
+		padding: 20px;
+		border-radius: 10px;
+	}
+
+	.section-title {
+		background: #0d5c63;
+		color: white;
+		text-align: center;
+		font-weight: bold;
+		padding: 8px;
+		margin: 10px;
+		border-radius: 5px;
+	}
+
+	.btn-success {
+		background-color: #0d5c63;
+		border: none;
+		margin: 10px;
+		padding: 10px 20px;
+	}
+
+	.btn-secondary {
+		background-color: #444;
+		color: white;
+		text-decoration: none;
+		margin: 10px;
+		padding: 10px 20px;
+	}
+
+		.btn-secondary:hover {
+			background-color: #222;
+		}
+</style>
+
+@code {
+	[Parameter]
+	public int PagoID { get; set; }
+	public PagosCXC Pago { get; set; } = new PagosCXC();
+	public List<CuentasXCobrar> ListaCXC { get; set; } = new();
+	[Inject] protected ToastService ToastService { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		Pago = await pagosCXCService.Buscar(PagoID);
+		ListaCXC = await cxcService.Listar(x => true);
+	}
+
+	public async Task Guardar()
+	{
+		if (Pago.Descripcion != null)
+		{
+			await pagosCXCService.Guardar(Pago);
+			ToastService.Notify(new(ToastType.Success, "Exito", $"Descripción actualizada correctamente."));
+			navigation.NavigateTo("/Pagos/Index");
+		}
+		else
+		{
+			ToastService.Notify(new(ToastType.Info, "Aviso", $"No se ha actualizado ninguna información."));
+			navigation.NavigateTo("/Pagos/Index");
+		}
+	}
+}

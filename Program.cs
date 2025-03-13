@@ -1,7 +1,9 @@
+using Blazored.Toast;
 using EyePocket.Components;
 using EyePocket.Components.Account;
 using EyePocket.Data;
 using EyePocket.Service;
+
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -39,11 +41,21 @@ builder.Services.AddBlazorBootstrap();
 
 //inject services
 builder.Services.AddScoped<ClienteServices>();
+builder.Services.AddScoped<ProductosService>();
+builder.Services.AddScoped<MermasService>();
 builder.Services.AddScoped<TicketServices>();
 builder.Services.AddScoped<T_PuntosServices>();
 builder.Services.AddScoped<AgenteServices>();
 builder.Services.AddScoped<CitasService>();
+builder.Services.AddScoped<CuentasXCobrarService>();
+builder.Services.AddScoped<OrdenVentaService>();
+builder.Services.AddScoped<PagosCXCService>();
+builder.Services.AddScoped<CuotasCXCService>();
+builder.Services.AddScoped<InventarioService>();
+builder.Services.AddScoped<ProvedoresServices>();
 
+//notificacion
+builder.Services.AddBlazoredToast();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

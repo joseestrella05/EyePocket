@@ -1,0 +1,131 @@
+﻿@page "/Productos/Edit/{ProductoId:int}"
+@inject ProductosService productoService
+@inject NavigationManager navigation
+
+<PageTitle>Editando Producto | @producto.Nombre</PageTitle>
+
+<div class="text-left">
+    <h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-box m-1"></i> Editar Producto</h2>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <div class="section-title">Datos del Producto</div>
+
+            <div class="row">
+                <div class="col">
+                    <label>Código *</label>
+                    <InputText class="form-control" @bind-Value="producto.Codigo" placeholder="Código del producto"></InputText>
+                </div>
+                <div class="col">
+                    <label>Nombre *</label>
+                    <InputText class="form-control" @bind-Value="producto.Nombre" placeholder="Nombre del producto"></InputText>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label>Precio *</label>
+                    <InputNumber class="form-control" @bind-Value="producto.Precio"></InputNumber>
+                </div>
+                <div class="col">
+                    <label>Costo *</label>
+                    <InputNumber class="form-control" @bind-Value="producto.Costo"></InputNumber>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label>Categoría *</label>
+                    <InputSelect class="form-control" @bind-Value="producto.Categoria" placeholder="Categoría">
+                        <option value="">Seleccione una categoria</option>
+                        @foreach (var categoria in new List<string> { "Alimentos", "Electrónica", "Belleza", "Hogar", "Ferreteria", "Papeleria" })
+                        {
+                            <option value="@categoria">@categoria</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="col">
+                    <label>Proveedor</label>
+                    <InputText class="form-control" @bind-Value="producto.Proveedor" placeholder="Proveedor"></InputText>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label>Descripción *</label>
+                    <InputTextArea class="form-control" @bind-Value="producto.Descripcion" placeholder="Descripción del producto"></InputTextArea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <button @onclick="Guardar" class="btn btn-success">Guardar</button>
+        <a href="/Productos/Index" class="btn btn-secondary">Volver</a>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 800px;
+        margin: auto;
+        padding: 10px;
+    }
+
+    .card {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+    }
+
+    .section-title {
+        background: #0d5c63;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+        padding: 8px;
+        margin: 10px;
+        border-radius: 5px;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public int ProductoId { get; set; }
+    public Productos producto { get; set; } = new Productos();
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        producto = await productoService.BuscarId(ProductoId);
+    }
+
+    public async Task Guardar()
+    {
+        if (await Validar())
+        {
+            await productoService.Guardar(producto);
+            ToastService.Notify(new(ToastType.Success, "Éxito", "Producto editado correctamente."));
+            navigation.NavigateTo("/Productos/Index");
+        }
+        else
+        {
+            ToastService.Notify(new(ToastType.Danger, "Error", "Producto ya existe."));
+        }
+    }
+
+    public async Task<bool> Validar()
+    {
+        var existeCodigo = await productoService.BuscarCodigo(producto.Codigo);
+        if (existeCodigo != null && existeCodigo.ProductoId != producto.ProductoId)
+        {
+            ToastService.Notify(new(ToastType.Danger, "Error", "Producto ya existe."));
+            return false;
+        }
+        return true;
+    }
+
+
+}

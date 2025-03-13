@@ -1,0 +1,194 @@
+﻿@page "/Inventario/Entrada"
+@inject InventarioService inventarioService
+@inject ProductosService productosService
+@inject ToastService toastService
+@inject NavigationManager Navigation
+
+<PageTitle>Registrar Entrada</PageTitle>
+
+<h3>Registrar Entrada de Producto</h3>
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+
+            <!-- Buscar Producto por Código o Nombre -->
+            <div class="mb-3">
+                <label class="form-label">Buscar Producto (Código o Nombre)</label>
+                <input type="text" class="form-control" @bind="Busqueda" @oninput="FiltrarProductos" placeholder="Escriba el código o nombre del producto..." />
+
+                @if (ProductosFiltrados.Any())
+                {
+                    <ul class="list-group mt-2" style="max-height: 200px; overflow-y: auto;">
+                        @foreach (var producto in ProductosFiltrados)
+                        {
+                            <li class="list-group-item" @onclick="() => SeleccionarProducto(producto)">
+                                @producto.Codigo - @producto.Nombre
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+
+            <!-- Campo para mostrar la cantidad actual en inventario (SOLO LECTURA) -->
+            <div class="mb-3">
+                <label class="form-label">Cantidad en Inventario</label>
+                <input type="number" class="form-control" value="@CantidadEnInventario" readonly />
+            </div>
+
+            <!-- Cantidad con botones de incremento/decremento -->
+            <div class="mb-3">
+                <label class="form-label">Cantidad a Ingresar</label>
+                <div class="input-group">
+                    <button class="btn btn-outline-secondary" @onclick="() => ModificarCantidad(-1)">-1</button>
+                    <button class="btn btn-outline-secondary" @onclick="() => ModificarCantidad(-10)">-10</button>
+                    <button class="btn btn-outline-secondary" @onclick="() => ModificarCantidad(-60)">-60</button>
+
+                    <input type="number" class="form-control" value="@Cantidad" readonly />
+
+                    <button class="btn btn-outline-secondary" @onclick="() => ModificarCantidad(1)">+1</button>
+                    <button class="btn btn-outline-secondary" @onclick="() => ModificarCantidad(10)">+10</button>
+                    <button class="btn btn-outline-secondary" @onclick="() => ModificarCantidad(60)">+60</button>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Fecha</label>
+                <input type="date" class="form-control" @bind="FechaEntrada" />
+            </div>
+
+            <!-- Botones de Acción -->
+            <button class="btn btn-primary" @onclick="RegistrarEntrada">Registrar Entrada</button>
+            <button class="btn btn-secondary" @onclick="LimpiarFormulario">Limpiar</button>
+            <button class="btn btn-warning" @onclick="VolverAInventarios">Volver a Inventarios</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int ProductoId { get; set; }
+    private string Busqueda { get; set; } = "";
+    private int Cantidad { get; set; } = 1;
+    private int CantidadEnInventario { get; set; } = 0; // Nueva variable para mostrar la cantidad en inventario
+    private DateTime FechaEntrada { get; set; } = DateTime.Today;
+
+    private List<Productos> productos = new();
+    private List<Productos> ProductosFiltrados = new();
+    private Productos ProductoSeleccionado { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        productos = await productosService.Listar(a => true);
+    }
+
+    // Filtrar productos por código o nombre
+    private void FiltrarProductos(ChangeEventArgs e)
+    {
+        Busqueda = e.Value.ToString();
+        if (!string.IsNullOrWhiteSpace(Busqueda))
+        {
+            ProductosFiltrados = productos
+                .Where(p => p.Codigo.Contains(Busqueda, StringComparison.OrdinalIgnoreCase) ||
+                            p.Nombre.Contains(Busqueda, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+        else
+        {
+            ProductosFiltrados.Clear();
+        }
+    }
+
+    // Seleccionar un producto desde la lista de productos filtrados
+    private async void SeleccionarProducto(Productos producto)
+    {
+        ProductoSeleccionado = producto;
+        ProductoId = producto.ProductoId;
+        Busqueda = producto.Nombre;  // Mostrar el nombre del producto seleccionado en el campo de búsqueda.
+
+        // Obtener la cantidad actual del producto en inventario (si existe)
+        var inventarios = await inventarioService.Listar(i => i.ProductoId == ProductoId);
+        if (inventarios.Any())
+        {
+            CantidadEnInventario = inventarios.First().Stock; // Mostrar en el campo de solo lectura
+        }
+        else
+        {
+            CantidadEnInventario = 0; // Si no existe inventario, mostramos 0
+        }
+
+        Cantidad = 1; // Restablecer la cantidad a ingresar
+        ProductosFiltrados.Clear();  // Limpiar los resultados de búsqueda después de seleccionar un producto.
+    }
+
+    // Modificar cantidad (añadir o restar)
+    private void ModificarCantidad(int cantidad)
+    {
+        Cantidad = Math.Max(1, Cantidad + cantidad); // Asegura que la cantidad nunca sea menor a 1
+    }
+
+    // Registrar la entrada del producto
+    // Registrar la entrada del producto
+    private async Task RegistrarEntrada()
+    {
+        if (ProductoId > 0 && Cantidad > 0)
+        {
+            var inventario = await inventarioService.Listar(i => i.ProductoId == ProductoId);
+            if (inventario.Any())
+            {
+                var inv = inventario.First();
+                inv.Entradas += Cantidad;
+                bool resultado = await inventarioService.Modificar(inv);
+                if (resultado)
+                {
+                    toastService.Notify(new ToastMessage(ToastType.Success, "Éxito", "Entrada registrada correctamente"));
+                }
+                else
+                {
+                    toastService.Notify(new ToastMessage(ToastType.Warning, "Error", "No se pudo registrar la entrada"));
+                }
+            }
+            else
+            {
+                var nuevoInventario = new Inventarios
+                    {
+                        ProductoId = ProductoId,
+                        Entradas = Cantidad,
+                        FechaRegistro = FechaEntrada,
+                    };
+                bool resultado = await inventarioService.Insertar(nuevoInventario);
+                if (resultado)
+                {
+                    toastService.Notify(new ToastMessage(ToastType.Success, "Éxito", "Nuevo inventario registrado correctamente"));
+                }
+                else
+                {
+                    toastService.Notify(new ToastMessage(ToastType.Warning, "Error", "No se pudo registrar el nuevo inventario"));
+                }
+            }
+
+            // Después de guardar, limpiar el formulario automáticamente
+            LimpiarFormulario();
+        }
+        else
+        {
+            toastService.Notify(new ToastMessage(ToastType.Warning, "Error", "Por favor, seleccione un producto y una cantidad válida"));
+        }
+    }
+
+    // Limpiar formulario
+    private void LimpiarFormulario()
+    {
+        ProductoId = 0;
+        Busqueda = "";
+        Cantidad = 1;
+        CantidadEnInventario = 0; // Limpiar también la cantidad en inventario
+        FechaEntrada = DateTime.Today;
+        ProductosFiltrados.Clear();
+    }
+
+    // Volver a la página de Inventarios
+    private void VolverAInventarios()
+    {
+        Navigation.NavigateTo("/Productos/Inventario");
+    }
+}
