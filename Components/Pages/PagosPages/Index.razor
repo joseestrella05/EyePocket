@@ -133,29 +133,6 @@
 	</div>
 </div>
 
-@if (mostrarModal)
-{
-	<div class="modal fade show" tabindex="-1" style="display: block;" aria-modal="true" role="dialog">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header" style="background-color: #7B0323; color: white;">
-					<h5 class="modal-title">Eliminar Cliente</h5>
-					<button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<p>¿Está seguro de que desea eliminar a este cliente?</p>
-					<p>Esta opción no se puede deshacer.</p>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cancelar</button>
-					<button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="modal-backdrop fade show" @onclick="CerrarModal"></div>
-}
-
 <style>
 	body {
 		background-color: #f5f5f5;
@@ -185,54 +162,6 @@
 		ListaOrdenVenta = await ordenVentaService.Listar(C => true);
 	}
 
-	// MODALS
-	private bool mostrarModal = false;
-	private int ClienteIdSeleccionado { get; set; }
-	private string EmailClienteSelecionado { get; set; } = "";
-
-	private void MostrarModal(int clienteId, string clienteEmail)
-	{
-		ClienteIdSeleccionado = clienteId;
-		EmailClienteSelecionado = clienteEmail;
-		mostrarModal = true;
-	}
-
-	private void CerrarModal()
-	{
-		mostrarModal = false;
-		ClienteIdSeleccionado = 0;
-		EmailClienteSelecionado = "";
-	}
-
-	public async Task Eliminar()
-	{
-		try
-		{
-			// OJO: cuando sea necesario se descomentara este codigo
-			//
-			// var user = await UserManager.FindByEmailAsync(EmailClienteSelecionado);
-			// if (user == null)
-			// 	return;
-			// await UserManager.DeleteAsync(user);
-
-			await clientesService.Eliminar(ClienteIdSeleccionado);
-			ListaPagos = await pagosCXCService.Listar(x => true);
-			mostrarModal = false;
-			ClienteIdSeleccionado = 0;
-			TipoNotificacion = ToastType.Success;
-			TituloNotificacion = "Enhorabuena";
-			MensajeNotificacion = "¡Se ha eliminado el cliente exitosamente!";
-			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
-		}
-		catch (Exception ex)
-		{
-			TipoNotificacion = ToastType.Danger;
-			TituloNotificacion = "Error";
-			MensajeNotificacion = "Hubo un error al eliminar el cliente.";
-			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
-		}
-	}
-
 	//NOTIFICACIONES
 	public ToastType TipoNotificacion { get; set; }
 	public string MensajeNotificacion { get; set; } = string.Empty;
@@ -246,10 +175,7 @@
 	{
 		if (string.IsNullOrEmpty(valorFiltro))
 		{
-			TipoNotificacion = ToastType.Warning;
-			TituloNotificacion = "Aviso";
-			MensajeNotificacion = "Debe seleccionar una opción en el fitro.";
-			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+			toastService.Notify(new(ToastType.Warning, "Aviso", "Seleccione una opción en el filtro."));
 			ListaPagos = await pagosCXCService.Listar(x => true);
 			return;
 		}
@@ -261,79 +187,54 @@
 			case "idpago":
 				if (string.IsNullOrEmpty(searchBarValue))
 				{
-					TipoNotificacion = ToastType.Warning;
-					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "Debe proveer un ID de pago para buscar";
-					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					toastService.Notify(new(ToastType.Warning, "Aviso", "Debe proveer un ID de pago para buscar."));
 					return;
 				}
 				if (!searchBarValue.All(char.IsDigit))
 				{
-					TipoNotificacion = ToastType.Warning;
-					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "El criterio de búsqueda solo puede alojar numeros.";
-					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					toastService.Notify(new(ToastType.Warning, "Aviso", "El criterio de búsqueda solo puede alojar números."));
 					return;
 				}
-				if (int.TryParse(searchBarValue, out int id))
-					ListaPagos = await pagosCXCService.Listar(lt => lt.Id == id);
+				ListaPagos = await pagosCXCService.Listar(lt => lt.Id.ToString().Contains(searchBarValue));
 				break;
 
 			case "idcxc":
 				if (string.IsNullOrEmpty(searchBarValue))
 				{
-					TipoNotificacion = ToastType.Warning;
-					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "Debe proveer un ID de CXC para buscar";
-					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					toastService.Notify(new(ToastType.Warning, "Aviso", "Debe proveer un ID de una CxC para buscar."));
 					return;
 				}
 				if (!searchBarValue.All(char.IsDigit))
 				{
-					TipoNotificacion = ToastType.Warning;
-					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "El criterio de búsqueda solo puede alojar numeros.";
-					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					toastService.Notify(new(ToastType.Warning, "Aviso", "El criterio de búsqueda solo puede alojar números."));
 					return;
 				}
-				ListaPagos = await pagosCXCService.Listar(lt => lt.CXCId.ToString() == searchBarValue);
+				ListaPagos = await pagosCXCService.Listar(lt => lt.CXCId.ToString().Contains(searchBarValue));
 				break;
 
 			case "cliente":
 				if (string.IsNullOrEmpty(searchBarValue))
 				{
-					TipoNotificacion = ToastType.Warning;
-					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "Debe proveer un nombre para buscar";
-					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					toastService.Notify(new(ToastType.Warning, "Aviso", "Debe proveer un nombre para buscar."));
 					return;
 				}
 				if (searchBarValue.Any(char.IsDigit))
 				{
-					TipoNotificacion = ToastType.Warning;
-					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "El criterio de búsqueda solo puede alojar letras";
-					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					toastService.Notify(new(ToastType.Warning, "Aviso", "El criterio de búsqueda solo puede alojar letras."));
 					return;
 				}
-				ListaPagos = await pagosCXCService.Listar(c => c.Deuda.OrdenVenta.Clientes.Nombre == searchBarValue);
+				ListaPagos = await pagosCXCService.Listar(c => c.Deuda.OrdenVenta.Clientes.Nombre.Contains(searchBarValue));
 				break;
 
 			case "fechapago":
 				if (Desde == null || Hasta == null)
 				{
-					TipoNotificacion = ToastType.Warning;
-					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "Ambos campos de las fechas deben llenarse.";
-					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					toastService.Notify(new(ToastType.Warning, "Aviso", "Seleccione una fecha en ambos campos."));
 					return;
 				}
 				if (Desde > Hasta)
 				{
-					TipoNotificacion = ToastType.Warning;
-					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "La fecha inicial no puede ser mayor a la final.";
-					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					toastService.Notify(new(ToastType.Warning, "Aviso", "La fecha inicial no puede ser mayor a la final."));
 					return;
 				}
 				ListaPagos = await pagosCXCService.Listar(x => x.FechaPago >= Desde && x.FechaPago <= Hasta);
@@ -353,9 +254,6 @@
 		Desde = null;
 		Hasta = null;
 
-		TipoNotificacion = ToastType.Info;
-		TituloNotificacion = "Aviso";
-		MensajeNotificacion = "Se han restablecido los criterios de búsqueda.";
-		MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+		toastService.Notify(new(ToastType.Info, "Aviso", "Se han restablecido todos los criterios de búsqueda."));
 	}
 }
