@@ -72,7 +72,7 @@
 						<td>@tarjeta.Estado</td>
 						<td class="text-center">
 							<a href="/TarjetaPunto/Edit/@tarjeta.TarjetaId" class="btn btn-outline-info bi bi-pencil-square"></a>
-							<button type="button" @onclick="() => MostrarModal(tarjeta.TarjetaId, tarjeta.Cliente.Nombre)" class="btn btn-outline-danger bi bi-trash"></button>
+							<button type="button" @onclick="() => MostrarModal(tarjeta.TarjetaId)" class="btn btn-outline-danger bi bi-trash"></button>
 						</td>
 					</tr>
 				}
@@ -118,12 +118,12 @@
 
 	private bool mostrarModal = false;
 	private int TarjetaIdSeleccionado { get; set; }
-	private string NombreClienteSeleccionado { get; set; } = "";
+	
 
-	private void MostrarModal(int tarjetaId, string nombreCliente)
+	private void MostrarModal(int tarjetaId)
 	{
 		TarjetaIdSeleccionado = tarjetaId;
-		NombreClienteSeleccionado = nombreCliente;
+
 		mostrarModal = true;
 	}
 
@@ -131,7 +131,7 @@
 	{
 		mostrarModal = false;
 		TarjetaIdSeleccionado = 0;
-		NombreClienteSeleccionado = "";
+	
 	}
 
 	public async Task Eliminar()

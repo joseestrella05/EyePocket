@@ -20,4 +20,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Components\Pages\ClientePage\Create.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\ClientePage\Edit.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\ClientePage\Index.razor" />
+  </ItemGroup>
+
 </Project>
