@@ -20,5 +20,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<Provedores> Provedores { get; set; }
 
+    public DbSet<OrdenVenta> OrdenVentas { get; set; }
+
+    public DbSet<OrdenVentaDetalle> OrdenVentasDetalle { get; set; }
 
 }
