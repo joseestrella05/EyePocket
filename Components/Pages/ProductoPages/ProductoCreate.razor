@@ -1,5 +1,6 @@
 ﻿@page "/Productos/Create"
 @inject ProductosService productoService
+@inject ProvedoresServices provedoreServices 
 @inject Blazored.Toast.Services.IToastService ToastService
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
@@ -49,18 +50,21 @@
                     <label>Nombre Producto</label>
                     <InputText class="input-field" @bind-Value="producto.Nombre" />
                 </div>
-                <div class="form-group full-width">
-                    <label>Proveedor</label>
-                    <InputText class="input-field" @bind-Value="producto.Proveedor" />
+                <div class="form-group">
+                    <label>Provedor</label>
+                    <InputSelect class="input-field" @bind-Value="producto.Proveedor">
+                        <option value="">Seleccione un provedor</option>
+                        @foreach (var provedores in provedores)
+                        {
+                            <option value="@provedores">@provedores.Nombre</option>
+                        }
+                    </InputSelect>
                 </div>
                 <div class="form-group full-width">
                     <label>Descripción</label>
                     <InputText class="input-field" @bind-Value="producto.Descripcion" Rows="3" />
                 </div>
-                @* <div class="form-group">
-                    <label>Descuento</label>
-                    <InputNumber class="input-field" @bind-Value="producto.Descuento" />
-                </div> *@
+
                 <div class="form-group">
                     <label>Fecha Ingreso</label>
                     <InputDate class="input-field" @bind-Value="producto.FechaIngreso" />
@@ -82,85 +86,92 @@
 </div>
 <style>
     body {
-        background-color: #f5f5f5;
+    background-color: #f5f5f5;
     }
 
     .container {
-        margin-bottom: 20px;
-        padding: 20px;
-        background: white;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    padding: 20px;
+    background: white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .card-header {
-        display: flex;
-        align-items: center;
-        border-bottom: 2px solid #ddd;
-        padding-bottom: 10px;
-        margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
     }
 
     .header-icon {
-        font-size: 28px;
-        color: black;
+    font-size: 28px;
+    color: black;
     }
 
     .header-title {
-        font-size: 22px;
-        font-weight: bold;
-        color: black;
+    font-size: 22px;
+    font-weight: bold;
+    color: black;
     }
 
     .grid-container {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
     }
 
     .full-width {
-        grid-column: span 2;
+    grid-column: span 2;
     }
 
     .form-group {
-        display: flex;
-        flex-direction: column;
+    display: flex;
+    flex-direction: column;
     }
 
     .input-field {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
     }
 
     .buttons {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
     }
 
     .btn-cancel {
-        background-color: #a94442;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
+    background-color: #a94442;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
     }
 
     .btn-save {
-        background-color: #004085;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
+    background-color: #004085;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
     }
 </style>
 
 @code {
     private Productos producto = new Productos();
     private string MensajeNotificacion = string.Empty;
+    public List<Provedores> provedores { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        provedores = await provedoreServices.Listar(a => true);
+    }
+
 
     private async Task Guardar()
     {
