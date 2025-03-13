@@ -14,8 +14,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Compras> Compras { get; set; }
     public DbSet<CXP> CXP { get; set; }
     public DbSet<MetodoPago> MetodoPagos { get; set; }
-
     public DbSet<EstadoCXP> EstadoCXP { get; set; }
+    public DbSet<OrdenCompra> ordenCompra { get; set; }
+    public DbSet<OrdenCompraDetalle> ordenCompraDetalles { get; set; }
+    public DbSet<EstadoOrdenCompra> estadoOdCompra { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -112,7 +114,34 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     }
        );
 
+        modelBuilder.Entity<EstadoOrdenCompra>().HasData(
+    new List<EstadoOrdenCompra>()
+    {
+        new EstadoOrdenCompra() { EstadoOdId = 1, descripcionEstado = "Realizada" },
+        new EstadoOrdenCompra() { EstadoOdId = 2, descripcionEstado = "Aprobada" },
+        new EstadoOrdenCompra() { EstadoOdId = 3, descripcionEstado = "Enviada" },
+        new EstadoOrdenCompra() { EstadoOdId = 4, descripcionEstado = "Facturada" },
+        new EstadoOrdenCompra() { EstadoOdId = 5, descripcionEstado = "Rechazada" },
+        new EstadoOrdenCompra() { EstadoOdId = 6, descripcionEstado = "Recibida" },
+        new EstadoOrdenCompra() { EstadoOdId = 7, descripcionEstado = "Cerrada" }
+    }
+);
+
+
+
+        modelBuilder.Entity<Productos>().HasData(
+           new List<Productos>()
+           {
+               new Productos(){ ProductoId=1, Codigo="5334", Nombre="Galletas Princesa", Precio=123, Costo=344, Categoria="Comestibles", Proveedor="Club Crackers", Descripcion="",Descuento=200},
+               new Productos(){ ProductoId=2, Codigo="8254", Nombre="Jugo Santal", Precio=234, Costo=345, Categoria="Bebibas", Proveedor="Santal", Descripcion="",Descuento=654},
+               new Productos(){ ProductoId=3, Codigo="7259", Nombre="Salami Mortadela", Precio=156, Costo=643, Categoria="Comestibles", Proveedor="Induveca", Descripcion="",Descuento=523},
+               new Productos(){ ProductoId=4, Codigo="3842", Nombre="Toallitas Nosotras", Precio=564, Costo=764, Categoria="Toallas humedas", Proveedor="Nosotras", Descripcion="",Descuento=402},
+           }
+       );
+
         base.OnModelCreating(modelBuilder);
     }
+
+
 
 }
