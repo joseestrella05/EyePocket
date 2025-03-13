@@ -251,6 +251,43 @@ namespace EyePocket.Migrations
                     b.HasKey("EstadoOdId");
 
                     b.ToTable("estadoOdCompra");
+
+                    b.HasData(
+                        new
+                        {
+                            EstadoOdId = 1,
+                            descripcionEstado = "Realizada"
+                        },
+                        new
+                        {
+                            EstadoOdId = 2,
+                            descripcionEstado = "Aprobada"
+                        },
+                        new
+                        {
+                            EstadoOdId = 3,
+                            descripcionEstado = "Enviada"
+                        },
+                        new
+                        {
+                            EstadoOdId = 4,
+                            descripcionEstado = "Facturada"
+                        },
+                        new
+                        {
+                            EstadoOdId = 5,
+                            descripcionEstado = "Rechazada"
+                        },
+                        new
+                        {
+                            EstadoOdId = 6,
+                            descripcionEstado = "Recibida"
+                        },
+                        new
+                        {
+                            EstadoOdId = 7,
+                            descripcionEstado = "Cerrada"
+                        });
                 });
 
             modelBuilder.Entity("EyePocket.Models.Estados", b =>
@@ -443,12 +480,65 @@ namespace EyePocket.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Proveedor")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ProductoId");
 
                     b.ToTable("Productos");
+
+                    b.HasData(
+                        new
+                        {
+                            ProductoId = 1,
+                            Categoria = "Comestibles",
+                            Codigo = "5334",
+                            Costo = 344m,
+                            Descripcion = "Galletas",
+                            Descuento = 200m,
+                            FechaIngreso = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Nombre = "Galletas Princesa",
+                            Precio = 123m,
+                            Proveedor = "Club Crackers"
+                        },
+                        new
+                        {
+                            ProductoId = 2,
+                            Categoria = "Bebibas",
+                            Codigo = "8254",
+                            Costo = 345m,
+                            Descripcion = "Jugo",
+                            Descuento = 654m,
+                            FechaIngreso = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Nombre = "Jugo Santal",
+                            Precio = 234m,
+                            Proveedor = "Santal"
+                        },
+                        new
+                        {
+                            ProductoId = 3,
+                            Categoria = "Comestibles",
+                            Codigo = "7259",
+                            Costo = 643m,
+                            Descripcion = "salami",
+                            Descuento = 523m,
+                            FechaIngreso = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Nombre = "Salami Mortadela",
+                            Precio = 156m,
+                            Proveedor = "Induveca"
+                        },
+                        new
+                        {
+                            ProductoId = 4,
+                            Categoria = "Toallas humedas",
+                            Codigo = "3842",
+                            Costo = 764m,
+                            Descripcion = "Toallas",
+                            Descuento = 402m,
+                            FechaIngreso = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Nombre = "Toallitas Nosotras",
+                            Precio = 564m,
+                            Proveedor = "Nosotras"
+                        });
                 });
 
             modelBuilder.Entity("EyePocket.Models.Provedores", b =>

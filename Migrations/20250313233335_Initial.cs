@@ -115,7 +115,7 @@ namespace EyePocket.Migrations
                     Precio = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Costo = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Categoria = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Proveedor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Proveedor = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Descuento = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     FechaIngreso = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -441,6 +441,31 @@ namespace EyePocket.Migrations
                     { 3, "Transferencia Bancaria" },
                     { 4, "Tarjeta de crédito" },
                     { 5, "Cheque" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Productos",
+                columns: new[] { "ProductoId", "Categoria", "Codigo", "Costo", "Descripcion", "Descuento", "FechaIngreso", "Nombre", "Precio", "Proveedor" },
+                values: new object[,]
+                {
+                    { 1, "Comestibles", "5334", 344m, "Galletas", 200m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Galletas Princesa", 123m, "Club Crackers" },
+                    { 2, "Bebibas", "8254", 345m, "Jugo", 654m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Jugo Santal", 234m, "Santal" },
+                    { 3, "Comestibles", "7259", 643m, "salami", 523m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Salami Mortadela", 156m, "Induveca" },
+                    { 4, "Toallas humedas", "3842", 764m, "Toallas", 402m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Toallitas Nosotras", 564m, "Nosotras" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "estadoOdCompra",
+                columns: new[] { "EstadoOdId", "descripcionEstado" },
+                values: new object[,]
+                {
+                    { 1, "Realizada" },
+                    { 2, "Aprobada" },
+                    { 3, "Enviada" },
+                    { 4, "Facturada" },
+                    { 5, "Rechazada" },
+                    { 6, "Recibida" },
+                    { 7, "Cerrada" }
                 });
 
             migrationBuilder.CreateIndex(
