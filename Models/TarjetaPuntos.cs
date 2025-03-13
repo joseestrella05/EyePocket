@@ -7,13 +7,16 @@ public class TarjetaPuntos
 { 
     [Key] 
     public int TarjetaId { get; set; }
-    
+
     [Required]
-    public string NombreCliente { get; set; }
+    public int ClienteId { get; set; }
+    
+    [ForeignKey("ClienteId")]
+    public Clientes Cliente { get; set; } = null!;
     
     [Required]
     public string TipoTarjeta { get; set; }
-    
+
     [Required]
     public int Puntos { get; set; } = 0;
 
@@ -22,8 +25,4 @@ public class TarjetaPuntos
     
     [Required]
     public string Estado { get; set; }
-    
-    [ForeignKey("ClienteId")]
-    public Clientes Cliente { get; set; }
-
 }

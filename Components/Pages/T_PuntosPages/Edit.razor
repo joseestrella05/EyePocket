@@ -1,5 +1,6 @@
 @page "/TarjetaPunto/Edit/{TarjetaId:int}"
 @inject T_PuntosServices tarjetaPuntoService
+@inject ClienteServices clienteService
 @inject NavigationManager navigation
 @inject ToastService ToastService
 
@@ -7,38 +8,70 @@
 <div class="text-left">
     <h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-credit-card m-1"></i>Editando Tarjeta Punto</h2>
 </div>
-
 <EditForm Model="tarjetaPunto" OnValidSubmit="Modificar">
-    <div class="container">
-        <div class="card">
-            <div class="card-body">
-                <div class="section-title">Datos de la Tarjeta de Puntos</div>
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <div class="section-title">Datos de la Tarjeta de Puntos</div>
 
-                <div class="row">
-                    <div class="col">
-                        <label>Fecha de Creación *</label>
-                        <InputDate class="form-control" @bind-Value="tarjetaPunto.FechaCreacion" readonly />
-                    </div>
+            <div class="row">
+                <div class="col">
+                    <label>Fecha de Creación *</label>
+                    <InputDate class="form-control" @bind-Value="tarjetaPunto.FechaCreacion" readonly/>
                 </div>
+            </div>
 
-                <div class="row">
-                    <div class="col">
-                        <label>Tarjeta ID *</label>
-                        <InputNumber class="form-control" @bind-Value="tarjetaPunto.TarjetaId" readonly />
-                    </div>
-                    <div class="col">
-                        <label>Puntos Acumulados *</label>
-                        <InputNumber class="form-control" @bind-Value="tarjetaPunto.Puntos" placeholder="Ingrese los puntos acumulados" />
-                    </div>
+            <div class="row">
+                <div class="col">
+                    <label>Tarjeta ID *</label>
+                    <InputNumber class="form-control" @bind-Value="tarjetaPunto.TarjetaId" readonly/>
                 </div>
+                <div class="col">
+                    <label>Puntos Acumulados *</label>
+                    <InputNumber class="form-control" @bind-Value="tarjetaPunto.Puntos" placeholder="Ingrese los puntos acumulados"></InputNumber>
+                </div>
+            </div>
 
+            <div class="row">
+                <div class="col">
+                    <label>Nombre del Cliente *</label>
+                    <InputSelect class="form-control" @bind-Value="tarjetaPunto.ClienteId">
+                        <option value="">Seleccione un cliente</option>
+                        @foreach (var cliente in clientesDisponibles)
+                        {
+                        <option value="@cliente.ClienteId">@cliente.Nombre</option>
+                        }
+                    </InputSelect>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label>Tipo de Tarjeta *</label>
+                    <InputSelect class="form-control" @bind-Value="tarjetaPunto.TipoTarjeta">
+                        <option value="">Seleccione</option>
+                        <option value="Plata">Plata</option>
+                        <option value="Oro">Oro</option>
+                        <option value="Platino">Platino</option>
+                    </InputSelect>
+                </div>
+                <div class="col">
+                    <label>Estado *</label>
+                    <InputSelect class="form-control" @bind-Value="tarjetaPunto.Estado">
+                        <option value="">Seleccione</option>
+                        <option value="Activa">Activa</option>
+                        <option value="Inactiva">Inactiva</option>
+                        <option value="Suspendida">Suspendida</option>
+                    </InputSelect>
+                </div>
             </div>
         </div>
-        <div class="text-center">
-            <button type="submit" class="btn btn-success">Guardar Cambios</button>
-            <a href="/TarjetaPunto/Index" class="btn btn-secondary">Volver</a>
-        </div>
     </div>
+    <div class="text-center">
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <a href="/TarjetaPunto/Index" class="btn btn-secondary">Volver</a>
+    </div>
+</div>
 </EditForm>
 
 <style>
@@ -93,15 +126,18 @@
 @code {
     public TarjetaPuntos tarjetaPunto { get; set; } = new TarjetaPuntos();
     [Parameter] public int TarjetaId { get; set; }
+    public List<Clientes> clientesDisponibles { get; set; } = new List<Clientes>();
 
     protected override async Task OnInitializedAsync()
     {
+        
         tarjetaPunto = await tarjetaPuntoService.Buscar(TarjetaId);
         if (tarjetaPunto == null)
         {
             ToastService.Notify(new(ToastType.Danger, "Error", "Tarjeta no encontrada."));
             navigation.NavigateTo("/TarjetaPunto/Index");
         }
+        clientesDisponibles = await clienteService.Listar(c => true);
     }
 
     public async Task Modificar()

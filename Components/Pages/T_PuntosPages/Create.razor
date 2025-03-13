@@ -1,6 +1,7 @@
 @page "/TarjetaPunto/Create"
 @inject T_PuntosServices tarjetaPuntoService
 @inject NavigationManager navigation
+@inject ClienteServices clienteService
 
 <PageTitle>Creando Tarjeta Punto</PageTitle>
 <div class="text-left">
@@ -34,7 +35,13 @@
                 <div class="row">
                     <div class="col">
                         <label>Nombre del Cliente *</label>
-                        <InputText class="form-control" @bind-Value="tarjetaPunto.NombreCliente" placeholder="Ingrese el nombre del cliente"></InputText>
+                        <InputSelect class="form-control" @bind-Value="tarjetaPunto.ClienteId">
+                            <option value="">Seleccione un cliente</option>
+                            @foreach (var cliente in clientesDisponibles)
+                            {
+                                <option value="@cliente.ClienteId">@cliente.Nombre</option>
+                            }
+                        </InputSelect>
                     </div>
                 </div>
 
@@ -111,7 +118,13 @@
 
 @code {
     public TarjetaPuntos tarjetaPunto { get; set; } = new TarjetaPuntos();
+    public List<Clientes> clientesDisponibles { get; set; } = new List<Clientes>();
     [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        clientesDisponibles = await clienteService.Listar(c => true);
+    }
 
     public async Task Guardar()
     {
