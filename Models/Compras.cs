@@ -9,13 +9,17 @@ public class Compras
     public int CompraId { get; set; }
 
     [Required(ErrorMessage = "Campo obrigatório")]
-    public string? Estado { get; set; }
-
-    [Required(ErrorMessage = "Campo obrigatório")]
-    public string? Fecha { get; set; }
+    public DateTime Fecha { get; set; } = DateTime.Now;
 
     [Required(ErrorMessage = "Campo obrigatório")]
     public decimal Total { get; set; }
+
+    [Required(ErrorMessage = "Campo obrigatório")]
+    public string? Descripcion { get; set; }
+    public int EstadoId { get; set; }
+
+    [ForeignKey("EstadoId")]
+    public Estados Estado { get; set; } = null!;
 
     public int ProvedorId { get; set; }
 
