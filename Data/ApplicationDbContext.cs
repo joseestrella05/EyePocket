@@ -83,7 +83,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             }
         );
 
-        modelBuilder.Entity<EstadoCXP>().HasData(
+      modelBuilder.Entity<EstadoCXP>().HasData(
     new List<EstadoCXP>()
     {
         new EstadoCXP()
@@ -129,13 +129,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
 
 
-        modelBuilder.Entity<Productos>().HasData(
+       modelBuilder.Entity<Productos>().HasData(
            new List<Productos>()
            {
-               new Productos(){ ProductoId=1, Codigo="5334", Nombre="Galletas Princesa", Precio=123, Costo=344, Categoria="Comestibles", Proveedor="Club Crackers", Descripcion="",Descuento=200},
-               new Productos(){ ProductoId=2, Codigo="8254", Nombre="Jugo Santal", Precio=234, Costo=345, Categoria="Bebibas", Proveedor="Santal", Descripcion="",Descuento=654},
-               new Productos(){ ProductoId=3, Codigo="7259", Nombre="Salami Mortadela", Precio=156, Costo=643, Categoria="Comestibles", Proveedor="Induveca", Descripcion="",Descuento=523},
-               new Productos(){ ProductoId=4, Codigo="3842", Nombre="Toallitas Nosotras", Precio=564, Costo=764, Categoria="Toallas humedas", Proveedor="Nosotras", Descripcion="",Descuento=402},
+               new Productos(){ ProductoId=1, Codigo="5334", Nombre="Galletas Princesa", Precio=123, Costo=344, Categoria="Comestibles", Proveedor="Club Crackers", Descripcion="Galletas",Descuento=200},
+               new Productos(){ ProductoId=2, Codigo="8254", Nombre="Jugo Santal", Precio=234, Costo=345, Categoria="Bebibas", Proveedor="Santal", Descripcion="Jugo",Descuento=654},
+               new Productos(){ ProductoId=3, Codigo="7259", Nombre="Salami Mortadela", Precio=156, Costo=643, Categoria="Comestibles", Proveedor="Induveca", Descripcion="salami",Descuento=523},
+               new Productos(){ ProductoId=4, Codigo="3842", Nombre="Toallitas Nosotras", Precio=564, Costo=764, Categoria="Toallas humedas", Proveedor="Nosotras", Descripcion="Toallas",Descuento=402},
            }
        );
 
