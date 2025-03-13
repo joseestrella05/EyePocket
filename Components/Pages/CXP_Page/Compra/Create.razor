@@ -13,8 +13,8 @@
 
                 <div class="row">
                     <div class="col">
-                        <label>ID *</label>
-                        <InputNumber class="form-control" @bind-Value="Compra.CompraId" placeholder="CompraId "></InputNumber>
+                        <label>ID </label>
+                        <InputNumber class="form-control" @bind-Value="Compra.CompraId" placeholder="CompraId " readonly></InputNumber>
                     </div>
                 </div>
 
@@ -49,6 +49,7 @@
 
                 <div class="row">
                     <div class="col">
+                        <label>Estado</label>
                         <InputSelect class="form-control form-select" @bind-Value="Compra.EstadoId">
                             <option value="0" selected disabled>Elija una opción</option>
                             @foreach (var Estado in Estados)
@@ -88,7 +89,7 @@
             await compraService.Guardar(Compra);
             ToastService.Notify(new(ToastType.Success, "Exito", $"Provedor Creado correctamente."));
             Compra = new Compras();
-            navigation.NavigateTo("/CxP/Provedores/Index");
+            navigation.NavigateTo("/CxP/Compra/Index");
         }
         else
         {

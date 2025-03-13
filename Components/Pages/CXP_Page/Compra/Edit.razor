@@ -1,4 +1,4 @@
-﻿@page "/CxP/Compra/Edit{CompraId:int}"
+﻿@page "/CxP/Compra/Edit/{CompraId:int}"
 @inject ProvedoresServices provedoresService
 @inject CompraServices compraService
 @inject EstadoServices estadoServices
@@ -11,10 +11,11 @@
             <div class="card-body">
                 <div class="section-title">Datos de compra</div>
 
+
                 <div class="row">
                     <div class="col">
-                        <label>ID *</label>
-                        <InputNumber class="form-control" @bind-Value="Compra.CompraId" placeholder="CompraId "></InputNumber>
+                        <label>ID </label>
+                        <InputNumber class="form-control" @bind-Value="Compra.CompraId" placeholder="CompraId " readonly></InputNumber>
                     </div>
                 </div>
 
@@ -90,7 +91,7 @@
     }
     public async Task Crear()
     {
-        if (Compra.CompraId < 0)
+        if (Compra.CompraId > 0)
         {
             await compraService.Guardar(Compra);
             ToastService.Notify(new(ToastType.Success, "Exito", $"Provedor Editado correctamente."));

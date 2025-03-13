@@ -63,12 +63,12 @@
 							var estado = ListaEstados.FirstOrDefault(c => c.EstadoId == compras.EstadoId);
 							<tr class="text-center">
 								<td>@compras.CompraId</td>
-								<td>@(provedor?. Nombre ?? "no encontrado")</td>
-								<td>@(estado?. Nombre ?? "no encontrado")</td>
+								<td>@(provedor?.Nombre ?? "no encontrado")</td>
+								<td>@(estado?.Nombre ?? "no encontrado")</td>
 								<td class="text-center" style="display: flex; justify-content: center; gap: 5px;">
-									<a href="/CxP/Provedores/Details/@compras.CompraId" class="btn btn-outline-dark bi-eye"></a>
-									<a href="/CxP/Provedores/Edit/@compras.CompraId" class="btn btn-outline-info bi bi-pencil-square"></a>
-									<button type="button" @onclick="() => MostrarModal(compras.CompraId, compras.Provedores.Nombre)" class="btn btn-outline-danger bi bi-trash"></button>
+									<a href="/CxP/Compra/Details/@compras.CompraId" class="btn btn-outline-dark bi-eye"></a>
+									<a href="/CxP/Compra/Edit/@compras.CompraId" class="btn btn-outline-info bi bi-pencil-square"></a>
+									<button type="button" @onclick="() => MostrarModal(compras.CompraId, compras.Descripcion)" class="btn btn-outline-danger bi bi-trash"></button>
 								</td>
 							</tr>
 						}
@@ -111,7 +111,7 @@
 	public string valorFiltro { get; set; } = string.Empty;
 	public List<Provedores> ListaProvedores { get; set; } = new List<Provedores>();
 	public List<Compras> ListaCompra { get; set; } = new List<Compras>();
-    public List<Estados> ListaEstados { get; set; } = new List<Estados>();
+	public List<Estados> ListaEstados { get; set; } = new List<Estados>();
 	private bool mostrarModal = false;
 	private int IdSeleccionado { get; set; }
 	private string ProvedorSelecionado { get; set; } = "";
@@ -124,8 +124,8 @@
 	protected override async Task OnInitializedAsync()
 	{
 		ListaProvedores = await provedoresService.Listar(C => true);
-        ListaCompra = await compraService.Listar(C => true);
-        ListaEstados = await estadoService.Listar(C => true);
+		ListaCompra = await compraService.Listar(C => true);
+		ListaEstados = await estadoService.Listar(C => true);
 	}
 
 	private void MostrarModal(int compraId, string Provedor)
@@ -144,26 +144,36 @@
 
 	private async Task Buscar()
 	{
-		if (!string.IsNullOrWhiteSpace(valorFiltro))
+		if (!string.IsNullOrWhiteSpace(valorFiltro) && valorFiltro == "id")
 		{
-			if (valorFiltro == "id" && int.TryParse(valorFiltro, out int ProvedoreId))
+			if (int.TryParse(searchBarValue, out int compraId))
 			{
-				ListaProvedores = await provedoresService.Listar(s => s.ProvedorId == ProvedoreId);
+				// Filtrar por CompraId
+				ListaCompra = await compraService.Listar(c => c.CompraId == compraId);
 			}
-
+			else
+			{
+				// Si no se puede convertir a int, mostrar un mensaje o manejar el error
+				TipoNotificacion = ToastType.Warning;
+				TituloNotificacion = "Advertencia";
+				MensajeNotificacion = "Por favor ingrese un ID válido.";
+				MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+			}
 		}
 		else
 		{
-			ListaProvedores = await provedoresService.Listar(p => true);
+			// Si no se selecciona filtro o el valor es vacío, mostrar todas las compras
+			ListaCompra = await compraService.Listar(c => true);
 		}
 	}
+
 
 	public async Task Eliminar()
 	{
 		try
 		{
-			await provedoresService.Eliminar(IdSeleccionado);
-			ListaProvedores = await provedoresService.Listar(x => true);
+			await compraService.Eliminar(IdSeleccionado);
+			ListaCompra = await compraService.Listar(x => true);  // ACTUALIZA ListaCompra
 			mostrarModal = false;
 			IdSeleccionado = 0;
 			TipoNotificacion = ToastType.Success;
@@ -175,10 +185,11 @@
 		{
 			TipoNotificacion = ToastType.Danger;
 			TituloNotificacion = "Error";
-			MensajeNotificacion = "Hubo un error al eliminar el provedor.";
+			MensajeNotificacion = "Hubo un error al eliminar la compra.";
 			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 		}
 	}
+
 
 	public void MostrarToast(ToastType tipo, string titulo, string cuerpo)
 	=> toastService.Notify(new(tipo, titulo, cuerpo));

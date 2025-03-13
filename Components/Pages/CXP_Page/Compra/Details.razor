@@ -1,0 +1,69 @@
+﻿@page "/CxP/Compra/Details/{CompraId:int}"
+@inject CompraServices compraService
+@inject ProvedoresServices provedoresService
+@inject NavigationManager navigation
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <div class="section-title">Datos de la compra</div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold">Compra ID:</label>
+                    <span>@compra.CompraId</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold">Precio:</label>
+                    <span>@compra.Precio</span>
+                </div>
+            </div>
+
+            <div class="section-title">Datos de contacto</div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold">Estado:</label>
+                    <span>@compra.Estados</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold"></label>
+                    <label class="font-weight-bold">Descripcion:</label>
+                    <span>@compra.Descripcion</span>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-3">
+        <a href="/CxP/Compra/Index" class="btn btn-secondary">Volver</a>
+    </div>
+</div>
+
+@code {
+
+
+
+
+
+
+
+    [Parameter]
+    public int CompraId { get; set; }
+    public Compras compra { get; set; } = new Compras();
+    public Provedores proveedor { get; set; } = new Provedores();
+
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        compra = await compraService.Buscar(CompraId);
+    }
+}
