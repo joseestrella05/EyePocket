@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using EyePocket.Data;
 
-namespace EyePocket.Services
+namespace EyePocket.Service
 {
     public class ProductosService(IDbContextFactory<ApplicationDbContext> DbFactory)
     {
@@ -63,6 +63,12 @@ namespace EyePocket.Services
             await using var contexto = await DbFactory.CreateDbContextAsync();
             return await contexto.Productos.FirstOrDefaultAsync(p => p.Nombre == nombre);
         }
+        // 7️⃣ Método para buscar un producto por Codigo
+        public async Task<Productos?> BuscarCodigo(string codigo)
+        {
+            await using var contexto = await DbFactory.CreateDbContextAsync();
+            return await contexto.Productos.FirstOrDefaultAsync(p => p.Codigo == codigo);
+        }
 
         // 8️⃣ Método para buscar un producto por ID
         public async Task<Productos?> BuscarId(int id)
@@ -70,5 +76,6 @@ namespace EyePocket.Services
             await using var contexto = await DbFactory.CreateDbContextAsync();
             return await contexto.Productos.FirstOrDefaultAsync(p => p.ProductoId == id);
         }
+        
     }
 }

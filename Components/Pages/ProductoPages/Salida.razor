@@ -1,0 +1,101 @@
+﻿@page "/Inventario/Salida"
+@inject InventarioService inventarioService
+@inject ProductosService productosService
+@inject ToastService toastService
+
+<PageTitle>Registrar Salida</PageTitle>
+
+<h3>Registrar Salida de Producto</h3>
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+
+            <div class="mb-3">
+                <label class="form-label">Código</label>
+                <input type="text" class="form-control" value="@ProductoSeleccionado?.Codigo" readonly />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Producto</label>
+                <select class="form-control" @bind="ProductoId">
+                    <option value="">Seleccione un producto</option>
+                    @foreach (var producto in productos)
+                    {
+                        <option value="@producto.ProductoId">@producto.Nombre</option>
+                    }
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Cantidad</label>
+                <input type="number" class="form-control" @bind="Cantidad" min="1" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Fecha</label>
+                <input type="date" class="form-control" @bind="FechaSalida" />
+            </div>
+
+            <button class="btn btn-danger" @onclick="RegistrarSalida">Registrar Salida</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int ProductoId { get; set; }
+    private int Cantidad { get; set; } = 1;
+    private DateTime FechaSalida { get; set; } = DateTime.Today;
+
+    private List<Productos> productos = new();
+    private Productos ProductoSeleccionado { get; set; }
+    private List<Inventarios> inventarios = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        productos = await productosService.Listar(a => true);
+        inventarios = await inventarioService.Listar(i => true);
+    }
+
+    private void OnProductoSeleccionado()
+    {
+        ProductoSeleccionado = productos.FirstOrDefault(p => p.ProductoId == ProductoId);
+    }
+
+    private async Task RegistrarSalida()
+    {
+        if (ProductoId > 0 && Cantidad > 0)
+        {
+            var inventario = inventarios.FirstOrDefault(i => i.ProductoId == ProductoId);
+            if (inventario != null)
+            {
+                if (inventario.Stock < Cantidad)
+                {
+                    toastService.Notify(new(ToastType.Warning, "Error", "Stock insuficiente para la salida"));
+                    return;
+                }
+
+                inventario.Salidas += Cantidad;
+                inventario.Stock -= Cantidad;
+
+                bool resultado = await inventarioService.Modificar(inventario);
+                if (resultado)
+                {
+                    toastService.Notify(new(ToastType.Success, "Éxito", "Salida registrada correctamente"));
+                }
+                else
+                {
+                    toastService.Notify(new(ToastType.Warning, "Error", "No se pudo registrar la salida"));
+                }
+            }
+            else
+            {
+                toastService.Notify(new(ToastType.Warning, "Error", "El producto no tiene inventario registrado"));
+            }
+        }
+        else
+        {
+            toastService.Notify(new(ToastType.Warning, "Error", "Por favor, seleccione un producto y una cantidad válida"));
+        }
+    }
+}

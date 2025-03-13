@@ -3,7 +3,7 @@ using EyePocket.Components;
 using EyePocket.Components.Account;
 using EyePocket.Data;
 using EyePocket.Service;
-using EyePocket.Services;
+
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -43,10 +43,14 @@ builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<ClienteServices>();
 builder.Services.AddScoped<ProductosService>();
 builder.Services.AddScoped<TicketServices>();
+
 builder.Services.AddScoped<CuentasXCobrarService>();
 builder.Services.AddScoped<OrdenVentaService>();
 builder.Services.AddScoped<PagosCXCService>();
 builder.Services.AddScoped<CuotasCXCService>();
+builder.Services.AddScoped<InventarioService>();
+builder.Services.AddScoped<ProvedoresServices>();
+
 
 
 

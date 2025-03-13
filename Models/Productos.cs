@@ -29,9 +29,6 @@ namespace EyePocket.Models
         [Required(ErrorMessage ="Describa el producto")]
         public string Descripcion { get; set; }
 
-        [Range(0, 100, ErrorMessage = "El descuento debe estar entre 0 y 100.")]
-        public decimal Descuento { get; set; }
-
         [Required(ErrorMessage = "La fecha de ingreso es obligatoria.")]
         public DateTime FechaIngreso { get; set; } = DateTime.Now;
     }

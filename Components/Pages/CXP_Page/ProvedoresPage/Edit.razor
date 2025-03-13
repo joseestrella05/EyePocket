@@ -1,0 +1,92 @@
+﻿@page "/CxP/Provedores/Edit/{ProvedorId:int}"
+@inject ProvedoresServices provedoresService
+@inject NavigationManager navigation
+
+<EditForm Model="provedores" OnValidSubmit="Crear">
+    <DataAnnotationsValidator />
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-center">
+                    <InputFile class="form-control" multiples />
+                    <label class="form-label">Seleccionar una imagen</label>
+                </div>
+
+                <div class="section-title">Datos personales</div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Nombres *</label>
+                        <InputText class="form-control" @bind-Value="provedores.Nombre" placeholder="Nombre "></InputText>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Dirección *</label>
+                        <InputText class="form-control" @bind-Value="provedores.Direccion" placeholder="Ej. Av. Duarte #10"></InputText>
+                    </div>
+                </div>
+
+                <div class="section-title">Datos de contacto</div>
+
+                <div class="row">
+
+                    <div class="col">
+                        <label>TEL. PRINCIPAL *</label>
+                        <InputText class="form-control" @bind-Value="provedores.Telefono" placeholder="(000) 000-0000"></InputText>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Correo Electrónico</label>
+                        <InputText class="form-control" @bind-Value="provedores.Correo" placeholder="email@gmail.com"></InputText>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <a href="/CxP/Provedores/Index" class="btn btn-secondary">Volver</a>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int ProvedorId { get; set; }
+    public Provedores provedores { get; set; } = new Provedores();
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        provedores = await provedoresService.Buscar(ProvedorId);  
+    }
+    public Edit(ToastService toastService)
+    {
+        ToastService = toastService;
+    }
+    public async Task Crear()
+    {
+        if (!await Validar())
+        {
+            await provedoresService.Guardar(provedores);
+            ToastService.Notify(new(ToastType.Success, "Exito", $"Provedor Editado correctamente."));
+            navigation.NavigateTo("/CxP/Provedores/Index");
+        }
+        else
+        {
+            ToastService.Notify(new(ToastType.Danger, "Error", $"Provedor ya existe."));
+        }
+    }
+
+    public async Task<bool> Validar()
+    {
+        var existeNombre = await provedoresService.BuscarNombres(provedores.Nombre);
+        return existeNombre != null;
+    }
+}

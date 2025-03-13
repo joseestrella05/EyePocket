@@ -1,0 +1,156 @@
+﻿@page "/Productos/Inventario"
+@inject InventarioService inventarioService
+@inject ProductosService productosService
+@inject ToastService toastService
+
+@rendermode InteractiveServer
+
+<PageTitle>Inventario</PageTitle>
+
+@if (mostrarModal)
+{
+    <div class="modal fade show" style="display: block;" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirmación</h5>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar el inventario con ID: @InventarioIdSeleccionado?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" @onclick="EliminarInventario">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show" @onclick="CerrarModal"></div>
+}
+
+<div class="row" style="background-color:white; padding:10px; margin:10px;">
+    <div class="col">
+        <div class="text-left">
+            <h2 class="text-black"><i class="bi bi-clipboard m-1"></i> Inventario</h2>
+        </div>
+    </div>
+    <div class="col">
+        <a href="/Inventario/Entrada" class="btn btn-secondary">Entrada</a>
+        <a href="/Inventario/Salida" class="btn btn-primary">Salida</a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-light table-hover">
+                <thead class="table table-striped">
+                    <tr class="text-center">
+                        <th>Codigo</th>
+                        <th>Producto</th>
+                        <th>Stock</th>
+                        <th>Entradas</th>
+                        <th>Salidas</th>
+                        <th>Precio</th>
+                        <th>Importe Inventario</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var inventario in ListaInventario)
+                    {
+                        var importeInventario = inventario.Stock * inventario.Producto.Precio;
+
+                        <tr class="text-center text-white">
+                            <td>@inventario.Producto.Codigo</td>
+                            <td>@inventario.Producto.Nombre</td>
+                            <td>@inventario.Stock</td>
+                            <td>@inventario.Entradas</td>
+                            <td>@inventario.Salidas</td>
+                            <td>@inventario.Producto.Precio</td>
+                            <td>@importeInventario.ToString("C2")</td>  
+                            <td class="text-center">
+                                <button type="button" @onclick="() => MostrarModal(inventario.InventarioId)" class="btn btn-outline-danger bi bi-trash"></button>
+                                <button type="button" @onclick="() => AgregarEntrada(inventario.InventarioId)" class="btn btn-outline-success bi bi-plus-circle"></button>
+                                <button type="button" @onclick="() => RegistrarSalida(inventario.InventarioId)" class="btn btn-outline-warning bi bi-dash-circle"></button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <caption>Total Inventario: @ListaInventario.Count</caption>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    public List<Inventarios> ListaInventario { get; set; } = new List<Inventarios>();
+    private bool mostrarModal = false;
+    private int InventarioIdSeleccionado { get; set; }
+
+    private void MostrarModal(int inventarioId)
+    {
+        InventarioIdSeleccionado = inventarioId;
+        mostrarModal = true;
+    }
+
+    private void CerrarModal()
+    {
+        mostrarModal = false;
+        InventarioIdSeleccionado = 0;
+    }
+
+    private async Task EliminarInventario()
+    {
+        if (InventarioIdSeleccionado > 0)
+        {
+            await inventarioService.Eliminar(InventarioIdSeleccionado);
+            ListaInventario = await inventarioService.Listar(i => true);
+            CerrarModal();
+            toastService.Notify(new(ToastType.Success, "Éxito", "Inventario eliminado correctamente"));
+        }
+    }
+
+    private async Task AgregarEntrada(int inventarioId)
+    {
+        var exito = await inventarioService.RegistrarEntrada(inventarioId, 1); 
+        if (exito)
+        {
+            var inventario = await inventarioService.BuscarId(inventarioId);
+            var inventarioExistente = ListaInventario.FirstOrDefault(i => i.InventarioId == inventarioId);
+            if (inventarioExistente != null && inventario != null)
+            {
+                inventarioExistente.Stock = inventario.Stock;
+            }
+            toastService.Notify(new(ToastType.Success, "Éxito", "Entrada registrada correctamente"));
+        }
+        else
+        {
+            toastService.Notify(new(ToastType.Warning, "Error", "Hubo un problema al registrar la entrada"));
+        }
+    }
+
+    private async Task RegistrarSalida(int inventarioId)
+    {
+        var exito = await inventarioService.RegistrarSalida(inventarioId, 1); 
+        if (exito)
+        {
+            var inventario = await inventarioService.BuscarId(inventarioId);
+            var inventarioExistente = ListaInventario.FirstOrDefault(i => i.InventarioId == inventarioId);
+            if (inventarioExistente != null && inventario != null)
+            {
+                inventarioExistente.Stock = inventario.Stock;  
+            }
+            toastService.Notify(new(ToastType.Success, "Éxito", "Salida registrada correctamente"));
+        }
+        else
+        {
+            toastService.Notify(new(ToastType.Warning, "Error", "No hay suficiente stock"));
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaInventario = await inventarioService.Listar(i => true);
+    }
+}

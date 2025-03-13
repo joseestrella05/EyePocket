@@ -1,5 +1,4 @@
 ﻿@page "/Productos/Create"
-@using EyePocket.Services
 @inject ProductosService productoService
 @inject Blazored.Toast.Services.IToastService ToastService
 
@@ -37,7 +36,8 @@
                 <div class="form-group">
                     <label>Categoría</label>
                     <InputSelect class="input-field" @bind-Value="producto.Categoria">
-                        @foreach (var categoria in new List<string> { "Alimentos", "Electrónica" })
+                        <option value="">Seleccione una categoria</option>
+                        @foreach (var categoria in new List<string> { "Alimentos", "Electrónica","Belleza", "Hogar", "Ferreteria", "Papeleria"})
                         {
                             <option value="@categoria">@categoria</option>
                         }
@@ -53,12 +53,12 @@
                 </div>
                 <div class="form-group full-width">
                     <label>Descripción</label>
-                    <InputTextArea class="input-field" @bind-Value="producto.Descripcion" Rows="3" />
+                    <InputText class="input-field" @bind-Value="producto.Descripcion" Rows="3" />
                 </div>
-                <div class="form-group">
+                @* <div class="form-group">
                     <label>Descuento</label>
                     <InputNumber class="input-field" @bind-Value="producto.Descuento" />
-                </div>
+                </div> *@
                 <div class="form-group">
                     <label>Fecha Ingreso</label>
                     <InputDate class="input-field" @bind-Value="producto.FechaIngreso" />
