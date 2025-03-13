@@ -301,7 +301,7 @@
                                         </div>
                                     </div>
                                     <div class="col-12 d-flex justify-content-between">
-                                        <button class="btn btn-success bi bi-currency-dollar" @onclick="MostrarModalPagoaCredito">Confirmar Pago</button>
+                                        <button class="btn btn-success bi bi-currency-dollar" @onclick="ConfirmarPagoaCredito">Confirmar Pago</button>
                                         <button class="btn btn-danger bi bi-arrow-left-circle" @onclick="CerrarModalPagoaCredito">Cancelar</button>
                                     </div>
                                 </div>
@@ -440,6 +440,7 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" @onclick="CerrarModalFactura">Cerrar</button>
+                    <button class="btn btn-success" @onclick="Confirm">Confirmar</button>
                 </div>
             </div>
         </div>
@@ -549,9 +550,20 @@
         //NavigationManager.NavigateTo("/Ventas/Facturacion/Index", true);
     }
 
+    private async Task Confirm()
+    {
+        NavigationManager.NavigateTo("/Ventas/Facturacion/Index", true);
+    }
+
     private async Task ConfirmarPagoTarjeta()
     {
         MostrarModalFactura();
+    }
+
+    private async Task ConfirmarPagoaCredito()
+    {
+        MostrarModalFactura();
+
     }
 
 
