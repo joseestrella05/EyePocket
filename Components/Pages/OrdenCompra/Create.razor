@@ -1,4 +1,9 @@
 ﻿@page "/OrdenCompra/Create"
+@using EyePocket.Data
+@using EyePocket.Services
+@inject ApplicationDbContext context
+@inject ProvedoresServices proveedoresService
+@inject ProductosService productoService
 @inject OrdenCompraService ordenCompraService
 @inject OrdenCompraDetalleService ordenComparDetalleService
 @inject EstadoOdService estadoOdService
@@ -20,7 +25,7 @@
 
                 <div class="row">
                     <div class="col">
-                        <label>Proveedores</label>
+                        <label>Proveedor:</label>
                         <InputSelect class="form-control form-select" @bind-Value="Provedores.ProvedorId">
                             <option value="0" selected disabled>Elija una opción</option>
                             @foreach (var proveedor in ListaProveedores )
@@ -31,100 +36,100 @@
                     </div>
 
                 </div>
-            </div>
 
-            <div class="row">
-                <div class="col">
-                    <label>Saldo pendiente</label>
-                    <InputDate class="form-control" @bind-Value="OrdenCompra.FechaEmision" placeholder="FechaEmision"></InputDate>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col">
-                    <label>Saldo pendiente</label>
-                    <InputDate class="form-control" @bind-Value="OrdenCompra.FechaVencimiento" placeholder="FechaVencimiento"></InputDate>
-                </div>
-            </div>
-
-
-            <div class="row">
-                <div class="col">
-                    <label>Saldo pendiente</label>
-                    <InputText class="form-control" @bind-Value="OrdenCompra.NumeroFactura" placeholder="NumeroFactura"></InputText>
-                </div>
-            </div>
-
-
-            <div class="row">
-                <div class="col">
-                    <label>Estado de la cuenta</label>
-                    <InputSelect class="form-control form-select" @bind-Value="OrdenCompra.EstadoOdId">
-                        <option value="0" selected disabled>Elija una opción</option>
-                        @foreach (var Estado in EstadoODC)
-                        {
-                            <option value="@Estado.EstadoOdId">@Estado.descripcionEstado</option>
-                        }
-                    </InputSelect>
+                <div class="row">
+                    <div class="col">
+                        <label>Fecha de Emision</label>
+                        <InputDate class="form-control" @bind-Value="OrdenCompra.FechaEmision" placeholder="FechaEmision"></InputDate>
+                    </div>
                 </div>
 
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col">
-                <label>Saldo pendiente</label>
-                <InputNumber class="form-control" @bind-Value="OrdenCompra.MontoTotal" placeholder="MontoTotal"></InputNumber>
-            </div>
-        </div>
-
-
-        <div class="container">
-            <div class="card shadow-lg">
-                <div class="card-header text-center">
-                    <h5><strong>Detalles de artículos utilizados</strong></h5>
+                <div class="row">
+                    <div class="col">
+                        <label>Fecha de vencimiento</label>
+                        <InputDate class="form-control" @bind-Value="OrdenCompra.FechaVencimiento" placeholder="FechaVencimiento"></InputDate>
+                    </div>
                 </div>
 
-                <div class="border border-success p-3 mt-3">
-                    <h5>Trabajo Detalle</h5>
 
-                   <OrdenCompraPicker ListaProductos="ListaProducto"
-                    ProductoId="OrdenCompraDetalle.ProductoId"
-                    Cantidad="OrdenCompraDetalle.cantidad"
-                    ProductoSeleccionado="AgregarProducto" />
+                <div class="row">
+                    <div class="col">
+                        <label>Numero de Factura</label>
+                        <InputText class="form-control" @bind-Value="OrdenCompra.NumeroFactura" placeholder="NumeroFactura"></InputText>
+                    </div>
+                </div>
 
-                    <hr />
-                    <table class="table table-light">
-                        <thead class="table table-striped">
-                            <tr class="text-center">
-                                <th>Producto</th>
-                                <th>Cantidad</th>
-                                <th>Precio</th>
-                                <th>Remover</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var detalle in OrdenCompra.OrdenCompraDetalle)
+
+                <div class="row">
+                    <div class="col">
+                        <label>Estado de la cuenta</label>
+                        <InputSelect class="form-control form-select" @bind-Value="OrdenCompra.EstadoOdId">
+                            <option value="0" selected disabled>Elija una opción</option>
+                            @foreach (var Estado in EstadoODC)
                             {
-                                <tr class="text-center">
-                                    <td class="ps-3">@detalle.Productos.Descripcion</td>
-                                    <td class="ps-3">@detalle.cantidad</td>
-                                    @* <td class="ps-3">@detalle.Preio.ToString("C")</td>*@
-                                    <td class="ps-3">
-                                        <button type="button" class="btn btn-outline-danger bi bi-trash"
-                                        @onclick="() => RemoverDetalle(detalle)"></button>
-                                    </td>
-                                </tr>
+                                <option value="@Estado.EstadoOdId">@Estado.descripcionEstado</option>
                             }
-                        </tbody>
-                    </table>
+                        </InputSelect>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Monto Total</label>
+                        <InputNumber class="form-control" @bind-Value="OrdenCompra.MontoTotal" placeholder="MontoTotal"></InputNumber>
+                    </div>
                 </div>
 
 
-            </div>
-            <div class="text-center">
-                <button type="submit" class="btn btn-success">Guardar</button>
-                <a href="/OrdenCompra/Index" class="btn btn-secondary">Volver</a>
+                <div class="container">
+                    <div class="card shadow-lg">
+                        <div class="card-header text-center">
+                            <h5><strong>Detalles de los productos para la orden</strong></h5>
+                        </div>
+
+                        <div class="border border-success p-3 mt-3">
+                            <h5>Trabajo Detalle</h5>
+
+                            <OrdenCompraPicker ListaProductos="ListaProducto"
+                            ProductoId="OrdenCompraDetalle.ProductoId"
+                            Cantidad="OrdenCompraDetalle.cantidad"
+                            ProductoSeleccionado="AgregarProducto" />
+
+                            <hr />
+                            <table class="table table-light">
+                                <thead class="table table-striped">
+                                    <tr class="text-center">
+                                        <th>Producto</th>
+                                        <th>Cantidad</th>
+                                        <th>Precio</th>
+                                        <th>Remover</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var detalle in OrdenCompra.OrdenCompraDetalle)
+                                    {
+                                        <tr class="text-center">
+                                            <td class="ps-3">@detalle.Productos.Descripcion</td>
+                                            <td class="ps-3">@detalle.cantidad</td>
+                                            @* <td class="ps-3">@detalle.Preio.ToString("C")</td>*@
+                                            <td class="ps-3">
+                                                <button type="button" class="btn btn-outline-danger bi bi-trash"
+                                                @onclick="() => RemoverDetalle(detalle)"></button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                        <a href="/OrdenCompra/Index" class="btn btn-secondary">Volver</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -147,9 +152,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        ListaProveedores = await proveedoresService.Listar(P => true);
         ListaOrdenCompras = await ordenCompraService.Listar(C => true);
         EstadoODC = await estadoOdService.Listar(C => true);
-       
+        ListaProducto = await productoService.Listar(P => true);
+
+
     }
 
 
