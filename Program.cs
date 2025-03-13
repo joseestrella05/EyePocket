@@ -59,6 +59,12 @@ builder.Services.AddScoped<MetodoPagoService>();
 
 builder.Services.AddScoped<EstadoCXPService>();
 
+builder.Services.AddScoped<OrdenCompraService>();
+
+builder.Services.AddScoped<OrdenCompraDetalleService>();
+
+builder.Services.AddScoped<EstadoOdService>();
+
 
 
 //notificacion
