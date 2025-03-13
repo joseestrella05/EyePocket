@@ -1,148 +1,136 @@
-@page "/Tarjeta/Create"
-@inject ClienteServices clienteService
+@page "/TarjetaPunto/Create"
+@inject T_PuntosServices tarjetaPuntoService
 @inject NavigationManager navigation
 
-<PageTitle>Creando Tarjeta</PageTitle>
+<PageTitle>Creando Tarjeta Punto</PageTitle>
 <div class="text-left">
-    <h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-person-plus m-1"></i>Nuevo/a Cliente</h2>
+    <h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-credit-card-plus m-1"></i>Nuevo Tarjeta Punto</h2>
 </div>
 
-<EditForm Model="clientes" OnValidSubmit="Crear">
+<EditForm Model="tarjetaPunto" OnValidSubmit="Guardar">
     <div class="container">
         <div class="card">
             <div class="card-body">
-                <div class="text-center">
-                    <InputFile class="form-control" multiples/>
-                    <label class="form-label">Seleccionar una imagen</label>
-                </div>
-
-                <div class="section-title">Datos personales</div>
+                <div class="section-title">Datos de la Tarjeta de Puntos</div>
 
                 <div class="row">
                     <div class="col">
-                        <label>Nombres *</label>
-                        <InputText class="form-control" @bind-Value="clientes.Nombre" placeholder="Nombre del cliente"></InputText>
-                    </div>
-                    <div class="col">
-                        <label>DOC. Identidad *</label>
-                        <InputText class="form-control" @bind-Value="clientes.Cedula" placeholder="000-0000000-0"></InputText>
+                        <label>Fecha de Creación *</label>
+                        <InputDate class="form-control" @bind-Value="tarjetaPunto.FechaCreacion" readonly/>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col">
-                        <label>Dirección *</label>
-                        <InputText class="form-control" @bind-Value="clientes.Direccion" placeholder="Ej. Av. Duarte #10"></InputText>
+                        <label>Tarjeta ID *</label>
+                        <InputNumber class="form-control" @bind-Value="tarjetaPunto.TarjetaId" readonly/>
                     </div>
                     <div class="col">
-                        <label>Fecha Registro *</label>
-                        <InputDate class="form-control" @bind-Value="clientes.FechaIngreso"></InputDate>
-                    </div>
-                </div>
-
-                <div class="section-title">Datos de contacto</div>
-
-                <div class="row">
-                    <div class="col">
-                        <label>Whatsapp *</label>
-                        <InputText class="form-control" @bind-Value="clientes.Telefono" placeholder="(000) 000-0000"></InputText>
-                    </div>
-                    <div class="col">
-                        <label>TEL. PRINCIPAL *</label>
-                        <InputText class="form-control" @bind-Value="clientes.Telefono" placeholder="(000) 000-0000"></InputText>
+                        <label>Puntos Acumulados *</label>
+                        <InputNumber class="form-control" @bind-Value="tarjetaPunto.Puntos" placeholder="Ingrese los puntos acumulados"></InputNumber>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col">
-                        <label>Correo Electrónico</label>
-                        <InputText class="form-control" @bind-Value="clientes.Email" placeholder="email@gmail.com"></InputText>
+                        <label>Nombre del Cliente *</label>
+                        <InputText class="form-control" @bind-Value="tarjetaPunto.NombreCliente" placeholder="Ingrese el nombre del cliente"></InputText>
                     </div>
+                </div>
 
+                <div class="row">
+                    <div class="col">
+                        <label>Tipo de Tarjeta *</label>
+                        <InputSelect class="form-control" @bind-Value="tarjetaPunto.TipoTarjeta">
+                            <option value="">Seleccione</option>
+                            <option value="Plata">Plata</option>
+                            <option value="Oro">Oro</option>
+                            <option value="Platino">Platino</option>
+                        </InputSelect>
+                    </div>
+                    <div class="col">
+                        <label>Estado *</label>
+                        <InputSelect class="form-control" @bind-Value="tarjetaPunto.Estado">
+                            <option value="">Seleccione</option>
+                            <option value="Activa">Activa</option>
+                            <option value="Inactiva">Inactiva</option>
+                            <option value="Suspendida">Suspendida</option>
+                        </InputSelect>
+                    </div>
                 </div>
             </div>
-
         </div>
         <div class="text-center">
             <button type="submit" class="btn btn-success">Guardar</button>
-            <a  href="/Cliente/Index"class="btn btn-secondary">Volver</a>
+            <a href="/TarjetaPunto/Index" class="btn btn-secondary">Volver</a>
         </div>
     </div>
 </EditForm>
 
 <style>
-    body{
-    background-color:#f5f5f5;
+    body {
+        background-color: #f5f5f5;
     }
     .container {
-    max-width: 800px;
-    margin: auto;
-    padding: 10px;
+        max-width: 800px;
+        margin: auto;
+        padding: 10px;
     }
-
     .card {
-    background:white;
-    padding: 30px;
-    border-radius: 10px;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
     }
-
     .section-title {
-    background: #0d5c63;
-    color: white;
-    text-align: center;
-    font-weight: bold;
-    padding: 8px;
-    margin: 10px;
-    border-radius: 5px;
+        background: #0d5c63;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+        padding: 8px;
+        margin: 10px;
+        border-radius: 5px;
     }
-
     .btn {
-    margin: 10px;
-    padding: 10px 20px;
-    border-radius: 5px;
+        margin: 10px;
+        padding: 10px 20px;
+        border-radius: 5px;
     }
-
     .btn-success {
-    background-color: #0d5c63;
-    border: none;
+        background-color: #0d5c63;
+        border: none;
     }
-
     .btn-secondary {
-    background-color: #444;
-    color: white;
-    text-decoration: none;
+        background-color: #444;
+        color: white;
+        text-decoration: none;
     }
-
     .btn-secondary:hover {
-    background-color: #222;
+        background-color: #222;
     }
 </style>
 
 @code {
-    public Clientes clientes { get; set; } = new Clientes();
+    public TarjetaPuntos tarjetaPunto { get; set; } = new TarjetaPuntos();
     [Inject] protected ToastService ToastService { get; set; }
 
-    public async Task Crear()
+    public async Task Guardar()
     {
-        clientes.Apellido = "  ";
-        clientes.EstadoId = 1;
         if (!await Validar())
         {
-            await clienteService.Guardar(clientes);
-            ToastService.Notify(new(ToastType.Success, "Exito", $"Cliente Creado correctamente."));
-            clientes = new Clientes();
-            navigation.NavigateTo("/Cliente/Index");
+            await tarjetaPuntoService.Guardar(tarjetaPunto);
+            ToastService.Notify(new(ToastType.Success, "Éxito", $"Tarjeta Punto creada correctamente."));
+            tarjetaPunto = new TarjetaPuntos();
+            navigation.NavigateTo("/TarjetaPunto/Index");
         }
         else
         {
-            ToastService.Notify(new(ToastType.Danger, "Error", $"Cliente ya existe."));
+            ToastService.Notify(new(ToastType.Danger, "Error", $"Tarjeta ya existe."));
         }
     }
 
     public async Task<bool> Validar()
     {
-        var existeNombre = await clienteService.BuscarNombres(clientes.Nombre);
-        var existeRnc = await clienteService.BuscarRNC(clientes.Cedula);
-        return existeNombre != null && existeRnc != null;
+        var existeNumeroTarjeta = await tarjetaPuntoService.Buscar(tarjetaPunto.TarjetaId);
+        return existeNumeroTarjeta != null;
     }
 }

@@ -8,9 +8,7 @@ public class Tickets
     [Key]
     public int TicketId { get; set; }
     [Required]
-    public string NombreCliente { get; set; }
-    [Required]
-    public string NombreAgente { get; set; }
+    public int ClienteId { get; set; }
     
     [Required(ErrorMessage = "El campo es requerido")]
     public string Asunto { get; set; }
@@ -25,4 +23,9 @@ public class Tickets
     [Required]
     public DateTime Fecha { get; set; } = DateTime.Today;
     
+    [ForeignKey("ClienteId")]
+    public Clientes Cliente { get; set; }
+    
+    
 }
+

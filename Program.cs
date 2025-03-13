@@ -24,7 +24,7 @@ builder.Services.AddAuthentication(options =>
     })
     .AddIdentityCookies();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("SqlConStr");
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -41,7 +41,8 @@ builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<ClienteServices>();
 builder.Services.AddScoped<TicketServices>();
 builder.Services.AddScoped<T_PuntosServices>();
-
+builder.Services.AddScoped<AgenteServices>();
+builder.Services.AddScoped<CitasService>();
 
 var app = builder.Build();
 

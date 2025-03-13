@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EyePocket.Models;
 
@@ -21,5 +22,8 @@ public class TarjetaPuntos
     
     [Required]
     public string Estado { get; set; }
+    
+    [ForeignKey("ClienteId")]
+    public Clientes Cliente { get; set; }
 
 }
