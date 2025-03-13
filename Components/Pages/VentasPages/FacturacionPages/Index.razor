@@ -1,6 +1,8 @@
 ﻿@page "/Ventas/Facturacion/Index"
 @using EyePocket.Services
 @inject ProductosService productoService
+@inject OrdenVentaService OrdenVentaService
+@inject OrdenVentasDetalleService OrdenVentasDetalleService
 @inject ToastService toastService
 @inject NavigationManager NavigationManager
 
@@ -155,11 +157,11 @@
                             <button class="btn btn-success w-50 mt-4 rounded-pill" @onclick="Cobrar">
                                 <i class="bi bi-cash"></i> Cobrar
                             </button>
-                          
+
                             <button class="btn btn-success w-50 mt-2 rounded-pill"  @onclick="MostrarModalFactura">
                                 <i class="bi bi-printer"></i> Imprimir
                             </button>
-                            
+
 
 
                             <button class="btn btn-danger w-50 mt-2 rounded-pill" @onclick="CerrarModalCobro">
@@ -237,7 +239,7 @@
                                 <option value="DK">Dinamarca</option>
                             </select>
 
-                            <button type="button" class="btn btn-success mt-3 bi bi-currency-dollar">Pagar Ahora</button>
+                            <button type="button" @onclick="ConfirmarPagoTarjeta" class="btn btn-success mt-3 bi bi-currency-dollar">Confirmar Pago</button>
                             <button type="button" @onclick="CerrarModalPagoTarjeta" class="btn btn-danger mt-3 bi bi-arrow-left-circle">Volver</button>
                         </form>
                     </div>
@@ -503,10 +505,55 @@
 
     private async Task ConfirmarPagoEfectivo()
     {
-        MostrarToast(ToastType.Success, "Éxito", "Los datos se guardaron con éxito");
-        await Task.Delay(2000); 
-        NavigationManager.NavigateTo("/Ventas/Facturacion/Index", true);
+        // Crear la Orden de Venta
+        var nuevaOrdenVenta = new OrdenVenta
+            {
+                ClienteId = 4, // Asegurar que este ID esté disponible
+                FechaEmision = DateTime.Now,
+                NumeroFactura = 001.ToString(), // Generar un número único
+                MontoTotal = Total,
+                Estado = true, // Asumiendo que la venta está completada
+                RNC = "123456789" // Reemplazar con el valor real
+            };
+
+        // Guardar la Orden de Venta usando el servicio
+        if (await OrdenVentaService.Guardar(nuevaOrdenVenta))
+        {
+            // Crear los detalles de la Orden de Venta
+            foreach (var factura in ListaFacturas)
+            {
+                var detalle = new OrdenVentaDetalle
+                    {
+                        OrdenVentaId = nuevaOrdenVenta.OrdenVentaId, // Asociar con la orden creada
+                        ProductoId = factura.ProductoId,
+                        Cantidad = factura.Cantidad,
+                        Subtotal = factura.Subtotal
+                    };
+
+                // Guardar cada detalle de la venta usando el servicio
+                await OrdenVentasDetalleService.Guardar(detalle);
+            }
+
+            // Mostrar mensaje de éxito
+            MostrarToast(ToastType.Success, "Éxito", "Los datos se guardaron con éxito");
+            await Task.Delay(2000);
+        }
+        else
+        {
+            MostrarToast(ToastType.Danger, "Error", "No se pudo guardar la orden de venta");
+        }
+
+        // Navegar a la página de facturación
+        CerrarModalPagoEfectivo();
+        MostrarModalFactura();
+        //NavigationManager.NavigateTo("/Ventas/Facturacion/Index", true);
     }
+
+    private async Task ConfirmarPagoTarjeta()
+    {
+        MostrarModalFactura();
+    }
+
 
 
     private void CerrarModalPagoEfectivo()
