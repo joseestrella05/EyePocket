@@ -22,9 +22,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 	public DbSet<MetodosPago> MetodosPago { get; set; }
 	public DbSet<PagosCXC> PagosCXC { get; set; }
 	public DbSet<CuotasCXC> CuotasCXC { get; set; }
-  public DbSet<Inventarios> Inventarios { get; set; }
+	public DbSet<Inventarios> Inventarios { get; set; }
+    public DbSet<Compras> Compras { get; set; }
 
-	protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public DbSet<Provedores> Provedores { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		base.OnModelCreating(modelBuilder); // Asegura que Identity est� bien configurado
 
