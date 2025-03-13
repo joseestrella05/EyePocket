@@ -237,6 +237,22 @@ namespace EyePocket.Migrations
                         });
                 });
 
+            modelBuilder.Entity("EyePocket.Models.EstadoOrdenCompra", b =>
+                {
+                    b.Property<int>("EstadoOdId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EstadoOdId"));
+
+                    b.Property<string>("descripcionEstado")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("EstadoOdId");
+
+                    b.ToTable("estadoOdCompra");
+                });
+
             modelBuilder.Entity("EyePocket.Models.Estados", b =>
                 {
                     b.Property<int>("EstadoId")
@@ -323,6 +339,71 @@ namespace EyePocket.Migrations
                             MetodoPagoId = 5,
                             Descripcion = "Cheque"
                         });
+                });
+
+            modelBuilder.Entity("EyePocket.Models.OrdenCompra", b =>
+                {
+                    b.Property<int>("OrdenCompraID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrdenCompraID"));
+
+                    b.Property<int>("EstadoOdId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaEmision")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaVencimiento")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("MontoTotal")
+                        .HasColumnType("float");
+
+                    b.Property<string>("NumeroFactura")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProveedorId")
+                        .HasColumnType("int");
+
+                    b.HasKey("OrdenCompraID");
+
+                    b.HasIndex("EstadoOdId");
+
+                    b.HasIndex("ProveedorId");
+
+                    b.ToTable("ordenCompra");
+                });
+
+            modelBuilder.Entity("EyePocket.Models.OrdenCompraDetalle", b =>
+                {
+                    b.Property<int>("OdDetalleID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OdDetalleID"));
+
+                    b.Property<int>("OrdenCompraID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("SubTotal")
+                        .HasColumnType("float");
+
+                    b.Property<int>("cantidad")
+                        .HasColumnType("int");
+
+                    b.HasKey("OdDetalleID");
+
+                    b.HasIndex("OrdenCompraID");
+
+                    b.HasIndex("ProductoId");
+
+                    b.ToTable("ordenCompraDetalles");
                 });
 
             modelBuilder.Entity("EyePocket.Models.Productos", b =>
@@ -621,6 +702,44 @@ namespace EyePocket.Migrations
                     b.Navigation("Provedores");
                 });
 
+            modelBuilder.Entity("EyePocket.Models.OrdenCompra", b =>
+                {
+                    b.HasOne("EyePocket.Models.EstadoOrdenCompra", "estadoOd")
+                        .WithMany()
+                        .HasForeignKey("EstadoOdId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EyePocket.Models.Provedores", "proveedores")
+                        .WithMany()
+                        .HasForeignKey("ProveedorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("estadoOd");
+
+                    b.Navigation("proveedores");
+                });
+
+            modelBuilder.Entity("EyePocket.Models.OrdenCompraDetalle", b =>
+                {
+                    b.HasOne("EyePocket.Models.OrdenCompra", "OrdenCompra")
+                        .WithMany("OrdenCompraDetalle")
+                        .HasForeignKey("OrdenCompraID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EyePocket.Models.Productos", "Productos")
+                        .WithMany()
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OrdenCompra");
+
+                    b.Navigation("Productos");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -670,6 +789,11 @@ namespace EyePocket.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("EyePocket.Models.OrdenCompra", b =>
+                {
+                    b.Navigation("OrdenCompraDetalle");
                 });
 #pragma warning restore 612, 618
         }
