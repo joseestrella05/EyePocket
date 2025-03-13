@@ -16,5 +16,13 @@ namespace EyePocket.Service
                 .Where(criterio)
                 .ToListAsync();
         }
+
+        public async Task<bool> Guardar(OrdenVentaDetalle ordenVentaDetalle)
+        {
+            await using var _contexto = await DbFactory.CreateDbContextAsync();
+            _contexto.OrdenVentasDetalle.Add(ordenVentaDetalle);
+            return await _contexto.SaveChangesAsync() > 0;
+        }
+
     }
 }
