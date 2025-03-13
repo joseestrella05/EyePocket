@@ -239,6 +239,40 @@ namespace EyePocket.Migrations
                         });
                 });
 
+            modelBuilder.Entity("EyePocket.Models.Mermas", b =>
+                {
+                    b.Property<int>("MermaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MermaId"));
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaRegistro")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("InventariosInventarioId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Motivo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("MermaId");
+
+                    b.HasIndex("InventariosInventarioId");
+
+                    b.HasIndex("ProductoId");
+
+                    b.ToTable("Mermas");
+                });
+
             modelBuilder.Entity("EyePocket.Models.MetodosPago", b =>
                 {
                     b.Property<int>("MetodoPagoId")
@@ -364,9 +398,6 @@ namespace EyePocket.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Descuento")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<DateTime>("FechaIngreso")
                         .HasColumnType("datetime2");
 
@@ -453,6 +484,39 @@ namespace EyePocket.Migrations
                     b.HasKey("TicketId");
 
                     b.ToTable("Tickets");
+                });
+
+            modelBuilder.Entity("Inventarios", b =>
+                {
+                    b.Property<int>("InventarioId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InventarioId"));
+
+                    b.Property<int>("Entradas")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaRegistro")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Salidas")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
+
+                    b.Property<double>("importe")
+                        .HasColumnType("float");
+
+                    b.HasKey("InventarioId");
+
+                    b.HasIndex("ProductoId");
+
+                    b.ToTable("Inventarios");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -622,6 +686,21 @@ namespace EyePocket.Migrations
                     b.Navigation("Estado");
                 });
 
+            modelBuilder.Entity("EyePocket.Models.Mermas", b =>
+                {
+                    b.HasOne("Inventarios", null)
+                        .WithMany("Mermas")
+                        .HasForeignKey("InventariosInventarioId");
+
+                    b.HasOne("EyePocket.Models.Productos", "Producto")
+                        .WithMany()
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Producto");
+                });
+
             modelBuilder.Entity("EyePocket.Models.OrdenVenta", b =>
                 {
                     b.HasOne("EyePocket.Models.Clientes", "Clientes")
@@ -642,6 +721,17 @@ namespace EyePocket.Migrations
                         .IsRequired();
 
                     b.Navigation("Deuda");
+                });
+
+            modelBuilder.Entity("Inventarios", b =>
+                {
+                    b.HasOne("EyePocket.Models.Productos", "Producto")
+                        .WithMany()
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Producto");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -698,6 +788,11 @@ namespace EyePocket.Migrations
             modelBuilder.Entity("EyePocket.Models.CuentasXCobrar", b =>
                 {
                     b.Navigation("ListaCuotasCXC");
+                });
+
+            modelBuilder.Entity("Inventarios", b =>
+                {
+                    b.Navigation("Mermas");
                 });
 #pragma warning restore 612, 618
         }
