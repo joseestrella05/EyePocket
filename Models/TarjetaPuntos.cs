@@ -19,7 +19,6 @@ public class TarjetaPuntos
 
     [Required]
     public int Puntos { get; set; } = 0;
-
     [Required]
     public DateTime FechaCreacion { get; set; } = DateTime.Today;
     

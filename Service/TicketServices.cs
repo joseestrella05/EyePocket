@@ -66,6 +66,4 @@ public class TicketServices (IDbContextFactory<ApplicationDbContext> DbFactory)
             .AsNoTracking()
             .ToListAsync();
     }
-    
-    
 }

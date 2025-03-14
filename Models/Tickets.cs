@@ -22,6 +22,5 @@ public class Tickets
     public string Prioridad { get; set; }
     [Required]
     public DateTime Fecha { get; set; } = DateTime.Today;
-    
 }
 

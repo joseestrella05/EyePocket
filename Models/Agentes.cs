@@ -17,7 +17,6 @@ public class Agentes
     [Required(ErrorMessage = "El salario es obligatorio.")]
     [Range(0, double.MaxValue, ErrorMessage = "El salario no puede ser negativo.")]
     public double Salario { get; set; }
-
     [Required(ErrorMessage = "El número de teléfono es obligatorio.")]
     [Phone(ErrorMessage = "El número de teléfono no es válido.")]
     public string N_Telefono { get; set; } = string.Empty;
