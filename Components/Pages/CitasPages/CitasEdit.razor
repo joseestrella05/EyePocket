@@ -1,0 +1,122 @@
+@page "/Cita/Edit/{Id:int}"
+@inject CitasService citaService
+@inject NavigationManager navigation
+
+<PageTitle>Editando Cita | @cita.Nombre_Persona</PageTitle>
+<div class="text-left">
+    <h2 class="text-black" style="background-color:white; padding:5px;">
+        <i class="bi bi-calendar-check m-1"></i> Editar Cita
+    </h2>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <div class="section-title">Datos de la Cita</div>
+
+            <div class="row">
+                <div class="col">
+                    <label>Nombre *</label>
+                    <InputText class="form-control" @bind-Value="cita.Nombre_Persona" placeholder="Nombre de la persona"></InputText>
+                </div>
+                <div class="col">
+                    <label>Fecha *</label>
+                    <InputDate class="form-control" @bind-Value="cita.Fecha"></InputDate>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col">
+                    <label>Estado *</label>
+                    <InputSelect class="form-select" @bind-Value="cita.Estado">
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Finalizada">Finalizada</option>
+                        <option value="Cancelada">Cancelada</option>
+                    </InputSelect>
+                </div>
+
+                <div class="col">
+                    <label>Asunto</label>
+                    <InputText class="form-control" @bind-Value="cita.AsuntoCita" placeholder="Nombre de la persona"></InputText>
+                </div>
+            </div>
+            <div class="col">
+                <label>Hora</label>
+                <InputText class="form-control" @bind-Value="cita.Hora" placeholder="Ejemplo: 5:30 PM" />
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <button @onclick="Guardar" class="btn btn-success">Guardar</button>
+        <a href="/Cita/Index" class="btn btn-secondary">Volver</a>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #f5f5f5;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: auto;
+        padding: 10px;
+    }
+
+    .card {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+    }
+
+    .section-title {
+        background: #0d5c63;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+        padding: 8px;
+        margin: 10px;
+        border-radius: 5px;
+    }
+
+    .btn {
+        margin: 10px;
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+
+    .btn-success {
+        background-color: #0d5c63;
+        border: none;
+    }
+
+    .btn-secondary {
+        background-color: #444;
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+        background-color: #222;
+    }
+</style>
+
+@code {
+[Parameter]
+public int Id { get; set; }
+public Citas cita { get; set; } = new Citas();
+[Inject] protected ToastService ToastService { get; set; }
+
+protected override async Task OnInitializedAsync()
+{
+    cita = await citaService.Buscar(Id);
+}
+
+public async Task Guardar()
+{
+    await citaService.Guardar(cita);
+    ToastService.Notify(new(ToastType.Success, "Éxito", "Cita editada correctamente."));
+    navigation.NavigateTo("/Cita/Index");
+} 
+}
