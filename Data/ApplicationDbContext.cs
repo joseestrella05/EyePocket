@@ -132,10 +132,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
        modelBuilder.Entity<Productos>().HasData(
            new List<Productos>()
            {
-               new Productos(){ ProductoId=1, Codigo="5334", Nombre="Galletas Princesa", Precio=123, Costo=344, Categoria="Comestibles", Proveedor="Club Crackers", Descripcion="Galletas",Descuento=200},
-               new Productos(){ ProductoId=2, Codigo="8254", Nombre="Jugo Santal", Precio=234, Costo=345, Categoria="Bebibas", Proveedor="Santal", Descripcion="Jugo",Descuento=654},
-               new Productos(){ ProductoId=3, Codigo="7259", Nombre="Salami Mortadela", Precio=156, Costo=643, Categoria="Comestibles", Proveedor="Induveca", Descripcion="salami",Descuento=523},
-               new Productos(){ ProductoId=4, Codigo="3842", Nombre="Toallitas Nosotras", Precio=564, Costo=764, Categoria="Toallas humedas", Proveedor="Nosotras", Descripcion="Toallas",Descuento=402},
+               new Productos(){ ProductoId=1, Codigo="5334", Nombre="Galletas Princesa", Precio=123.00, Costo=344.00, Categoria="Comestibles", Proveedor="Club Crackers", Descripcion="Galletas",Descuento=200},
+               new Productos(){ ProductoId=2, Codigo="8254", Nombre="Jugo Santal", Precio=234.00, Costo=345.00, Categoria="Bebibas", Proveedor="Santal", Descripcion="Jugo",Descuento=654},
+               new Productos(){ ProductoId=3, Codigo="7259", Nombre="Salami Mortadela", Precio=156.00, Costo=643.00, Categoria="Comestibles", Proveedor="Induveca", Descripcion="salami",Descuento=523},
+               new Productos(){ ProductoId=4, Codigo="3842", Nombre="Toallitas Nosotras", Precio=564.00, Costo=764.00, Categoria="Toallas humedas", Proveedor="Nosotras", Descripcion="Toallas",Descuento=402},
            }
        );
 
