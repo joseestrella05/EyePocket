@@ -1,61 +1,55 @@
 ﻿@page "/CxP/Index"
 @inject ProvedoresServices ProvedoresServices
 @inject CompraServices CompraServices
-@inject OrdenCompraService ordenCompraService
+@inject CXPServices cxpServices
 
 <h2 class="text-center">Cuentas por Pagar y Compra</h2>
-
-<h4>Binvenido a Compra y Cuenta por cobrar</h4>
+<h4>Bienvenido a Compra y Cuenta por Pagar</h4>
 
 <div class="row">
-    <div class="col-md-3">
-        <div class="card shadow-lg text-white" style="background-color: #085559; ">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="card-title bi bi-person-plus m-lg-4">Provedores</h4>
-                        <h6 class="m-lg-4">Cant.: @Provedores.Count</h6>
-                    </div>
-
-                </div>
-            </div>
-        </div
-
-        <div class="card shadow-lg text-white" style="background-color: #085559; ">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="card-title bi bi-person-plus m-lg-4">Compra</h4>
-                        <h6 class="m-lg-4">Cant.: @Compras.Count</h6>
-                    </div>
-
-                </div>
+    <div class="col-md-4">
+        <div class="card shadow-lg text-white" style="background-color: #085559;">
+            <div class="card-body text-center">
+                <i class="bi bi-person-lines-fill display-4"></i>
+                <h4 class="card-title mt-3">Proveedores</h4>
+                <h6 class="m-lg-4">Cant.: @Provedores.Count</h6>
             </div>
         </div>
+    </div>
 
-        <div class="card shadow-lg text-white" style="background-color: #085559; ">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="card-title bi bi-person-plus m-lg-4">Compra</h4>
-                        <h6 class="m-lg-4">Cant.: @OrdenCompra.Count</h6>
-                    </div>
+    <div class="col-md-4">
+        <div class="card shadow-lg text-white" style="background-color: #085559;">
+            <div class="card-body text-center">
+                <i class="bi bi-cart-fill display-4"></i>
+                <h4 class="card-title mt-3">Compras</h4>
+                <h6 class="m-lg-4">Cant.: @Compras.Count</h6>
+            </div>
+        </div>
+    </div>
 
-                </div>
+    <div class="col-md-4">
+        <div class="card shadow-lg text-white" style="background-color: #085559;">
+            <div class="card-body text-center">
+                <i class="bi bi-cash-stack display-4"></i>
+                <h4 class="card-title mt-3">Cuentas por Pagar</h4>
+                <h6 class="m-lg-4">Cant.: @cxp.Count</h6>
             </div>
         </div>
     </div>
 </div>
 
+
+
 @code {
-    public List<Provedores> Provedores { get; set; } = new List<Provedores>();
-    public List<Compras> Compras { get; set; } = new List<Compras>();
-    public List<OrdenCompra> OrdenCompra { get; set; } = new List<OrdenCompra>();
+    public List<Provedores> Provedores { get; set; } = new();
+    public List<Compras> Compras { get; set; } = new();
+    public List<CXP> cxp { get; set; } = new();
+    public List<OrdenCompra> OrdenCompras { get; set; } = new List<OrdenCompra>();
 
     protected override async Task OnInitializedAsync()
     {
         Provedores = await ProvedoresServices.Listar(p => true);
         Compras = await CompraServices.Listar(c => true);
-        OrdenCompra = await ordenCompraService.Listar(P => true);
+        cxp = await cxpServices.Listar(c => true);
     }
 }
