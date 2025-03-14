@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EyePocket.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class OrdenCompra : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -112,8 +112,8 @@ namespace EyePocket.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Codigo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Precio = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Costo = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Precio = table.Column<double>(type: "float", nullable: false),
+                    Costo = table.Column<double>(type: "float", nullable: false),
                     Categoria = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Proveedor = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -448,10 +448,10 @@ namespace EyePocket.Migrations
                 columns: new[] { "ProductoId", "Categoria", "Codigo", "Costo", "Descripcion", "Descuento", "FechaIngreso", "Nombre", "Precio", "Proveedor" },
                 values: new object[,]
                 {
-                    { 1, "Comestibles", "5334", 344m, "Galletas", 200m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Galletas Princesa", 123m, "Club Crackers" },
-                    { 2, "Bebibas", "8254", 345m, "Jugo", 654m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Jugo Santal", 234m, "Santal" },
-                    { 3, "Comestibles", "7259", 643m, "salami", 523m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Salami Mortadela", 156m, "Induveca" },
-                    { 4, "Toallas humedas", "3842", 764m, "Toallas", 402m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Toallitas Nosotras", 564m, "Nosotras" }
+                    { 1, "Comestibles", "5334", 344.0, "Galletas", 200m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Galletas Princesa", 123.0, "Club Crackers" },
+                    { 2, "Bebibas", "8254", 345.0, "Jugo", 654m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Jugo Santal", 234.0, "Santal" },
+                    { 3, "Comestibles", "7259", 643.0, "salami", 523m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Salami Mortadela", 156.0, "Induveca" },
+                    { 4, "Toallas humedas", "3842", 764.0, "Toallas", 402m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Toallitas Nosotras", 564.0, "Nosotras" }
                 });
 
             migrationBuilder.InsertData(

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EyePocket.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250313233335_Initial")]
-    partial class Initial
+    [Migration("20250314005500_OrdenCompra")]
+    partial class OrdenCompra
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -462,8 +462,8 @@ namespace EyePocket.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Costo")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Costo")
+                        .HasColumnType("float");
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
@@ -479,8 +479,8 @@ namespace EyePocket.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Precio")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Precio")
+                        .HasColumnType("float");
 
                     b.Property<string>("Proveedor")
                         .HasColumnType("nvarchar(max)");
@@ -495,12 +495,12 @@ namespace EyePocket.Migrations
                             ProductoId = 1,
                             Categoria = "Comestibles",
                             Codigo = "5334",
-                            Costo = 344m,
+                            Costo = 344.0,
                             Descripcion = "Galletas",
                             Descuento = 200m,
                             FechaIngreso = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Galletas Princesa",
-                            Precio = 123m,
+                            Precio = 123.0,
                             Proveedor = "Club Crackers"
                         },
                         new
@@ -508,12 +508,12 @@ namespace EyePocket.Migrations
                             ProductoId = 2,
                             Categoria = "Bebibas",
                             Codigo = "8254",
-                            Costo = 345m,
+                            Costo = 345.0,
                             Descripcion = "Jugo",
                             Descuento = 654m,
                             FechaIngreso = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Jugo Santal",
-                            Precio = 234m,
+                            Precio = 234.0,
                             Proveedor = "Santal"
                         },
                         new
@@ -521,12 +521,12 @@ namespace EyePocket.Migrations
                             ProductoId = 3,
                             Categoria = "Comestibles",
                             Codigo = "7259",
-                            Costo = 643m,
+                            Costo = 643.0,
                             Descripcion = "salami",
                             Descuento = 523m,
                             FechaIngreso = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Salami Mortadela",
-                            Precio = 156m,
+                            Precio = 156.0,
                             Proveedor = "Induveca"
                         },
                         new
@@ -534,12 +534,12 @@ namespace EyePocket.Migrations
                             ProductoId = 4,
                             Categoria = "Toallas humedas",
                             Codigo = "3842",
-                            Costo = 764m,
+                            Costo = 764.0,
                             Descripcion = "Toallas",
                             Descuento = 402m,
                             FechaIngreso = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Toallitas Nosotras",
-                            Precio = 564m,
+                            Precio = 564.0,
                             Proveedor = "Nosotras"
                         });
                 });
