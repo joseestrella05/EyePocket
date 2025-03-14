@@ -1,20 +1,52 @@
-﻿﻿<div class="col-auto input-group align-items-center">
+﻿<div class="col-auto input-group align-items-center">
+ 
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Costo</th>
+                    <th>Código</th>
+                    <th>Proveedor</th>
+                    <th>Descuento</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var producto in ListaProductos)
+                {
+                    <tr>
+                        <td>@producto.Nombre</td>
+                        <td>@producto.Categoria</td>
+                        <td>@producto.Precio.ToString("0.00")</td>
+                        <td>@producto.Costo.ToString("0.00")</td>
+                        <td>@producto.Codigo</td>
+                        <td>@producto.Proveedor</td>
+                        <td>@producto.Descuento</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
 
     <InputSelect class="form-select" @bind-Value="ProductoId">
         <option disabled value="0">Seleccione un producto</option>
         @foreach (var producto in ListaProductos)
         {
             <option value="@producto.ProductoId">
-                @producto.Nombre --- $ @(producto.Costo.ToString("0.00"))-- $ @(producto.Precio.ToString("0.00"))--- @producto.Codigo --- @producto.Proveedor --- @producto.Categoria --- @producto.Descuento
+                @producto.Nombre
             </option>
         }
     </InputSelect>
 
-
+    <!-- Cantidad -->
     <label class="col-form-label input-group-text">Cantidad</label>
     <InputNumber class="form-control" @bind-Value="Cantidad"></InputNumber>
     <button type="button" class="btn btn-success bi bi-plus-square" @onclick="ElegirArticulo"></button>
 </div>
+
 @if (!string.IsNullOrEmpty(mensaje))
 {
     <div class="alert alert-danger">@mensaje</div>
@@ -22,8 +54,7 @@
 
 @code {
     [Parameter]
-    public List<Productos> ListaProductos { get; set; } = [];
-
+    public List<Productos> ListaProductos { get; set; } = new List<Productos>();
 
     [Parameter]
     public int ProductoId { get; set; }
@@ -43,16 +74,16 @@
             var ProdutoElegido = ListaProductos.Single(a => a.ProductoId == ProductoId);
             if (ProdutoElegido != null)
             {
-                
                 await ProductoSeleccionado.InvokeAsync((ProdutoElegido, Cantidad));
-                
             }
             else
             {
-                mensaje = "Debe seleccionar un producto y cantidad valida";
+                mensaje = "Debe seleccionar un producto y cantidad válida";
             }
-
         }
-
+        else
+        {
+            mensaje = "Debe seleccionar un producto y una cantidad válida";
+        }
     }
 }
