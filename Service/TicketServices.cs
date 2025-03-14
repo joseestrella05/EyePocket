@@ -23,6 +23,8 @@ public class TicketServices (IDbContextFactory<ApplicationDbContext> DbFactory)
         }
     }
 
+    
+
     public async Task<bool> Existe(int id)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();

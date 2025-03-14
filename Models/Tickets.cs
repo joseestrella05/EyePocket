@@ -9,8 +9,6 @@ public class Tickets
     public int TicketId { get; set; }
     [Required]
     public string NombreCliente { get; set; }
-    [Required]
-    public string NombreAgente { get; set; }
     
     [Required(ErrorMessage = "El campo es requerido")]
     public string Asunto { get; set; }
@@ -26,3 +24,4 @@ public class Tickets
     public DateTime Fecha { get; set; } = DateTime.Today;
     
 }
+
