@@ -28,5 +28,5 @@ public class Compras
 
     public virtual ICollection<Productos> Productos { get; set; } = null!;
 
-    public virtual ICollection<CompraDestalles> CompraDestalles { get; set; } = null!;
+    public virtual ICollection<ComprasDetalles> ComprasDetalles { get; set; } = null!;
 }
