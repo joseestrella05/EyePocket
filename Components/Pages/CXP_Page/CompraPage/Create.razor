@@ -77,7 +77,7 @@
                     </tr>
                 </thead> 
                 <tbody>
-                    @foreach (var destalles in Compra.CompraDestalles)
+                    @foreach (var destalles in Compra.ComprasDetalles)
                     {
                         <td>@destalles.Productos?.Nombre</td>
                         <td>@destalles.Cantidad</td>
@@ -95,7 +95,7 @@
                 <div class="mb-3">
                     <label class="form-label"><strong>Monto Total</strong></label>
                     <label class="form-control text-end">
-                        <strong>@(Compra.CompraDestalles?.Sum(d => d.Productos.Precio) ?? 0)</strong>
+                        <strong>@(Compra.ComprasDetalles?.Sum(d => d.Productos.Precio) ?? 0)</strong>
                     </label>
                 </div>
             </div>
@@ -112,7 +112,7 @@
     public List<Provedores> Provedores { get; set; } = new List<Provedores>();
     public List<Estados> Estados { get; set; } = new List<Estados>();
     public List<Productos> ListaProductos { get; set; } = new List<Productos>();
-    public CompraDestalles DetalleSeleccionado { get; set; } = new();
+    public ComprasDetalles DetalleSeleccionado { get; set; } = new();
     [Inject] protected ToastService ToastService { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -130,7 +130,7 @@
             return;
         }
 
-        var destalle = new CompraDestalles
+        var destalle = new ComprasDetalles
         {
             ProductoId = selection.producto.ProductoId,
             Productos =  selection.producto,
@@ -138,8 +138,8 @@
 
         };
 
-        Compra.CompraDestalles.Add(destalle);
-        DetalleSeleccionado = new CompraDestalles();
+        Compra.ComprasDetalles.Add(destalle);
+        DetalleSeleccionado = new ComprasDetalles();
         await InvokeAsync(StateHasChanged);
     }
 
@@ -165,9 +165,9 @@
         }
     }
 
-    public void RemoverDestalle(CompraDestalles destalles)
+    public void RemoverDestalle(ComprasDetalles destalles)
     {
-        Compra.CompraDestalles.Remove(destalles);
+        Compra.ComprasDetalles.Remove(destalles);
         StateHasChanged();
     }
 

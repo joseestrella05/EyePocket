@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EyePocket.Models;
 
-public class CompraDestalles
+public class ComprasDetalles
 {
     [Key]
     public int DetalleId { get; set; }
@@ -15,7 +15,4 @@ public class CompraDestalles
     public int Cantidad { get; set; }
 
     public virtual Productos Productos { get; set; } = null!;
-
-    [ForeignKey("CompraId")]
-    public virtual Compras Compra { get; set; } = null!;
 }
