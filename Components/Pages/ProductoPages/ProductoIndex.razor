@@ -107,7 +107,7 @@
                                 <td>@producto.ProductoId</td>
                                 <td>@producto.Codigo</td>
                                 <td>@producto.Nombre</td>
-                                <td>@producto.Proveedor</td>
+                                <td>@producto.Proveedor?.Nombre</td>
                                 <td>@producto.Precio.ToString("C")</td>
                                 <td>@producto.Costo.ToString("C")</td>
                                 <td>@producto.FechaIngreso.ToString("dd/M/yyyy")</td>

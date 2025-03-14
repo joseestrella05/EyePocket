@@ -1,18 +1,20 @@
-﻿@page "/CxP/Provedores/Index"
+﻿@page "/CxP/Compra/Index"
 @inject ProvedoresServices provedoresService
+@inject CompraServices compraService
+@inject EstadoServices estadoService
 @rendermode InteractiveServer
 @inject NavigationManager navigation
 @inject ToastService toastService
 
-<PageTitle>Provedores</PageTitle>
+<PageTitle>Compra</PageTitle>
 <div class="row" style="background-color:white; padding:10px; margin:10px;">
 	<div class="col">
 		<div class="text-left">
-			<h2 class="text-black"><i class="bi bi-person-badge m-1"></i> Proveedores</h2>
+			<h2 class="text-black"><i class="bi bi-person-badge m-1"></i> Compra</h2>
 		</div>
 	</div>
 	<div class="col text-end">
-		<a href="/CxP/Provedores/Create" class="btn btn-secondary">Crear nuevo proveedor</a>
+		<a href="/CxP/Compra/Create" class="btn btn-secondary">Crear nuevo compra</a>
 	</div>
 </div>
 
@@ -25,9 +27,7 @@
 						<div class="form-floating">
 							<InputSelect class="form-select" id="floatingSelect" aria-label="Floating label select example" @bind-Value="@valorFiltro">
 								<option value="" selected disabled>--- Selecciona ---</option>
-								<option value="id">ProvedoresID</option>
-								<option value="Nombres">Nombre</option>
-								<option value="Correo">Email</option>
+								<option value="id">CompraId</option>
 							</InputSelect>
 							<label for="floatingSelect"><strong>Filtrar en base a...</strong></label>
 						</div>
@@ -45,37 +45,36 @@
 					</div>
 				</div>
 			</div>
-			
+
 			<div style="overflow-x: auto;">
 				<table class="table table-light table-hover" style="min-width: 100%;">
 					<thead class="table table-striped">
 						<tr class="text-center">
 							<th>ID</th>
-							<th>Nombre</th>
-							<th style="white-space: nowrap;">Contacto</th>
-							<th>Email</th>
-							<th>Dirección</th>
+							<th>Provedor</th>
+							<th>Estado</th>
 							<th>Acciones</th>
 						</tr>
 					</thead>
 					<tbody>
-						@foreach (var provedores in ListaProvedores)
+						@foreach (var compras in ListaCompra)
 						{
+							var provedor = ListaProvedores.FirstOrDefault(t => t.ProvedorId == compras.ProvedorId);
+							var estado = ListaEstados.FirstOrDefault(c => c.EstadoId == compras.EstadoId);
 							<tr class="text-center">
-								<td>@provedores.ProvedorId</td>
-								<td>@provedores.Nombre</td>
-								<td style="white-space: nowrap;">@($"({provedores.Telefono?[..3]}) {provedores.Telefono?[3..6]}-{provedores.Telefono?[6..]}")</td>
-								<td>@provedores.Correo</td>
-								<td>@provedores.Direccion</td>
+								<td>@compras.CompraId</td>
+								<td>@compras.Fecha</td>
+								<td>@(provedor?.Nombre ?? "no encontrado")</td>
+								<td>@(estado?.Nombre ?? "no encontrado")</td>
 								<td class="text-center" style="display: flex; justify-content: center; gap: 5px;">
-									<a href="/CxP/Provedores/Details/@provedores.ProvedorId" class="btn btn-outline-dark bi-eye"></a>
-									<a href="/CxP/Provedores/Edit/@provedores.ProvedorId" class="btn btn-outline-info bi bi-pencil-square"></a>
-									<button type="button" @onclick="() => MostrarModal(provedores.ProvedorId, provedores.Correo)" class="btn btn-outline-danger bi bi-trash"></button>
+									<a href="/CxP/Compra/Details/@compras.CompraId" class="btn btn-outline-dark bi-eye"></a>
+									<a href="/CxP/Compra/Edit/@compras.CompraId" class="btn btn-outline-info bi bi-pencil-square"></a>
+									<button type="button" @onclick="() => MostrarModal(compras.CompraId, compras.Descripcion)" class="btn btn-outline-danger bi bi-trash"></button>
 								</td>
 							</tr>
 						}
 					</tbody>
-					<caption>Cant. De Provedor: @ListaProvedores.Count</caption>
+					<caption>Cant. De compra: @ListaCompra.Count</caption>
 				</table>
 			</div>
 		</div>
@@ -108,16 +107,16 @@
 }
 
 
-
 @code {
 	public string searchBarValue { get; set; } = string.Empty;
 	public string valorFiltro { get; set; } = string.Empty;
 	public List<Provedores> ListaProvedores { get; set; } = new List<Provedores>();
+	public List<Compras> ListaCompra { get; set; } = new List<Compras>();
+	public List<Estados> ListaEstados { get; set; } = new List<Estados>();
 	private bool mostrarModal = false;
-	private int ProvedoreIdSeleccionado { get; set; }
-	private string EmailProvedoresSelecionado { get; set; } = "";
+	private int IdSeleccionado { get; set; }
+	private string ProvedorSelecionado { get; set; } = "";
 
-	//NOTIFICACIONES
 	public ToastType TipoNotificacion { get; set; }
 	public string MensajeNotificacion { get; set; } = string.Empty;
 	public string TituloNotificacion { get; set; } = string.Empty;
@@ -125,67 +124,72 @@
 	protected override async Task OnInitializedAsync()
 	{
 		ListaProvedores = await provedoresService.Listar(C => true);
+		ListaCompra = await compraService.Listar(C => true);
+		ListaEstados = await estadoService.Listar(C => true);
 	}
 
-	private void MostrarModal(int provedoreId, string provoresEmail)
+	private void MostrarModal(int compraId, string Provedor)
 	{
-		ProvedoreIdSeleccionado = provedoreId;
-		EmailProvedoresSelecionado = provoresEmail;
+		IdSeleccionado = compraId;
+		ProvedorSelecionado = Provedor;
 		mostrarModal = true;
 	}
 
 	private void CerrarModal()
 	{
 		mostrarModal = false;
-		ProvedoreIdSeleccionado = 0;
-		EmailProvedoresSelecionado = "";
+		IdSeleccionado = 0;
+		ProvedorSelecionado = "";
 	}
 
 	private async Task Buscar()
 	{
-		if (!string.IsNullOrWhiteSpace(valorFiltro))
+		if (!string.IsNullOrWhiteSpace(valorFiltro) && valorFiltro == "id")
 		{
-			if (valorFiltro == "id" && int.TryParse(valorFiltro, out int ProvedoreId))
+			if (int.TryParse(searchBarValue, out int compraId))
 			{
-				ListaProvedores = await provedoresService.Listar(s => s.ProvedorId == ProvedoreId);
+				// Filtrar por CompraId
+				ListaCompra = await compraService.Listar(c => c.CompraId == compraId);
 			}
-			else if (valorFiltro == "Nombre")
+			else
 			{
-				ListaProvedores = await provedoresService.Listar(s => s.Nombre.ToLower().Contains(valorFiltro.ToLower()));
+				// Si no se puede convertir a int, mostrar un mensaje o manejar el error
+				TipoNotificacion = ToastType.Warning;
+				TituloNotificacion = "Advertencia";
+				MensajeNotificacion = "Por favor ingrese un ID válido.";
+				MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 			}
-			else if (valorFiltro == "Telefono")
-			{
-				ListaProvedores = await provedoresService.Listar(s => s.Telefono.ToLower().Contains(valorFiltro.ToLower()));
-			}
-
 		}
 		else
 		{
-			ListaProvedores = await provedoresService.Listar(p => true);
+			// Si no se selecciona filtro o el valor es vacío, mostrar todas las compras
+			ListaCompra = await compraService.Listar(c => true);
 		}
 	}
+
 
 	public async Task Eliminar()
 	{
 		try
 		{
-			await provedoresService.Eliminar(ProvedoreIdSeleccionado);
-			ListaProvedores = await provedoresService.Listar(x => true);
+			await compraService.Eliminar(IdSeleccionado);
+			ListaCompra = await compraService.Listar(x => true);  // ACTUALIZA ListaCompra
 			mostrarModal = false;
-			ProvedoreIdSeleccionado = 0;
+			IdSeleccionado = 0;
 			TipoNotificacion = ToastType.Success;
 			TituloNotificacion = "Enhorabuena";
-			MensajeNotificacion = "¡Se ha eliminado el provedor exitosamente!";
+			MensajeNotificacion = "¡Se ha eliminado exitosamente!";
 			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 		}
 		catch (Exception ex)
 		{
 			TipoNotificacion = ToastType.Danger;
 			TituloNotificacion = "Error";
-			MensajeNotificacion = "Hubo un error al eliminar el provedor.";
+			MensajeNotificacion = "Hubo un error al eliminar la compra.";
 			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 		}
 	}
+
 
 	public void MostrarToast(ToastType tipo, string titulo, string cuerpo)
 	=> toastService.Notify(new(tipo, titulo, cuerpo));

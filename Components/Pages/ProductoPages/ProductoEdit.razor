@@ -1,5 +1,6 @@
 ﻿@page "/Productos/Edit/{ProductoId:int}"
 @inject ProductosService productoService
+@inject ProvedoresServices provedoreServices
 @inject NavigationManager navigation
 
 <PageTitle>Editando Producto | @producto.Nombre</PageTitle>
@@ -46,9 +47,15 @@
                         }
                     </InputSelect>
                 </div>
-                <div class="col">
-                    <label>Proveedor</label>
-                    <InputText class="form-control" @bind-Value="producto.Proveedor" placeholder="Proveedor"></InputText>
+                <div class="form-group">
+                    <label>Provedor</label>
+                    <InputSelect class="input-field" @bind-Value="producto.ProveedorId">
+                        <option value="">Seleccione un provedor</option>
+                        @foreach (var provedores in provedores)
+                        {
+                            <option value="@provedores.ProvedorId">@provedores.Nombre</option>
+                        }
+                    </InputSelect>
                 </div>
             </div>
 
@@ -95,11 +102,14 @@
     [Parameter]
     public int ProductoId { get; set; }
     public Productos producto { get; set; } = new Productos();
+    public List<Provedores> provedores { get; set; } = new();
     [Inject] protected ToastService ToastService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         producto = await productoService.BuscarId(ProductoId);
+        provedores = await provedoreServices.Listar(a => true);
+
     }
 
     public async Task Guardar()

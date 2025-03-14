@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EyePocket.Models
 {
@@ -24,8 +25,12 @@ namespace EyePocket.Models
 
         [Required(ErrorMessage = "Debe seleccionar una categoría.")]
         public string Categoria { get; set; }
+        [Required(ErrorMessage = "Debe seleccionar una provedor.")]
+    
+        public int ProveedorId { get; set; }
+        [ForeignKey("ProveedorId")]
+        public Provedores? Proveedor { get; set; }
 
-        public string Proveedor { get; set; }
         [Required(ErrorMessage ="Describa el producto")]
         public string Descripcion { get; set; }
 

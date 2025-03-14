@@ -99,26 +99,6 @@ namespace EyePocket.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Productos",
-                columns: table => new
-                {
-                    ProductoId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Codigo = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Precio = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Costo = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Categoria = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Proveedor = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FechaIngreso = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Productos", x => x.ProductoId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Provedores",
                 columns: table => new
                 {
@@ -285,26 +265,31 @@ namespace EyePocket.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Inventarios",
+                name: "Compras",
                 columns: table => new
                 {
-                    InventarioId = table.Column<int>(type: "int", nullable: false)
+                    CompraId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ProductoId = table.Column<int>(type: "int", nullable: false),
-                    Stock = table.Column<int>(type: "int", nullable: false),
-                    Entradas = table.Column<int>(type: "int", nullable: false),
-                    Salidas = table.Column<int>(type: "int", nullable: false),
-                    importe = table.Column<double>(type: "float", nullable: false),
-                    FechaRegistro = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Total = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EstadoId = table.Column<int>(type: "int", nullable: false),
+                    ProvedorId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Inventarios", x => x.InventarioId);
+                    table.PrimaryKey("PK_Compras", x => x.CompraId);
                     table.ForeignKey(
-                        name: "FK_Inventarios_Productos_ProductoId",
-                        column: x => x.ProductoId,
-                        principalTable: "Productos",
-                        principalColumn: "ProductoId",
+                        name: "FK_Compras_Estados_EstadoId",
+                        column: x => x.EstadoId,
+                        principalTable: "Estados",
+                        principalColumn: "EstadoId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Compras_Provedores_ProvedorId",
+                        column: x => x.ProvedorId,
+                        principalTable: "Provedores",
+                        principalColumn: "ProvedorId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -338,31 +323,29 @@ namespace EyePocket.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Mermas",
+                name: "Productos",
                 columns: table => new
                 {
-                    MermaId = table.Column<int>(type: "int", nullable: false)
+                    ProductoId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ProductoId = table.Column<int>(type: "int", nullable: false),
-                    Cantidad = table.Column<int>(type: "int", nullable: false),
-                    Motivo = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    FechaRegistro = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    InventariosInventarioId = table.Column<int>(type: "int", nullable: true)
+                    Codigo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Precio = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Costo = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Categoria = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Proveedor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FechaIngreso = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ComprasCompraId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Mermas", x => x.MermaId);
+                    table.PrimaryKey("PK_Productos", x => x.ProductoId);
                     table.ForeignKey(
-                        name: "FK_Mermas_Inventarios_InventariosInventarioId",
-                        column: x => x.InventariosInventarioId,
-                        principalTable: "Inventarios",
-                        principalColumn: "InventarioId");
-                    table.ForeignKey(
-                        name: "FK_Mermas_Productos_ProductoId",
-                        column: x => x.ProductoId,
-                        principalTable: "Productos",
-                        principalColumn: "ProductoId",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_Productos_Compras_ComprasCompraId",
+                        column: x => x.ComprasCompraId,
+                        principalTable: "Compras",
+                        principalColumn: "CompraId");
                 });
 
             migrationBuilder.CreateTable(
@@ -417,6 +400,58 @@ namespace EyePocket.Migrations
                         column: x => x.CXCId,
                         principalTable: "CuentasXCobrar",
                         principalColumn: "CXCId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Inventarios",
+                columns: table => new
+                {
+                    InventarioId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductoId = table.Column<int>(type: "int", nullable: false),
+                    Stock = table.Column<int>(type: "int", nullable: false),
+                    Entradas = table.Column<int>(type: "int", nullable: false),
+                    Salidas = table.Column<int>(type: "int", nullable: false),
+                    importe = table.Column<double>(type: "float", nullable: false),
+                    FechaRegistro = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Inventarios", x => x.InventarioId);
+                    table.ForeignKey(
+                        name: "FK_Inventarios_Productos_ProductoId",
+                        column: x => x.ProductoId,
+                        principalTable: "Productos",
+                        principalColumn: "ProductoId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Mermas",
+                columns: table => new
+                {
+                    MermaId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductoId = table.Column<int>(type: "int", nullable: false),
+                    Cantidad = table.Column<int>(type: "int", nullable: false),
+                    Motivo = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    FechaRegistro = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    InventariosInventarioId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Mermas", x => x.MermaId);
+                    table.ForeignKey(
+                        name: "FK_Mermas_Inventarios_InventariosInventarioId",
+                        column: x => x.InventariosInventarioId,
+                        principalTable: "Inventarios",
+                        principalColumn: "InventarioId");
+                    table.ForeignKey(
+                        name: "FK_Mermas_Productos_ProductoId",
+                        column: x => x.ProductoId,
+                        principalTable: "Productos",
+                        principalColumn: "ProductoId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -480,6 +515,16 @@ namespace EyePocket.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Compras_EstadoId",
+                table: "Compras",
+                column: "EstadoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Compras_ProvedorId",
+                table: "Compras",
+                column: "ProvedorId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CuentasXCobrar_EstadoId",
                 table: "CuentasXCobrar",
                 column: "EstadoId");
@@ -523,6 +568,11 @@ namespace EyePocket.Migrations
                 name: "IX_PagosCXC_CXCId",
                 table: "PagosCXC",
                 column: "CXCId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Productos_ComprasCompraId",
+                table: "Productos",
+                column: "ComprasCompraId");
         }
 
         /// <inheritdoc />
@@ -556,9 +606,6 @@ namespace EyePocket.Migrations
                 name: "PagosCXC");
 
             migrationBuilder.DropTable(
-                name: "Provedores");
-
-            migrationBuilder.DropTable(
                 name: "Tickets");
 
             migrationBuilder.DropTable(
@@ -577,13 +624,19 @@ namespace EyePocket.Migrations
                 name: "Productos");
 
             migrationBuilder.DropTable(
-                name: "Estados");
-
-            migrationBuilder.DropTable(
                 name: "OrdenVenta");
 
             migrationBuilder.DropTable(
+                name: "Compras");
+
+            migrationBuilder.DropTable(
                 name: "Clientes");
+
+            migrationBuilder.DropTable(
+                name: "Estados");
+
+            migrationBuilder.DropTable(
+                name: "Provedores");
         }
     }
 }
