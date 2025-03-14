@@ -16,11 +16,11 @@ namespace EyePocket.Models
 
         [Required(ErrorMessage = "El precio es obligatorio.")]
         [Range(0, double.MaxValue, ErrorMessage = "El precio debe ser mayor o igual a 0.")]
-        public decimal Precio { get; set; }
+        public double Precio { get; set; }
 
         [Required(ErrorMessage = "El costo es obligatorio.")]
         [Range(0, double.MaxValue, ErrorMessage = "El costo debe ser mayor o igual a 0.")]
-        public decimal Costo { get; set; }
+        public double Costo { get; set; }
 
         [Required(ErrorMessage = "Debe seleccionar una categoría.")]
         public string? Categoria { get; set; }
