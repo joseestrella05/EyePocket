@@ -4,6 +4,7 @@ using EyePocket.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EyePocket.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250313231817_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -444,14 +447,13 @@ namespace EyePocket.Migrations
                     b.Property<decimal>("Precio")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("ProveedorId")
-                        .HasColumnType("int");
+                    b.Property<string>("Proveedor")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ProductoId");
 
                     b.HasIndex("ComprasCompraId");
-
-                    b.HasIndex("ProveedorId");
 
                     b.ToTable("Productos");
                 });
@@ -786,14 +788,6 @@ namespace EyePocket.Migrations
                     b.HasOne("EyePocket.Models.Compras", null)
                         .WithMany("Productos")
                         .HasForeignKey("ComprasCompraId");
-
-                    b.HasOne("EyePocket.Models.Provedores", "Proveedor")
-                        .WithMany()
-                        .HasForeignKey("ProveedorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Proveedor");
                 });
 
             modelBuilder.Entity("Inventarios", b =>

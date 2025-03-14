@@ -23,9 +23,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 	public DbSet<CuotasCXC> CuotasCXC { get; set; }
 	public DbSet<Inventarios> Inventarios { get; set; }
     public DbSet<Compras> Compras { get; set; }
-
-    public DbSet<Provedores> Provedores { get; set; }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		base.OnModelCreating(modelBuilder); // Asegura que Identity est� bien configurado
