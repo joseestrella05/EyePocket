@@ -52,11 +52,11 @@
                 </div>
                 <div class="form-group">
                     <label>Provedor</label>
-                    <InputSelect class="input-field" @bind-Value="producto.Proveedor">
+                    <InputSelect class="input-field" @bind-Value="producto.ProveedorId">
                         <option value="">Seleccione un provedor</option>
                         @foreach (var provedores in provedores)
                         {
-                            <option value="@provedores">@provedores.Nombre</option>
+                            <option value="@provedores.ProvedorId">@provedores.Nombre</option>
                         }
                     </InputSelect>
                 </div>
