@@ -1,12 +1,14 @@
 ﻿@page "/OrdenCompra/Create"
 @using EyePocket.Data
 @using EyePocket.Services
+@using Microsoft.EntityFrameworkCore
 @inject ApplicationDbContext context
 @inject ProvedoresServices proveedoresService
 @inject ProductosService productoService
 @inject OrdenCompraService ordenCompraService
-@inject OrdenCompraDetalleService ordenComparDetalleService
+@inject OrdenCompraDetalleService ordenCompraDetalleService
 @inject EstadoOdService estadoOdService
+@inject ApplicationDbContext dbContext
 @inject NavigationManager navigation
 
 <EditForm Model="OrdenCompra" OnValidSubmit="Crear">
@@ -77,7 +79,7 @@
                 <div class="row">
                     <div class="col">
                         <label>Monto Total</label>
-                        <InputNumber class="form-control" @bind-Value="OrdenCompra.MontoTotal" placeholder="MontoTotal"></InputNumber>
+                        <InputNumber class="form-control" @bind-Value="OrdenCompra.MontoTotal" placeholder="Monto Total:" readonly></InputNumber>
                     </div>
                 </div>
 
@@ -146,7 +148,9 @@
     public OrdenCompra OrdenCompra { get; set; } = new OrdenCompra();
     public List<OrdenCompra> ListaOrdenCompras { get; set; } = new List<OrdenCompra>();
     public List<EstadoOrdenCompra> EstadoODC { get; set; } = new List<EstadoOrdenCompra>();
+    public double Total { get; set; }
     public Productos Productos { get; set; } = new Productos();
+    public string mensaje = string.Empty;
 
     [Inject] protected ToastService ToastService { get; set; }
 
@@ -155,34 +159,55 @@
         ListaProveedores = await proveedoresService.Listar(P => true);
         ListaOrdenCompras = await ordenCompraService.Listar(C => true);
         EstadoODC = await estadoOdService.Listar(C => true);
-        ListaProducto = await productoService.Listar(P => true);
-
+        ListaProducto = await dbContext.Productos.ToListAsync();
 
     }
 
-
-    public async Task Crear()
+    public void CalcularSubtotalYTotal()
     {
-        if (OrdenCompra.OrdenCompraID == 0)
-        {
-            if (OrdenCompra.EstadoOdId== 0)
-            {
-                ToastService.Notify(new(ToastType.Warning, "Advertencia", "Debe seleccionar un estado válido."));
-                return; 
-            }
+        double subtotal = 0;
 
-            await ordenCompraService.Guardar(OrdenCompra);
-            ToastService.Notify(new(ToastType.Success, "Éxito", "Cuenta creada correctamente."));
-            OrdenCompra = new OrdenCompra();
+        foreach (var detalle in OrdenCompra.OrdenCompraDetalle)
+        {
+            // Asegúrate de que el detalle tenga el precio antes de calcular
+            double precioProducto = detalle.Productos.Precio ;  // Si no tienes precio, asume 0
+            double subtotalDetalle = detalle.cantidad * precioProducto;
+            detalle.SubTotal = subtotalDetalle; // Si quieres agregar un campo SubTotal en el detalle
+
+            subtotal += subtotalDetalle;
+        }
+
+        // Actualizamos el monto total de la orden
+        OrdenCompra.MontoTotal = subtotal;
+    }
+
+
+
+    private async Task Crear()
+    {
+
+        if (!OrdenCompra.OrdenCompraDetalle.Any())
+        {
+            mensaje = "Debe agregar al menos un articulo";
+            return;
+        }
+        OrdenCompra.MontoTotal = Total;
+        var crear = await ordenCompraService.Guardar(OrdenCompra);
+        OrdenCompra = new OrdenCompra();
+
+        if (crear)
+        {
+            mensaje = "Se ha creado correctamente la orden";
             navigation.NavigateTo("/OrdenCompra/Index");
         }
         else
         {
-            ToastService.Notify(new(ToastType.Danger, "Error", "Cuenta ya existe."));
+            mensaje = "No se ha creado correctamente la orden";
         }
 
-    }
 
+    }
+    
 
     public void AgregarProducto((Productos productos, int cantidad) selection)
     {
@@ -191,17 +216,19 @@
                 ProductoId = selection.productos.ProductoId,
                 cantidad = selection.cantidad,
                 Productos = selection.productos,
-               //Precio = selection.producto.precio * selection.cantidad
+                // Precio se puede calcular aquí si es necesario
             };
 
         OrdenCompra.OrdenCompraDetalle.Add(detalle);
+        CalcularSubtotalYTotal(); // Actualiza los cálculos después de agregar un producto
     }
 
 
-    public void RemoverDetalle(OrdenCompraDetalle detalle)
-    {
-        OrdenCompra.OrdenCompraDetalle.Remove(detalle);
-    }
+  public void RemoverDetalle(OrdenCompraDetalle detalle)
+{
+    OrdenCompra.OrdenCompraDetalle.Remove(detalle);
+    CalcularSubtotalYTotal(); // Actualiza los cálculos después de eliminar un producto
+}
 
 
 
