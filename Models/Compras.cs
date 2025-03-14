@@ -27,4 +27,6 @@ public class Compras
     public Provedores Proveedor { get; set; } = null!;
 
     public virtual ICollection<Productos> Productos { get; set; } = null!;
+
+    public virtual ICollection<CompraDestalles> CompraDestalles { get; set; } = null!;
 }

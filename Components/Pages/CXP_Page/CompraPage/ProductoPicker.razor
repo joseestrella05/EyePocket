@@ -1,0 +1,53 @@
+﻿﻿<div class="col-auto input-group align-items-center">
+    <label class="col-form-label input-group-text">Seleccione:</label>
+
+    <InputSelect class="form-control form-select" @bind-Value="ProductoId">
+        <option disabled value="0">-- Seleccione un Producto --</option>
+        @foreach (var ciudad in Producto)
+        {
+            <option value="@ciudad.ProductoId">@ciudad.ProductoId - @ciudad.Nombre ($@ciudad.Precio.ToString("N2"))</option>
+        }
+    </InputSelect>
+    <label class="col-form-label input-group-text">Valor:</label>
+    <InputNumber class="form-control" id="quantity-input" @bind-Value="Monto" min="0" />
+
+    <button type="button" class="btn btn-outline-success bi bi-plus" @onclick="TriggerSelection">Agregar</button>
+</div>
+@if (ErrorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @ErrorMessage
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<Productos> Producto { get; set; } = [];
+
+    [Parameter]
+    public int ProductoId { get; set; }
+
+    [Parameter]
+    public int Monto { get; set; }
+
+    [Parameter]
+    public EventCallback<(Productos Producto, int Monto)> CiudadSelected { get; set; }
+
+    private string? ErrorMessage { get; set; } = null;
+
+    private async Task TriggerSelection()
+    {
+        ErrorMessage = null;
+        if (ProductoId > 0)
+        {
+            var CiudaSeleccionada = Producto.Single(p => p.ProductoId == ProductoId);
+
+            if (Monto <= 0)
+            {
+                ErrorMessage = "No es posible Agregar un monto menor que cero ";
+                return;
+            }
+            await CiudadSelected.InvokeAsync((CiudaSeleccionada, Monto));
+        }
+    }
+}
