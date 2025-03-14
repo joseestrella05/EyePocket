@@ -17,7 +17,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 	public DbSet<Provedores> Provedores { get; set; }
 	public DbSet<OrdenVenta> OrdenVenta { get; set; }
 	public DbSet<Tickets> Tickets { get; set; }
-
+  public DbSet<TarjetaPuntos> TarjetaPuntos { get; set; }
 	public DbSet<MetodosPago> MetodosPago { get; set; }
 	public DbSet<PagosCXC> PagosCXC { get; set; }
 	public DbSet<CuotasCXC> CuotasCXC { get; set; }
@@ -42,9 +42,4 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 			new Estados { EstadoId = 3, Nombre = "Vencido" }
 		);
 	}
-
-
-
-
-
 }
