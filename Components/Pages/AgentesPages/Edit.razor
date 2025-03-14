@@ -1,0 +1,126 @@
+@page "/Agente/Edit/{AgenteId:int}"
+@inject AgenteServices agenteService
+@inject NavigationManager navigation
+
+<PageTitle>Editando Agente | @agente.Nombre</PageTitle>
+<div class="text-left">
+    <h2 class="text-black" style="background-color:white; padding:5px;">
+        <i class="bi bi-person-plus m-1"></i>Editar Agente
+    </h2>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <div class="section-title">Datos del Agente</div>
+
+            <div class="row">
+                <div class="col">
+                    <label>Nombre *</label>
+                    <InputText class="form-control" @bind-Value="agente.Nombre" placeholder="Nombre del agente"></InputText>
+                </div>
+                <div class="col">
+                    <label>Departamento *</label>
+                    <InputText class="form-control" @bind-Value="agente.Departamento" placeholder="Ej. Ventas"></InputText>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label>Posición *</label>
+                    <InputText class="form-control" @bind-Value="agente.Posicion" placeholder="Ej. Gerente"></InputText>
+                </div>
+                <div class="col">
+                    <label>Salario *</label>
+                    <InputNumber class="form-control" @bind-Value="agente.Salario" placeholder="Ej. 25000"></InputNumber>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label>Teléfono *</label>
+                    <InputText class="form-control" @bind-Value="agente.N_Telefono" placeholder="(000) 000-0000"></InputText>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <button @onclick="Guardar" class="btn btn-success">Guardar</button>
+        <a href="/Agente/Index" class="btn btn-secondary">Volver</a>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #f5f5f5;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: auto;
+        padding: 10px;
+    }
+
+    .card {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+    }
+
+    .section-title {
+        background: #0d5c63;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+        padding: 8px;
+        margin: 10px;
+        border-radius: 5px;
+    }
+
+    .btn {
+        margin: 10px;
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+
+    .btn-success {
+        background-color: #0d5c63;
+        border: none;
+    }
+
+    .btn-secondary {
+        background-color: #444;
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+        background-color: #222;
+    }
+</style>
+
+@code {
+[Parameter]
+public int AgenteId { get; set; }
+public Agentes agente { get; set; } = new Agentes();
+[Inject] protected ToastService ToastService { get; set; }
+
+protected override async Task OnInitializedAsync()
+{
+agente = await agenteService.Buscar(AgenteId);
+}
+
+public async Task Guardar()
+{
+
+{
+await agenteService.Guardar(agente);
+ToastService.Notify(new(ToastType.Success, "Éxito", $"Agente editado correctamente."));
+navigation.NavigateTo("/Agente/Index");
+}
+
+}
+
+
+}
