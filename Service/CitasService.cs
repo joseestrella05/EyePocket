@@ -7,7 +7,6 @@ namespace EyePocket.Service;
 
 public class CitasService (IDbContextFactory<ApplicationDbContext> DbFactory)
 {
-    
         public async Task<bool> Existe(int id)
         {
             await using var contexto = await DbFactory.CreateDbContextAsync();

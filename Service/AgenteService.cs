@@ -58,4 +58,5 @@ public class AgenteServices(IDbContextFactory<ApplicationDbContext> DbFactory)
             .Where(criterio)
             .ToListAsync();
     }
+    
 }

@@ -61,6 +61,4 @@ public class TicketServices (IDbContextFactory<ApplicationDbContext> DbFactory)
             .Where(criterio)
             .ToListAsync();
     }
-    
-    
 }
