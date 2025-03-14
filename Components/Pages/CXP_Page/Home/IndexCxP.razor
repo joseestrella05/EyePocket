@@ -31,12 +31,25 @@
                 </div>
             </div>
         </div>
+        
+        <div class="card shadow-lg text-white" style="background-color: #085559; ">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="card-title bi bi-person-plus m-lg-4">Orden Compra</h4>
+                        <h6 class="m-lg-4">Cant.: @OrdenCompra.Count</h6>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 @code {
     public List<Provedores> Provedores { get; set; } = new List<Provedores>();
     public List<Compras> Compras { get; set; } = new List<Compras>();
+    public List<OrdenCompra> OrdenCompra { get; set; } = new List<OrdenCompra>();
 
     protected override async Task OnInitializedAsync()
     {
