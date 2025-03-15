@@ -1,5 +1,4 @@
 ﻿@page "/Ventas/Facturacion/Edit"
-@using EyePocket.Services
 @inject ProductosService productoService
 @inject ToastService toastService
 @inject NavigationManager NavigationManager
@@ -53,7 +52,6 @@
                     <th>Descripción</th>
                     <th>Cantidad</th>
                     <th>Precio</th>
-                    <th>Descuento</th>
                     <th>Subtotal</th>
                     <th>Editar</th>
                     <th>Eliminar</th>
@@ -69,7 +67,6 @@
                         <td class="text-black">@factura.Productos?.Nombre</td>
                         <td class="text-black">@factura.Cantidad</td>
                         <td class="text-black">@factura.Productos?.Precio</td>
-                        <td class="text-black">@factura.Productos?.Descuento</td>
                         <td class="text-black">@factura.Subtotal</td>
                         <td>
                             <a href="/Ventas/Facturacion/Edit/@factura.OrdenVenta?.OrdenVentaId" class="btn btn-info btn-sm">
