@@ -521,9 +521,6 @@ namespace EyePocket.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ComprasCompraId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("Costo")
                         .HasColumnType("decimal(18,2)");
 
@@ -545,8 +542,6 @@ namespace EyePocket.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ProductoId");
-
-                    b.HasIndex("ComprasCompraId");
 
                     b.HasIndex("ProveedorId");
 
@@ -824,7 +819,7 @@ namespace EyePocket.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EyePocket.Models.Provedores", "Proveedor")
+                    b.HasOne("EyePocket.Models.Provedores", "Provedor")
                         .WithMany()
                         .HasForeignKey("ProvedorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -832,7 +827,7 @@ namespace EyePocket.Migrations
 
                     b.Navigation("Estado");
 
-                    b.Navigation("Proveedor");
+                    b.Navigation("Provedor");
                 });
 
             modelBuilder.Entity("EyePocket.Models.ComprasDetalles", b =>
@@ -923,10 +918,6 @@ namespace EyePocket.Migrations
 
             modelBuilder.Entity("EyePocket.Models.Productos", b =>
                 {
-                    b.HasOne("EyePocket.Models.Compras", null)
-                        .WithMany("Productos")
-                        .HasForeignKey("ComprasCompraId");
-
                     b.HasOne("EyePocket.Models.Provedores", "Proveedor")
                         .WithMany()
                         .HasForeignKey("ProveedorId")
@@ -1012,8 +1003,6 @@ namespace EyePocket.Migrations
             modelBuilder.Entity("EyePocket.Models.Compras", b =>
                 {
                     b.Navigation("ComprasDetalles");
-
-                    b.Navigation("Productos");
                 });
 
             modelBuilder.Entity("EyePocket.Models.CuentasXCobrar", b =>
