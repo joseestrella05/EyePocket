@@ -14,13 +14,6 @@
 
                 <div class="row">
                     <div class="col">
-                        <label>ID </label>
-                        <InputNumber class="form-control" @bind-Value="Compra.CompraId" placeholder="CompraId " readonly></InputNumber>
-                    </div>
-                </div> 
-
-                <div class="row">
-                    <div class="col">
                         <label>Fecha</label>
                         <InputDate class="form-control" @bind-Value="Compra.Fecha" placeholder="CompraId " readonly></InputDate>
                     </div>
@@ -29,7 +22,7 @@
                 <div class="row">
                     <div class="col">
                         <label>Descripcion</label>
-                        <InputText class="form-control" @bind-Value="Compra.Descripcion" placeholder="Precio"></InputText>
+                        <InputText class="form-control" @bind-Value="Compra.Descripcion" placeholder="Compra de jose"></InputText>
                     </div>
                 </div>
 
@@ -45,20 +38,6 @@
                         </InputSelect>
                     </div>
                 </div>
-
-                <div class="row">
-                    <div class="col">
-                        <label>Estado</label>
-                        <InputSelect class="form-control form-select" @bind-Value="Compra.EstadoId">
-                            <option value="0" selected disabled>Elija una opción</option>
-                            @foreach (var Estado in Estados)
-                            {
-                                <option value="@Estado.EstadoId">@Estado.Nombre</option>
-                            }
-                        </InputSelect>
-                    </div>
-
-                </div>
             </div>
         </div>
         <div class="border border-success p-3 mt-3">
@@ -70,8 +49,9 @@
             <table class="table table-light text-center">
                 <thead class="thead-light">
                     <tr class="text-center">
+                        <th>Producto Id</th>
                         <th>Producto</th>
-                        <th>Cantida</th>
+                        <th>Cantidad</th>
                         <th>Remover</th>
 
                     </tr>
@@ -79,23 +59,26 @@
                 <tbody>
                     @foreach (var destalles in Compra.ComprasDetalles)
                     {
-                        <td>@destalles.Productos?.Nombre</td>
-                        <td>@destalles.Cantidad</td>
-                        <td>
-                            <button Type="button" class="btn btn-outline-danger bi bi-trash"
-                            @onclick= "() => RemoverDestalle(destalles)"></button>
-                        </td>
-
+                        <tr>
+                            <td>@destalles.ProductoId</td>
+                            <td>@destalles.Productos?.Nombre</td>
+                            <td>@destalles.Cantidad</td>
+                            <td>
+                                <button Type="button" class="btn btn-outline-danger bi bi-trash"
+                                @onclick="() => RemoverDestalle(destalles)"></button>
+                            </td>
+                        </tr>
                     }
-               </tbody>
+                </tbody>
+
             </table>
         </div>
         <div class="row mt-3">
-            <div class="col-6 offset-6">
+            <div class="col-6 offsed>t-6">
                 <div class="mb-3">
                     <label class="form-label"><strong>Monto Total</strong></label>
                     <label class="form-control text-end">
-                        <strong>@(Compra.ComprasDetalles?.Sum(d => d.Productos.Precio) ?? 0)</strong>
+                        <strong>@(Compra.ComprasDetalles?.Sum(d => d.Productos.Precio * d.Cantidad) ?? 0)</strong>
                     </label>
                 </div>
             </div>
@@ -147,6 +130,7 @@
     {
         try
         {
+            Compra.EstadoId = 1;
             var paso = await compraService.Guardar(Compra);
 
             if (paso)
@@ -161,7 +145,8 @@
         }
         catch(Exception ex)
         {
-            ToastService.Notify(new(ToastType.Danger, "Error", $"error al guardar: {ex.Message}"));
+            ToastService.Notify(new(ToastType.Danger, "Error", $"Error al guardar: {ex.Message}"));
+            ToastService.Notify(new(ToastType.Danger,$"Detalles del error: {ex.InnerException?.Message}"));
         }
     }
 
