@@ -25,14 +25,14 @@ public class OrdenVentaService(IDbContextFactory<ApplicationDbContext> DbFactory
     {
         await using var _contexto = await DbFactory.CreateDbContextAsync();
 
-        return await _contexto.OrdenVentas
+        return await _contexto.OrdenVenta
             .AnyAsync(c => c.OrdenVentaId == ordenVentaId);
     }
     private async Task<bool> Insertar(OrdenVenta ordenVenta)
     {
         await using var _contexto = await DbFactory.CreateDbContextAsync();
 
-        _contexto.OrdenVentas.Add(ordenVenta);
+        _contexto.OrdenVenta.Add(ordenVenta);
         return await _contexto.SaveChangesAsync() > 0;
     }
 
@@ -49,7 +49,7 @@ public class OrdenVentaService(IDbContextFactory<ApplicationDbContext> DbFactory
     {
         await using var _contexto = await DbFactory.CreateDbContextAsync();
 
-        return await _contexto.OrdenVentas
+        return await _contexto.OrdenVenta
             .AsNoTracking()
             .Where(o => o.OrdenVentaId == ordenVenta.OrdenVentaId)
             .ExecuteDeleteAsync() > 0;
@@ -59,7 +59,7 @@ public class OrdenVentaService(IDbContextFactory<ApplicationDbContext> DbFactory
     {
         await using var _contexto = await DbFactory.CreateDbContextAsync();
 
-        return await _contexto.OrdenVentas
+        return await _contexto.OrdenVenta
             .AnyAsync(o => o.OrdenVentaId != ordenVentaId);
     }
 
@@ -67,7 +67,7 @@ public class OrdenVentaService(IDbContextFactory<ApplicationDbContext> DbFactory
     {
         await using var _contexto = await DbFactory.CreateDbContextAsync();
 
-        return await _contexto.OrdenVentas
+        return await _contexto.OrdenVenta
             .AsNoTracking()
             .FirstOrDefaultAsync(o => o.OrdenVentaId == ordenVentaId);
     }
@@ -75,7 +75,7 @@ public class OrdenVentaService(IDbContextFactory<ApplicationDbContext> DbFactory
     {
         await using var _contexto = await DbFactory.CreateDbContextAsync();
 
-        return await _contexto.OrdenVentas
+        return await _contexto.OrdenVenta
             .AsNoTracking()
             .Where(criterio)
             .ToListAsync();
