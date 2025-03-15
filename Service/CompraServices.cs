@@ -49,7 +49,9 @@ public class CompraServices(IDbContextFactory<ApplicationDbContext> DbFactory)
     public async Task<List<Compras>> Listar(Expression<Func<Compras, bool>> criterio)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Compras.AsNoTracking()
+        return await contexto.Compras
+            .Include(c => c.ComprasDetalles)
+                 .ThenInclude(p => p.Productos)
             .Where(criterio)
             .ToListAsync();
     }
