@@ -27,12 +27,6 @@ public class CuentasXCobrarService(IDbContextFactory<ApplicationDbContext> DbFac
 			throw new Exception("⚠ ERROR: No se encontró la OrdenVenta en la base de datos.");
 		}
 
-		// Verificar si NFC tiene un valor válido
-		if (string.IsNullOrWhiteSpace(deuda.OrdenVenta.NFC))
-		{
-			// Lanzar excepción si NFC es nulo o vacío
-			throw new Exception("⚠ ERROR: El campo NFC es NULL o vacío antes de guardar.");
-		}
 
 		// Agregar la deuda al contexto y guardar los cambios
 		contexto.CuentasXCobrar.Add(deuda);
