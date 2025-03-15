@@ -2,6 +2,7 @@ using Blazored.Toast;
 using EyePocket.Components;
 using EyePocket.Components.Account;
 using EyePocket.Data;
+using EyePocket.Models;
 using EyePocket.Service;
 
 using Microsoft.AspNetCore.Components.Authorization;
@@ -53,6 +54,11 @@ builder.Services.AddScoped<PagosCXCService>();
 builder.Services.AddScoped<CuotasCXCService>();
 builder.Services.AddScoped<InventarioService>();
 builder.Services.AddScoped<ProvedoresServices>();
+builder.Services.AddScoped<EstadoServices>();
+builder.Services.AddScoped<CompraServices>();
+
+
+
 
 //notificacion
 builder.Services.AddBlazoredToast();
