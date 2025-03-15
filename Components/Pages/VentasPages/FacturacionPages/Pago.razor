@@ -1,0 +1,104 @@
+﻿@page "/Ventas/Factura"
+@inject NavigationManager navigation
+
+<PageTitle>Factura</PageTitle>
+
+<div class="text-left">
+    <h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-receipt m-1"></i> Factura</h2>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <div class="invoice-header text-center">
+                <h1>FACTURA</h1>
+            </div>
+            <div class="invoice-details">
+                <p>Factura n°: </p>
+                <p>Fecha: </p>
+                <p>Cliente: </p>
+            </div>
+            <table class="invoice-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Código</th>
+                        <th>Descripción</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Descuento</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="invoice-total text-right">
+                <p>Subtotal: $</p>
+                <p>Descuento Total: $</p>
+                <p><strong>TOTAL: $</strong></p>
+            </div>
+            <div class="invoice-contact-payment d-flex justify-content-between">
+                <div class="invoice-contact">
+                    <p><strong>Contacto:</strong></p>
+                    <p>(809) 126 - 3631</p>
+                    <p>EyePocket@gmail.com</p>
+                    <p>www.EyePocket.com</p>
+                    <p>Calle Duarte</p>
+                </div>
+                <div class="invoice-payment">
+                    <p><strong>Información de pago:</strong></p>
+                    <p>Nombre del tercero</p>
+                    <p>Nombre de cuentas</p>
+                    <p>Alto de cuenta</p>
+                    <p>Fecha de pago</p>
+                    <p>6125 4547 5901</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-3">
+        <button class="btn btn-primary" @onclick="Volver">Volver</button>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 800px;
+        margin: auto;
+        padding: 10px;
+    }
+
+    .card {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+    }
+
+    .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+        .invoice-table th, .invoice-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .invoice-table th {
+            background-color: #f9f9f9;
+        }
+
+    .btn-primary {
+        background-color: #0d5c63;
+        border: none;
+    }
+</style>
+
+@code {
+    private void Volver()
+    {
+        navigation.NavigateTo("/Ventas");
+    }
+}
+

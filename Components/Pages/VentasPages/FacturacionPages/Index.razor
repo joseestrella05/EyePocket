@@ -1,137 +1,673 @@
 ﻿@page "/Ventas/Facturacion/Index"
+@using EyePocket.Services
+@inject ProductosService productoService
+@inject OrdenVentaService OrdenVentaService
+@inject OrdenVentasDetalleService OrdenVentasDetalleService
+@inject ToastService toastService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Facturación</PageTitle>
 
-@* DISENO NO DEFINITIVO SOLO COMO EJEMPLO DE LA PAGINA DE VENTAS *@
+<EditForm Model="ListaFacturas" class="border shadow-lg p-3 rounded">
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-auto">
+                <div class="card border-0 rounded-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-3 text-center text-md-end mb-3 mb-md-0">
+                                <label class="d-inline-block fs-4 fw-bold text-black">Nombre del producto</label>
+                            </div>
 
-<div class="container-fluid">
-    <div>
-        <h3 class="bg-danger"> ESTE NO SERA EL DISEÑO DEFINITIVO ES UN EJEMPLO PARA TRABAJAR</h3>
-    </div>
-    <div class="row">
-        <div class="col">
-            <h2 class="text-black"><i class="bi bi-box-seam m-1"></i> Facturación</h2>
-        </div>
-        <div class="col text-end">
-            <a href="#" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Crear nueva factura</a>
-        </div>
-    </div>
+                            <div class="col-md-6 d-flex align-items-center mb-3 mb-md-0">
+                                <div class="input-group input-group-lg flex-grow-1 me-3">
+                                    <input @bind="valorFiltro" class="form-control" placeholder="Buscar" />
+                                </div>
 
-    <div class="card mt-4">
-        <div class="card-body">
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <select class="form-select">
-                            <option selected disabled>--- Selecciona ---</option>
-                            <option value="codigo">Código</option>
-                            <option value="nombre">Nombre</option>
-                            <option value="precio">Precio</option>
-                            <option value="descuento">Descuento</option>
-                        </select>
-                        <button class="btn btn-outline-secondary" type="button"><i class="bi bi-arrow-counterclockwise"></i></button>
-                    </div>
-                </div>
-                <div class="col-md-8">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Buscar" />
-                        <button class="btn btn-outline-secondary" type="button"><i class="bi bi-search"></i></button>
-                    </div>
-                </div>
-            </div>
+                                <div class="d-flex align-items-center">
+                                    <label for="Cantidad" class="form-label fw-bold me-2 mb-0">Cantidad:</label>
+                                    <input type="text" id="Cantidad" class="form-control me-3" style="width: 100px;" @bind="cantidad" />
+                                </div>
 
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Código</th>
-                        <th>Nombre</th>
-                        <th>Cantidad</th>
-                        <th>Precio</th>
-                        <th>Descuento</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>02145879</td>
-                        <td>NATHIEL TAVERAS</td>
-                        <td>15</td>
-                        <td>2500.00</td>
-                        <td>10%</td>
-                        <td>
-                            <button class="btn btn-outline-dark btn-sm"><i class="bi bi-eye"></i></button>
-                            <button class="btn btn-outline-info btn-sm"><i class="bi bi-pencil-square"></i></button>
-                            <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>01478224</td>
-                        <td>ORLANDO LORA</td>
-                        <td>02</td>
-                        <td>150.00</td>
-                        <td>5%</td>
-                        <td>
-                            <button class="btn btn-outline-dark btn-sm"><i class="bi bi-eye"></i></button>
-                            <button class="btn btn-outline-info btn-sm"><i class="bi bi-pencil-square"></i></button>
-                            <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>01223245</td>
-                        <td>ESMAILIN MARTINEZ</td>
-                        <td>29</td>
-                        <td>1500.00</td>
-                        <td>0%</td>
-                        <td>
-                            <button class="btn btn-outline-dark btn-sm"><i class="bi bi-eye"></i></button>
-                            <button class="btn btn-outline-info btn-sm"><i class="bi bi-pencil-square"></i></button>
-                            <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>03434542</td>
-                        <td>NATHIEL TAVERAS</td>
-                        <td>05</td>
-                        <td>4800.00</td>
-                        <td>25%</td>
-                        <td>
-                            <button class="btn btn-outline-dark btn-sm"><i class="bi bi-eye"></i></button>
-                            <button class="btn btn-outline-info btn-sm"><i class="bi bi-pencil-square"></i></button>
-                            <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                                <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2" @onclick="Restablecer">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                </button>
+                            </div>
 
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <button class="btn btn-success btn-lg"><i class="bi bi-printer"></i> Imprimir</button>
-                </div>
-                <div class="col-md-6 text-end">
-                    <button class="btn btn-danger btn-lg"><i class="bi bi-cash"></i> Cobrar</button>
-                </div>
-            </div>
-
-            <div class="row mt-4">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Registro</h5>
-                            <p class="card-text"><strong>Descuento:</strong> 100.00</p>
-                            <p class="card-text"><strong>Pesos:</strong> 8,500.00</p>
+                            <div class="col-md-3 d-flex justify-content-end rounded-pill">
+                                <button @onclick="Añadir" class="btn btn-success rounded-pill" type="button" style="background-color: #004b55; border-color: #004b55;">
+                                    <span class="bi bi-plus"></span> Añadir
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+    <div style="max-height: 400px; overflow-y: auto;">
+        <table class="table table-striped table-hover table-bordered text-center align-middle">
+            <thead class="bg-dark text-black">
+                <tr>
+                    <th>#</th>
+                    <th>Código</th>
+                    <th>Descripción</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Descuento</th>
+                    <th>Subtotal</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+            <tbody class="text-white">
+                @for (int i = 0; i < ListaFacturas.Count; i++)
+                {
+                    var factura = ListaFacturas[i];
+                    <tr>
+                        <td class="text-black">@(i + 1)</td>
+                        <td class="text-black">@factura.Productos?.Codigo</td>
+                        <td class="text-black">@factura.Productos?.Nombre</td>
+                        <td class="text-black">@factura.Cantidad</td>
+                        <td class="text-black">@factura.Productos?.Precio</td>
+                        <td class="text-black">@factura.Productos?.Descuento</td>
+                        <td class="text-black">@factura.Subtotal</td>
+                        <td>
+                            <a href="/Ventas/Facturacion/Edit/@factura.OrdenVenta?.OrdenVentaId" class="btn btn-info btn-sm">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" @onclick="() => ConfirmarEliminacion(factura.Productos?.Codigo)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <button class="btn btn-danger d-flex align-items-center px-3 py-2 rounded-pill" @onclick="MostrarModalCobro">
+            <i class="bi bi-cash me-2"></i> Cobrar
+        </button>
+
+        <button class="btn btn-info d-flex align-items-center px-3 py-2 rounded-pill" onclick="location.href='/Ventas/Facturacion/Edit'">
+            <i class="bi bi-eye me-2"></i> Ver Factura
+        </button>
+
+        <div class="p-3 rounded-3 shadow" style="background-color: #004b55; color: white; min-width: 200px;">
+            <h4 class="m-0 text-start" style="font-size: 1.5rem;">Total $@ListaFacturas.Sum(f => f.Subtotal)</h4>
+            <p class="m-0 text-start" style="font-size: 1rem;">SubTotal $@ListaFacturas.Sum(f => f.Subtotal)</p>
+        </div>
+    </div>
+
+    <div class="card-footer text-start">
+        <p>Total de Productos: @ListaFacturas.Count</p>
+    </div>
+</EditForm>
+
+@if (mostrarModalConfirmacion)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #004b55;">
+                    <h5 class="modal-title fw-bold text-white">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" @onclick="CancelarEliminacion"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro que quieres eliminar este artículo?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary rounded-pill" @onclick="CancelarEliminacion">Cancelar</button>
+                    <button class="btn btn-danger rounded-pill" @onclick="EliminarConfirmado">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (mostrarModalCobro)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #004b55; color: white;">
+                    <h5 class="modal-title">Cobros</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModalCobro"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex vh-75">
+                        <div class="text-white p-4 d-flex flex-column justify-content-center" style="width: 30%; background-color: #004b55;">
+                            <h5 class="fw-bold">Número de Artículos</h5>
+                            <h3 class="mb-4">@ListaFacturas.Count</h3>
+
+                            <button class="btn btn-light w-100 mb-2" @onclick="MostrarModalPagoEfectivo">Pago por Efectivo</button>
+                            <button class="btn btn-light w-100 mb-2" @onclick="MostrarModalPagoTarjeta">Pago con Tarjeta</button>
+                            <button class="btn btn-light w-100 mb-2" @onclick="MostrarModalPagoaCredito">Pago a Crédito</button>
+                        </div>
+
+                        <div class="bg-light p-4 d-flex flex-column align-items-center justify-content-center flex-grow-1">
+                            <h3>Total a Pagar</h3>
+                            <h1 class="fw-bold">$@ListaFacturas.Sum(f => f.Subtotal).ToString("0.00")</h1>
+
+                            <button class="btn btn-success w-50 mt-4 rounded-pill" @onclick="Cobrar">
+                                <i class="bi bi-cash"></i> Cobrar
+                            </button>
+
+                            <button class="btn btn-success w-50 mt-2 rounded-pill" @onclick="MostrarModalFactura">
+                                <i class="bi bi-printer"></i> Imprimir
+                            </button>
+
+
+
+                            <button class="btn btn-danger w-50 mt-2 rounded-pill" @onclick="CerrarModalCobro">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (mostrarModalPagoTarjeta)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #004b55; color: white;">
+                    <h5 class="modal-title">Pago con Tarjeta</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModalPagoTarjeta"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="payment-container" style="font-family: Arial; background-color: #fff; padding: 20px; border-radius: 12px;">
+                        <h2 class="text-center">Pago por Tarjeta</h2>
+                        <form>
+                            <label for="Name">Nombre</label>
+                            <input type="name" id="Name" name="Nombre" class="form-control" required>
+
+                            <label for="card-number">Número de Tarjeta</label>
+                            <input type="text" id="card-number" name="card-number" class="form-control" placeholder="1234 1234 1234 1234" required>
+
+                            <div class="row">
+                                <div class="col">
+                                    <label for="expiration">Fecha de Expiración</label>
+                                    <input type="text" id="expiration" name="expiration" class="form-control" placeholder="MM/YYYY" required>
+                                </div>
+                                <div class="col">
+                                    <label for="cvc">CVC</label>
+                                    <input type="text" id="cvc" name="cvc" class="form-control" placeholder="CVC" required>
+                                </div>
+                            </div>
+
+                            <label for="country">País</label>
+                            <select id="country" name="country" class="form-control" required>
+                                <option value="">Selecciona un país</option>
+                                <option value="AR">Argentina</option>
+                                <option value="BR">Brasil</option>
+                                <option value="CL">Chile</option>
+                                <option value="CO">Colombia</option>
+                                <option value="MX">México</option>
+                                <option value="US">Estados Unidos</option>
+                                <option value="RD">Republica Dominicana</option>
+                                <option value="CA">Canadá</option>
+                                <option value="GB">Reino Unido</option>
+                                <option value="FR">Francia</option>
+                                <option value="DE">Alemania</option>
+                                <option value="IT">Italia</option>
+                                <option value="ES">España</option>
+                                <option value="PT">Portugal</option>
+                                <option value="AU">Australia</option>
+                                <option value="IN">India</option>
+                                <option value="JP">Japón</option>
+                                <option value="CN">China</option>
+                                <option value="RU">Rusia</option>
+                                <option value="ZA">Sudáfrica</option>
+                                <option value="EG">Egipto</option>
+                                <option value="NG">Nigeria</option>
+                                <option value="KR">Corea del Sur</option>
+                                <option value="ID">Indonesia</option>
+                                <option value="SA">Arabia Saudita</option>
+                                <option value="SE">Suecia</option>
+                                <option value="FI">Finlandia</option>
+                                <option value="NO">Noruega</option>
+                                <option value="DK">Dinamarca</option>
+                            </select>
+
+                            <button type="button" @onclick="ConfirmarPagoTarjeta" class="btn btn-success mt-3 bi bi-currency-dollar">Confirmar Pago</button>
+                            <button type="button" @onclick="CerrarModalPagoTarjeta" class="btn btn-danger mt-3 bi bi-arrow-left-circle">Volver</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (mostrarModalPagoaCredito)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #004b55; color: white;">
+                    <h5 class="modal-title">Pago a Crédito</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModalPagoaCredito"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex vh-75">
+                        <div class="bg-light p-4 d-flex flex-column align-items-center justify-content-center flex-grow-1">
+                            <h3>Pago a Crédito</h3>
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="nombre">Nombre</label>
+                                            <input type="text" id="nombre" class="form-control" placeholder="Ingrese Nombre" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="identificacion">Identificación</label>
+                                            <input type="text" id="identificacion" class="form-control" placeholder="001-0000000-1" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="telefono">Teléfono</label>
+                                            <input type="text" id="telefono" class="form-control" placeholder="809-000-0000" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="fecha">Fecha</label>
+                                            <input type="date" id="fecha" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="plazo">Plazo de pago</label>
+                                            <input type="number" id="plazo" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="vencimiento">Vencimiento</label>
+                                            <input type="date" id="vencimiento" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-12 d-flex justify-content-between">
+                                        <button class="btn btn-success bi bi-currency-dollar" @onclick="ConfirmarPagoaCredito">Confirmar Pago</button>
+                                        <button class="btn btn-danger bi bi-arrow-left-circle" @onclick="CerrarModalPagoaCredito">Cancelar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@if (mostrarModalPagoEfectivo)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #004b55; color: white;">
+                    <h5 class="modal-title">Pago por Efectivo</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModalPagoEfectivo"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex vh-75">
+                        <div class="bg-light p-4 d-flex flex-column align-items-center justify-content-center flex-grow-1">
+                            <h3>Pago en Efectivo</h3>
+                            <div class="container">
+                                <div class="row">
+                                    <div class="form-group w-40">
+                                        <label for="nombre">Nombre</label>
+                                        <input type="text" id="nombre" placeholder="Ingrese Nombre" class="form-control">
+                                    </div>
+
+                                    <div class="form-group w-40">
+                                        <label for="ncf">NCF</label>
+                                        <input type="text" id="ncf" placeholder="Ingrese el NCF" class="form-control">
+                                    </div>
+
+                                    <div class="form-group w-40">
+                                        <label for="total">Total a Pagar</label>
+                                        <input type="text" id="total" value="@Total.ToString("0.00")" class="form-control" disabled readonly>
+                                    </div>
+
+                                    <div class="form-group w-40 mb-4">
+                                        <label for="efectivo">Monto en Efectivo</label>
+                                        <input type="number" id="efectivo" @bind-value="Efectivo" @bind-value:event="oninput" placeholder="Ingrese el monto en efectivo" class="form-control">
+                                    </div>
+
+                                    <div class="p-4 text-white w-40 text-center " style="background-color: #004b55; border-radius: 6px;">
+                                        <h5 class="fw-bold">Cambio a Devolver</h5>
+                                        <h3>$ @Cambio.ToString("0.00")</h3>
+                                    </div>
+
+                                    <div class="col-12 d-flex justify-content-left" style="margin-top: 16px;">
+                                        <button class="btn btn-success bi bi-currency-dollar" @onclick="ConfirmarPagoEfectivo">Confirmar Pago</button>
+                                        <button class="btn btn-danger bi bi-arrow-left-circle" @onclick="CerrarModalPagoEfectivo">Cancelar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (mostrarModalFactura)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #004b55;">
+                    <h5 class="modal-title fw-bold text-white">Factura</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModalFactura"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="invoice-header text-center">
+                        <h1>FACTURA</h1>
+                    </div>
+                    <div class="invoice-details">
+                        <p>Factura n°: 001</p>
+                        <p>Fecha: @DateTime.Now.ToString("dd/MM/yyyy")</p>
+                        <p>Cliente: Nombre del Cliente</p>
+                    </div>
+                    <table class="invoice-table table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Código</th>
+                                <th>Descripción</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Descuento</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < ListaFacturas.Count; i++)
+                            {
+                                var factura = ListaFacturas[i];
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td>@factura.Productos?.Codigo</td>
+                                    <td>@factura.Productos?.Nombre</td>
+                                    <td>@factura.Cantidad</td>
+                                    <td>@factura.Productos?.Precio</td>
+                                    <td>@factura.Productos?.Descuento</td>
+                                    <td>@factura.Subtotal</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div class="invoice-total text-right">
+                        <p>Subtotal: $@ListaFacturas.Sum(f => f.Subtotal)</p>
+                        <p>Descuento Total: $0.00</p>
+                        <p><strong>TOTAL: $@ListaFacturas.Sum(f => f.Subtotal)</strong></p>
+                    </div>
+                    <div class="invoice-contact-payment d-flex justify-content-between">
+                        <div class="invoice-contact">
+                            <p><strong>Contacto:</strong></p>
+                            <p>(809)-126-3631</p>
+                            <p>EyePocket@gmail.com</p>
+                            <p>www.EyePocket.com</p>
+                            <p>Calle Duarte</p>
+                        </div>
+                        <div class="invoice-payment">
+                            <p><strong>Información de pago:</strong></p>
+                            <p>Nombre del tercero</p>
+                            <p>Nombre de cuentas</p>
+                            <p>Alto de cuenta</p>
+                            <p>Fecha de pago</p>
+                            <p>6125 4547 5901</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CerrarModalFactura">Cerrar</button>
+                    <button class="btn btn-success" @onclick="Confirm">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 
 @code {
+    [Parameter] public int OrdenVentaId { get; set; }
+    public List<OrdenVentaDetalle> ListaFacturas { get; set; } = new();
+    private string valorFiltro = "";
+    private int cantidad;
+    private double Efectivo { get; set; } = 0.00;
+    private double Total => ListaFacturas.Sum(f => f.Subtotal);
+    private double Cambio => Efectivo > 0 ? Math.Max(Efectivo - Total, 0) : 0.00;
+    private bool mostrarModalFactura = false;
 
+
+    private bool mostrarModalConfirmacion = false;
+    private bool mostrarModalCobro = false;
+    private bool mostrarModalPagoTarjeta = false;
+    private bool mostrarModalPagoaCredito = false;
+    private bool mostrarModalPagoEfectivo = false;
+    private string? codigoProductoAEliminar;
+
+    private void MostrarModalFactura() => mostrarModalFactura = true;
+    private void CerrarModalFactura() => mostrarModalFactura = false;
+
+    private void MostrarModalCobro() => mostrarModalCobro = true;
+    private void CerrarModalCobro() => mostrarModalCobro = false;
+
+
+    private void MostrarModalPagoaCredito()
+    {
+        mostrarModalCobro = false;
+        mostrarModalPagoaCredito = true;
+    }
+
+
+    private void CerrarModalPagoaCredito()
+    {
+        mostrarModalCobro = true;
+        mostrarModalPagoaCredito = false;
+    }
+
+    private void MostrarModalPagoTarjeta()
+    {
+        mostrarModalCobro = false;
+        mostrarModalPagoTarjeta = true;
+    }
+
+    private void CerrarModalPagoTarjeta()
+    {
+        mostrarModalCobro = true;
+        mostrarModalPagoTarjeta = false;
+    }
+
+    private void MostrarModalPagoEfectivo()
+    {
+        mostrarModalCobro = false;
+        mostrarModalPagoEfectivo = true;
+    }
+
+    private async Task ConfirmarPagoEfectivo()
+    {
+        // Crear la Orden de Venta
+        var nuevaOrdenVenta = new OrdenVenta
+            {
+                ClienteId = 4, // Asegurar que este ID esté disponible
+                FechaEmision = DateTime.Now,
+                NumeroFactura = 001.ToString(), // Generar un número único
+                MontoTotal = Total,
+                Estado = true, // Asumiendo que la venta está completada
+                RNC = "123456789" // Reemplazar con el valor real
+            };
+
+        // Guardar la Orden de Venta usando el servicio
+        if (await OrdenVentaService.Guardar(nuevaOrdenVenta))
+        {
+            // Crear los detalles de la Orden de Venta
+            foreach (var factura in ListaFacturas)
+            {
+                var detalle = new OrdenVentaDetalle
+                    {
+                        OrdenVentaId = nuevaOrdenVenta.OrdenVentaId, // Asociar con la orden creada
+                        ProductoId = factura.ProductoId,
+                        Cantidad = factura.Cantidad,
+                        Subtotal = factura.Subtotal
+                    };
+
+                // Guardar cada detalle de la venta usando el servicio
+                await OrdenVentasDetalleService.Guardar(detalle);
+            }
+
+            // Mostrar mensaje de éxito
+            MostrarToast(ToastType.Success, "Éxito", "Los datos se guardaron con éxito");
+            await Task.Delay(2000);
+        }
+        else
+        {
+            MostrarToast(ToastType.Danger, "Error", "No se pudo guardar la orden de venta");
+        }
+
+        // Navegar a la página de facturación
+        CerrarModalPagoEfectivo();
+        MostrarModalFactura();
+        //NavigationManager.NavigateTo("/Ventas/Facturacion/Index", true);
+    }
+
+    private async Task Confirm()
+    {
+        NavigationManager.NavigateTo("/Ventas/Facturacion/Index", true);
+    }
+
+    private async Task ConfirmarPagoTarjeta()
+    {
+        MostrarModalFactura();
+    }
+
+    private async Task ConfirmarPagoaCredito()
+    {
+        MostrarModalFactura();
+
+    }
+
+
+
+    private void CerrarModalPagoEfectivo()
+    {
+        mostrarModalCobro = true;
+        mostrarModalPagoEfectivo = false;
+    }
+
+
+    private async Task Restablecer()
+    {
+        valorFiltro = "";
+        cantidad = 0;
+    }
+
+    private async Task Añadir()
+    {
+        if (cantidad < 1)
+        {
+            MostrarToast(ToastType.Warning, "Atención", "La cantidad debe ser mayor o igual a 1");
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(valorFiltro))
+        {
+            var producto = await productoService.BuscarNombre(valorFiltro);
+            if (producto != null)
+            {
+                ListaFacturas.Add(new OrdenVentaDetalle
+                    {
+                        OrdenVentaId = OrdenVentaId,
+                        ProductoId = producto.ProductoId,
+                        Productos = producto,
+                        Cantidad = cantidad,
+                        Subtotal = (double)(producto.Precio * cantidad)
+                    });
+            }
+            else
+            {
+                MostrarToast(ToastType.Danger, "Error", "Producto no encontrado");
+            }
+        }
+        else
+        {
+            MostrarToast(ToastType.Warning, "Atención", "Ingrese un nombre de producto");
+        }
+    }
+
+    private void ConfirmarEliminacion(string? codigoProducto)
+    {
+        codigoProductoAEliminar = codigoProducto;
+        mostrarModalConfirmacion = true;
+    }
+
+    private void EliminarConfirmado()
+    {
+        if (!string.IsNullOrWhiteSpace(codigoProductoAEliminar))
+        {
+            var productoAEliminar = ListaFacturas.FirstOrDefault(f => f.Productos?.Codigo == codigoProductoAEliminar);
+
+            if (productoAEliminar != null)
+            {
+                ListaFacturas.Remove(productoAEliminar);
+                MostrarToast(ToastType.Success, "Eliminado", "Producto eliminado correctamente");
+            }
+            else
+            {
+                MostrarToast(ToastType.Danger, "Error", "Producto no encontrado");
+            }
+        }
+        else
+        {
+            MostrarToast(ToastType.Danger, "Error", "Código de producto inválido");
+        }
+
+        mostrarModalConfirmacion = false;
+        codigoProductoAEliminar = null;
+    }
+
+    private void CancelarEliminacion()
+    {
+        mostrarModalConfirmacion = false;
+        codigoProductoAEliminar = null;
+    }
+
+    private void CalcularCambio(ChangeEventArgs e)
+    {
+        double.TryParse(e.Value?.ToString(), out double efectivo);
+        Efectivo = efectivo;
+    }
+
+    private void Cobrar()
+    {
+        MostrarToast(ToastType.Success, "Cobro Exitoso", "La transacción se ha realizado correctamente.");
+        CerrarModalCobro();
+    }
+
+    // private void Imprimir()
+    // {
+    //     MostrarToast(ToastType.Info, "Impresión", "Se ha enviado la factura a la impresora.");
+    // }
+
+    public void MostrarToast(ToastType tipo, string titulo, string cuerpo) =>
+        toastService.Notify(new(tipo, titulo, cuerpo));
 }
