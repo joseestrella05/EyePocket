@@ -52,6 +52,7 @@
 						<tr class="text-center">
 							<th>ID</th>
 							<th>Provedor</th>
+							<th>Fecha</th>
 							<th>Estado</th>
 							<th>Acciones</th>
 						</tr>
@@ -63,8 +64,8 @@
 							var estado = ListaEstados.FirstOrDefault(c => c.EstadoId == compras.EstadoId);
 							<tr class="text-center">
 								<td>@compras.CompraId</td>
-								<td>@compras.Fecha</td>
 								<td>@(provedor?.Nombre ?? "no encontrado")</td>
+								<td>@compras.Fecha</td>
 								<td>@(estado?.Nombre ?? "no encontrado")</td>
 								<td class="text-center" style="display: flex; justify-content: center; gap: 5px;">
 									<a href="/CxP/Compra/Details/@compras.CompraId" class="btn btn-outline-dark bi-eye"></a>
