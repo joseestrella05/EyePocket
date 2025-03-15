@@ -278,13 +278,13 @@ namespace EyePocket.Migrations
                 {
                     OrdenVentaId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    ClienteId = table.Column<int>(type: "int", nullable: false),
                     FechaEmision = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FechaVencimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
                     NumeroFactura = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MontoTotal = table.Column<double>(type: "float", nullable: false),
                     Estado = table.Column<bool>(type: "bit", nullable: false),
-                    NFC = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ClienteId = table.Column<int>(type: "int", nullable: false)
+                    RNC = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -450,6 +450,34 @@ namespace EyePocket.Migrations
                     table.PrimaryKey("PK_Inventarios", x => x.InventarioId);
                     table.ForeignKey(
                         name: "FK_Inventarios_Productos_ProductoId",
+                        column: x => x.ProductoId,
+                        principalTable: "Productos",
+                        principalColumn: "ProductoId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrdenVentasDetalle",
+                columns: table => new
+                {
+                    DetalleId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrdenVentaId = table.Column<int>(type: "int", nullable: false),
+                    ProductoId = table.Column<int>(type: "int", nullable: false),
+                    Cantidad = table.Column<int>(type: "int", nullable: false),
+                    Subtotal = table.Column<double>(type: "float", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrdenVentasDetalle", x => x.DetalleId);
+                    table.ForeignKey(
+                        name: "FK_OrdenVentasDetalle_OrdenVenta_OrdenVentaId",
+                        column: x => x.OrdenVentaId,
+                        principalTable: "OrdenVenta",
+                        principalColumn: "OrdenVentaId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrdenVentasDetalle_Productos_ProductoId",
                         column: x => x.ProductoId,
                         principalTable: "Productos",
                         principalColumn: "ProductoId",
@@ -659,6 +687,16 @@ namespace EyePocket.Migrations
                 column: "ClienteId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrdenVentasDetalle_OrdenVentaId",
+                table: "OrdenVentasDetalle",
+                column: "OrdenVentaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrdenVentasDetalle_ProductoId",
+                table: "OrdenVentasDetalle",
+                column: "ProductoId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PagosCXC_CXCId",
                 table: "PagosCXC",
                 column: "CXCId");
@@ -709,6 +747,9 @@ namespace EyePocket.Migrations
 
             migrationBuilder.DropTable(
                 name: "MetodosPago");
+
+            migrationBuilder.DropTable(
+                name: "OrdenVentasDetalle");
 
             migrationBuilder.DropTable(
                 name: "PagosCXC");
