@@ -1,4 +1,4 @@
-@page "/Servicio/Create"
+@page "/Servicio/Edit/{id:int}"
 @inject TicketServices ticketService
 @inject NavigationManager navigation
 
@@ -7,7 +7,7 @@
     <h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-person-plus m-1"></i>Nuevo Ticket</h2>
 </div>
 
-<EditForm Model="tickets" OnValidSubmit="Crear">
+<EditForm Model="tickets" OnValidSubmit="Modificar">
     <div class="container">
         <div class="card">
             <div class="card-body">
@@ -19,10 +19,7 @@
                         <label>Nombre Cliente</label>
                         <InputText class="form-control" @bind-Value="tickets.NombreCliente" placeholder="Nombre del cliente"></InputText>
                     </div>
-                    <div class="col">
-                        <label>Agente encargado *</label>
-                        <InputText class="form-control" @bind-Value="tickets.NombreAgente"></InputText>
-                    </div>
+                   
                 </div>
 
                 <div class="row">
@@ -118,18 +115,25 @@
     public Tickets tickets { get; set; } = new Tickets();
     [Inject] protected ToastService ToastService { get; set; }
 
-    public async Task Crear()
+    [Parameter]
+    public int id { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
-        
+        tickets = await ticketService.Buscar(id);
+    }
+    
+    public async Task Modificar()
+    {
         var creado =   await ticketService.Guardar(tickets);
         if(creado){
-            ToastService.Notify(new(ToastType.Success, "Exito", $"Cliente Creado correctamente."));
+            ToastService.Notify(new(ToastType.Success, "Exito", $"Ticket Modificado correctamente."));
             tickets = new Tickets();
             navigation.NavigateTo("/Servicio/Index");
         }
         else
         {
-            ToastService.Notify(new(ToastType.Danger, "Error", $"Cliente ya existe."));
+            ToastService.Notify(new(ToastType.Danger, "Error", $"Ticket ya existe."));
         }
     }
 

@@ -1,146 +1,139 @@
-﻿@page "/Cliente/Create"
+﻿@page "/Clientes/Create"
 @inject ClienteServices clienteService
 @inject NavigationManager navigation
 
 <PageTitle>Creando Cliente</PageTitle>
-<div class="text-left">
-    <h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-person-plus m-1"></i>Nuevo/a Cliente</h2>
+<div class="container mb-4">
+	<div class="card">
+		<div class="text-left">
+			<h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-person-plus m-1"></i> Nuevo/a Cliente</h2>
+		</div>
+	</div>
 </div>
 
-<EditForm Model="clientes" OnValidSubmit="Crear">
-    <div class="container">
-        <div class="card">
-            <div class="card-body">
-                <div class="text-center">
-                    <InputFile class="form-control" multiples/>
-                    <label class="form-label">Seleccionar una imagen</label>
-                </div>
+<div class="contenedor">
+	<div class="card">
+		<div class="card-body">
+			<div class="section-title">Datos personales</div>
+			<EditForm Model="clientes" OnValidSubmit="Crear">
+				<DataAnnotationsValidator />
+				<div class="row mb-3">
+					<div class="col">
+						<label><strong>Nombre y Apellido *</strong></label>
+						<InputText required class="form-control" @bind-Value="clientes.Nombre" placeholder="Nombre y Apellido"></InputText>
+					</div>
+					<div class="col">
+						<label><strong>DOC. Identidad *</strong></label>
+						<InputText required class="form-control" @bind-Value="clientes.Cedula" placeholder="000-0000000-0"></InputText>
+					</div>
+				</div>
 
-                <div class="section-title">Datos personales</div>
+				<div class="row mb-3">
+					<div class="col">
+						<label><strong>Dirección *</strong></label>
+						<InputText required class="form-control" @bind-Value="clientes.Direccion" placeholder="Av. Duarte #10"></InputText>
+					</div>
+					<div class="col">
+						<label><strong>Fecha de Regístro *</strong></label>
+						<InputDate required class="form-control" @bind-Value="clientes.FechaIngreso"></InputDate>
+					</div>
+				</div>
 
-                <div class="row">
-                    <div class="col">
-                        <label>Nombres *</label>
-                        <InputText class="form-control" @bind-Value="clientes.Nombre" placeholder="Nombre del cliente"></InputText>
-                    </div>
-                    <div class="col">
-                        <label>DOC. Identidad *</label>
-                        <InputText class="form-control" @bind-Value="clientes.Cedula" placeholder="000-0000000-0"></InputText>
-                    </div>
-                </div>
+				<div class="section-title">Datos de contacto</div>
 
-                <div class="row">
-                    <div class="col">
-                        <label>Dirección *</label>
-                        <InputText class="form-control" @bind-Value="clientes.Direccion" placeholder="Ej. Av. Duarte #10"></InputText>
-                    </div>
-                    <div class="col">
-                        <label>Fecha Registro *</label>
-                        <InputDate class="form-control" @bind-Value="clientes.FechaIngreso"></InputDate>
-                    </div>
-                </div>
+				<div class="row mb-3">
+					<div class="col">
+						<label><strong>Teléfono *</strong></label>
+						<InputText required class="form-control" @bind-Value="clientes.Telefono" placeholder="(555) 555-555"></InputText>
+					</div>
 
-                <div class="section-title">Datos de contacto</div>
+					<div class="col">
+						<label><strong>Correo Electrónico *</strong></label>
+						<InputText required type="email" class="form-control" @bind-Value="clientes.Email" placeholder="email@ejemplo.com"></InputText>
+					</div>
+				</div>
+				<div class="text-center">
+					<button type="submit" class="btn btn-success bi bi-floppy">   Guardar</button>
+					<a href="/Clientes/Index" class="btn btn-secondary bi bi-arrow-left-circle">   Volver</a>
+				</div>
+			</EditForm>
+		</div>
+	</div>
+</div>
 
-                <div class="row">
-                    <div class="col">
-                        <label>Whatsapp *</label>
-                        <InputText class="form-control" @bind-Value="clientes.Telefono" placeholder="(000) 000-0000"></InputText>
-                    </div>
-                    <div class="col">
-                        <label>TEL. PRINCIPAL *</label>
-                        <InputText class="form-control" @bind-Value="clientes.Telefono" placeholder="(000) 000-0000"></InputText>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col">
-                        <label>Correo Electrónico</label>
-                        <InputText class="form-control" @bind-Value="clientes.Email" placeholder="email@gmail.com"></InputText>
-                    </div>
-
-                </div>
-            </div>
-
-        </div>
-        <div class="text-center">
-            <button type="submit" class="btn btn-success">Guardar</button>
-            <a  href="/Cliente/Index"class="btn btn-secondary">Volver</a>
-        </div>
-    </div>
-</EditForm>
 
 <style>
-    body{
-    background-color:#f5f5f5;
-    }
-    .container {
-    max-width: 800px;
-    margin: auto;
-    padding: 10px;
-    }
+	body {
+		background-color: #f5f5f5;
+	}
 
-    .card {
-    background:white;
-    padding: 20px;
-    border-radius: 10px;
-    }
+	.contenedor {
+		max-width: 800px;
+		margin: auto;
+		padding: 10px;
+	}
 
-    .section-title {
-    background: #0d5c63;
-    color: white;
-    text-align: center;
-    font-weight: bold;
-    padding: 8px;
-    margin: 10px;
-    border-radius: 5px;
-    }
+	.card {
+		background: white;
+		padding: 20px;
+		border-radius: 10px;
+	}
 
-    .btn-success {
-    background-color: #0d5c63;
-    border: none;
-        margin: 10px;
-        padding: 10px 20px;
-    }
+	.section-title {
+		background: #0d5c63;
+		color: white;
+		text-align: center;
+		font-weight: bold;
+		padding: 8px;
+		margin: 10px;
+		border-radius: 5px;
+	}
 
-    .btn-secondary {
-    background-color: #444;
-    color: white;
-    text-decoration: none;
-        margin: 10px;
-        padding: 10px 20px;
-    }
+	.btn-success {
+		background-color: #0d5c63;
+		border: none;
+		margin: 10px;
+		padding: 10px 20px;
+	}
 
-    .btn-secondary:hover {
-    background-color: #222;
-    }
+	.btn-secondary {
+		background-color: #444;
+		color: white;
+		text-decoration: none;
+		margin: 10px;
+		padding: 10px 20px;
+	}
+
+		.btn-secondary:hover {
+			background-color: #222;
+		}
 </style>
 
 @code {
-    public Clientes clientes { get; set; } = new Clientes();
-    [Inject] protected ToastService ToastService { get; set; }
+	public Clientes clientes { get; set; } = new Clientes();
+	[Inject] protected ToastService ToastService { get; set; }
 
-    public async Task Crear()
-    {
-        clientes.Apellido = "  ";
-        clientes.EstadoId = 1;
-        if (!await Validar())
-        {
-            await clienteService.Guardar(clientes);
-            ToastService.Notify(new(ToastType.Success, "Exito", $"Cliente Creado correctamente."));
-            clientes = new Clientes();
-            navigation.NavigateTo("/Cliente/Index");
-        }
-        else
-        {
-            ToastService.Notify(new(ToastType.Danger, "Error", $"Cliente ya existe."));
-        }
-    }
+	public async Task Crear()
+	{
+		clientes.Apellido = "  ";
+		clientes.Activo = false;
+		if (!await Validar())
+		{
+			await clienteService.Guardar(clientes);
+			ToastService.Notify(new(ToastType.Success, "Exito", $"Cliente Creado correctamente."));
+			clientes = new Clientes();
+			navigation.NavigateTo("/Clientes/Index");
+		}
+		else
+		{
+			ToastService.Notify(new(ToastType.Danger, "Error", $"Cliente ya existe."));
+		}
+	}
 
-    public async Task<bool> Validar()
-    {
-        var existeNombre = await clienteService.BuscarNombres(clientes.Nombre);
-        var existeRnc = await clienteService.BuscarRNC(clientes.Cedula);
-        return existeNombre != null && existeRnc != null;
-    }
+	public async Task<bool> Validar()
+	{
+		var existeNombre = await clienteService.BuscarNombres(clientes.Nombre);
+		var existeRnc = await clienteService.BuscarRNC(clientes.Cedula);
+		return existeNombre != null && existeRnc != null;
+	}
 }

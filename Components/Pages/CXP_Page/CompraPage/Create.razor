@@ -1,0 +1,174 @@
+﻿@page "/CxP/Compra/Create"
+@inject ProvedoresServices provedoresService
+@inject CompraServices compraService
+@inject EstadoServices estadoServices
+@inject ProductosService productosServices
+@inject NavigationManager navigation
+
+<EditForm Model="Compra" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <div class="section-title">Datos de compra</div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>ID </label>
+                        <InputNumber class="form-control" @bind-Value="Compra.CompraId" placeholder="CompraId " readonly></InputNumber>
+                    </div>
+                </div> 
+
+                <div class="row">
+                    <div class="col">
+                        <label>Fecha</label>
+                        <InputDate class="form-control" @bind-Value="Compra.Fecha" placeholder="CompraId " readonly></InputDate>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Descripcion</label>
+                        <InputText class="form-control" @bind-Value="Compra.Descripcion" placeholder="Precio"></InputText>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Provedor</label>
+                        <InputSelect class="form-control form-select" @bind-Value="Compra.ProvedorId">
+                            <option value="0" selected disabled>Elija un provedor</option>
+                            @foreach (var provedor in Provedores)
+                            {
+                                <option value="@provedor.ProvedorId">@provedor.Nombre</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Estado</label>
+                        <InputSelect class="form-control form-select" @bind-Value="Compra.EstadoId">
+                            <option value="0" selected disabled>Elija una opción</option>
+                            @foreach (var Estado in Estados)
+                            {
+                                <option value="@Estado.EstadoId">@Estado.Nombre</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="border border-success p-3 mt-3">
+            <h5>Detalles de la Compra</h5>
+            <ProductoPicker Producto="ListaProductos"
+            ProductoId="DetalleSeleccionado.ProductoId"
+            Monto="DetalleSeleccionado.Cantidad"
+            CiudadSelected="HandleProductoSelect"/>
+            <table class="table table-light text-center">
+                <thead class="thead-light">
+                    <tr class="text-center">
+                        <th>Producto</th>
+                        <th>Cantida</th>
+                        <th>Remover</th>
+
+                    </tr>
+                </thead> 
+                <tbody>
+                    @foreach (var destalles in Compra.ComprasDetalles)
+                    {
+                        <td>@destalles.Productos?.Nombre</td>
+                        <td>@destalles.Cantidad</td>
+                        <td>
+                            <button Type="button" class="btn btn-outline-danger bi bi-trash"
+                            @onclick= "() => RemoverDestalle(destalles)"></button>
+                        </td>
+
+                    }
+               </tbody>
+            </table>
+        </div>
+        <div class="row mt-3">
+            <div class="col-6 offset-6">
+                <div class="mb-3">
+                    <label class="form-label"><strong>Monto Total</strong></label>
+                    <label class="form-control text-end">
+                        <strong>@(Compra.ComprasDetalles?.Sum(d => d.Productos.Precio) ?? 0)</strong>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-center">
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <a href="/CxP/Compra/Index" class="btn btn-secondary">Volver</a>
+    </div>
+</EditForm>
+
+@code {
+    public Compras Compra { get; set; } = new Compras();
+    public List<Provedores> Provedores { get; set; } = new List<Provedores>();
+    public List<Estados> Estados { get; set; } = new List<Estados>();
+    public List<Productos> ListaProductos { get; set; } = new List<Productos>();
+    public ComprasDetalles DetalleSeleccionado { get; set; } = new();
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaProductos = await productosServices.Listar(p => true);
+        Provedores = await provedoresService.Listar(C => true);
+        Estados = await estadoServices.Listar(C => true);
+    }
+
+    private async Task HandleProductoSelect((Productos producto, int monto) selection)
+    {
+        if (selection.producto == null || selection.producto.ProductoId <=0)
+        {
+            ToastService.Notify(new(ToastType.Warning, "Alerta", $"No se selecciono un producto valido."));
+            return;
+        }
+
+        var destalle = new ComprasDetalles
+        {
+            ProductoId = selection.producto.ProductoId,
+            Productos =  selection.producto,
+            Cantidad = selection.monto
+
+        };
+
+        Compra.ComprasDetalles.Add(destalle);
+        DetalleSeleccionado = new ComprasDetalles();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async Task Guardar()
+    {
+        try
+        {
+            var paso = await compraService.Guardar(Compra);
+
+            if (paso)
+            {
+                ToastService.Notify(new(ToastType.Success, "Exito", $" Creado correctamente."));
+            }
+
+            else
+            {
+                ToastService.Notify(new(ToastType.Danger, "Error", $"No se pudo guardar."));
+            }
+        }
+        catch(Exception ex)
+        {
+            ToastService.Notify(new(ToastType.Danger, "Error", $"error al guardar: {ex.Message}"));
+        }
+    }
+
+    public void RemoverDestalle(ComprasDetalles destalles)
+    {
+        Compra.ComprasDetalles.Remove(destalles);
+        StateHasChanged();
+    }
+
+}

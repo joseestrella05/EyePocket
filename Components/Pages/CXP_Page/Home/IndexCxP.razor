@@ -1,20 +1,76 @@
 ﻿@page "/CxP/Index"
 @inject ProvedoresServices ProvedoresServices
 
-<h2 class="text-center">Cuentas por Pagar y Compra</h2>
+<div class="container my-5">
+    <h2 class="text-center mb-3 fw-bold">Cuentas por Pagar y Compra</h2>
+    <h4 class="text-center mb-5 text-muted">Bienvenido a Compra y Cuenta por Cobrar</h4>
 
-<h4>Binvenido a Compra y Cuenta por cobrar</h4>
+    <div class="row g-4 mb-5 justify-content-center">
+        <div class="col-md-2 col-sm-6">
+            <div class="card shadow-lg rounded-4 text-white h-100" style="background: linear-gradient(135deg, #1a6b66 0%, #2c8781 100%);">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center p-3 text-center">
+                    <i class="bi bi-person-plus" style="font-size: 2rem; opacity: 0.9;"></i>
+                    <h5 class="card-title mb-1 fw-semibold" style="font-size: 1rem;">Proveedores</h5>
+                    <h6 class="mb-0" style="font-size: 1rem;">@Provedores.Count</h6>
+                    <small class="text-light opacity-75" style="font-size: 0.8rem;">Hoy</small>
+                </div>
+            </div>
+        </div>
 
-<div class="row">
-    <div class="col-md-3">
-        <div class="card shadow-lg text-white" style="background-color: #085559; ">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="card-title bi bi-person-plus m-lg-4">Provedores</h4>
-                        <h6 class="m-lg-4">Cant.: @Provedores.Count</h6>
-                    </div>
+        <div class="col-md-2 col-sm-6">
+            <div class="card shadow-lg rounded-4 text-white h-100" style="background: linear-gradient(135deg, #d4a017 0%, #e0b533 100%);">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center p-3 text-center">
+                    <i class="bi bi-cart" style="font-size: 2rem; opacity: 0.9;"></i>
+                    <h5 class="card-title mb-1 fw-semibold" style="font-size: 1rem;">Compras</h5>
+                    <h6 class="mb-0" style="font-size: 1rem;">@TotalCompras</h6>
+                    <small class="text-light opacity-75" style="font-size: 0.8rem;">Mes actual</small>
+                </div>
+            </div>
+        </div>
 
+        <div class="col-md-2 col-sm-6">
+            <div class="card shadow-lg rounded-4 text-white h-100" style="background: linear-gradient(135deg, #17a2b8 0%, #33b5c9 100%);">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center p-3 text-center">
+                    <i class="bi bi-clock" style="font-size: 2rem; opacity: 0.9;"></i>
+                    <h5 class="card-title mb-1 fw-semibold" style="font-size: 1rem;">Pendientes</h5>
+                    <h6 class="mb-0" style="font-size: 1rem;">@TotalPendientes</h6>
+                    <small class="text-light opacity-75" style="font-size: 0.8rem;">Mes actual</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-12">
+            <div class="card shadow-lg rounded-4">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4 fw-bold text-dark">Porcentaje de Aumento por Proveedor</h5>
+                    @if (Provedores.Any())
+                    {
+                        <div class="row g-3">
+                            @foreach (var proveedor in Provedores)
+                            {
+                                var porcentajeAumento = CalcularPorcentajeAumento(proveedor);
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span class="fw-semibold" style="font-size: 1rem;">@proveedor.Nombre</span>
+                                                <span class="@(porcentajeAumento >= 0 ? "text-success" : "text-danger") fw-semibold" style="font-size: 1rem;">@porcentajeAumento.ToString("F2")%</span>
+                                            </div>
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar @(porcentajeAumento >= 0 ? "bg-success" : "bg-danger")" role="progressbar" style="width: @(Math.Abs(porcentajeAumento))%;" aria-valuenow="@Math.Abs(porcentajeAumento)" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center">No hay datos de proveedores disponibles.</p>
+                    }
                 </div>
             </div>
         </div>
@@ -23,9 +79,25 @@
 
 @code {
     public List<Provedores> Provedores { get; set; } = new List<Provedores>();
+    public decimal TotalCapitalInvertido { get; set; }
+    public int TotalCompras { get; set; }
+    public int TotalPendientes { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         Provedores = await ProvedoresServices.Listar(p => true);
+        TotalCapitalInvertido = 3631745.00m;
+        TotalCompras = 9;
+        TotalPendientes = 15;
+    }
+
+    private double CalcularPorcentajeAumento(Provedores proveedor)
+    {
+        decimal valorAnterior = 1000;
+        decimal valorActual = 1200;
+
+        if (valorAnterior == 0) return 0;
+
+        return (double)((valorActual - valorAnterior) / valorAnterior * 100);
     }
 }

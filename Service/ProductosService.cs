@@ -52,7 +52,7 @@ namespace EyePocket.Service
         public async Task<List<Productos>> Listar(Expression<Func<Productos, bool>> criterio)
         {
             await using var contexto = await DbFactory.CreateDbContextAsync();
-            return await contexto.Productos
+            return await contexto.Productos.Include(p => p.Proveedor)
                 .Where(criterio)
                 .ToListAsync();
         }

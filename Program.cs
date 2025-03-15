@@ -26,7 +26,7 @@ builder.Services.AddAuthentication(options =>
     })
     .AddIdentityCookies();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("SqlConStr");
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -41,17 +41,18 @@ builder.Services.AddBlazorBootstrap();
 
 //inject services
 builder.Services.AddScoped<ClienteServices>();
-
 builder.Services.AddScoped<ProductosService>();
 builder.Services.AddScoped<MermasService>();
-
 builder.Services.AddScoped<TicketServices>();
+builder.Services.AddScoped<T_PuntosServices>();
+builder.Services.AddScoped<AgenteServices>();
+builder.Services.AddScoped<CitasService>();
+builder.Services.AddScoped<CuentasXCobrarService>();
+builder.Services.AddScoped<OrdenVentaService>();
+builder.Services.AddScoped<PagosCXCService>();
+builder.Services.AddScoped<CuotasCXCService>();
 builder.Services.AddScoped<InventarioService>();
-
 builder.Services.AddScoped<ProvedoresServices>();
-
-
-
 
 //notificacion
 builder.Services.AddBlazoredToast();
