@@ -8,7 +8,7 @@
             <option value="@ciudad.ProductoId">@ciudad.ProductoId - @ciudad.Nombre ($@ciudad.Precio.ToString("N2"))</option>
         }
     </InputSelect>
-    <label class="col-form-label input-group-text">Valor:</label>
+    <label class="col-form-label input-group-text">Cantidad:</label>
     <InputNumber class="form-control" id="quantity-input" @bind-Value="Monto" min="0" />
 
     <button type="button" class="btn btn-outline-success bi bi-plus" @onclick="TriggerSelection">Agregar</button>
