@@ -13,8 +13,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 	public DbSet<Citas> Citas { get; set; }
 	public DbSet<Agentes> Agentes { get; set; }
 	public DbSet<TarjetaPuntos> TarjetaPuntos { get; set; }
-    public DbSet<Mermas> Mermas { get; set; }
-    public DbSet<Productos> Productos { get; set; }
+  public DbSet<Mermas> Mermas { get; set; }
+  public DbSet<Productos> Productos { get; set; }
+
+  public DbSet<OrdenVentaDetalle> OrdenVentasDetalle { get; set; }
+
 	public DbSet<CuentasXCobrar> CuentasXCobrar { get; set; }
 	public DbSet<Provedores> Provedores { get; set; }
 	public DbSet<OrdenVenta> OrdenVenta { get; set; }
