@@ -1,5 +1,4 @@
 ﻿@page "/Ventas/Facturacion/Index"
-@using EyePocket.Services
 @inject ProductosService productoService
 @inject OrdenVentaService OrdenVentaService
 @inject OrdenVentasDetalleService OrdenVentasDetalleService
@@ -8,7 +7,7 @@
 
 <PageTitle>Facturación</PageTitle>
 
-<EditForm Model="ListaFacturas" class="border shadow-lg p-3 rounded">
+<EditForm Model="ListaFacturas"class="border shadow-lg p-3 rounded">
     <div class="container mt-4">
         <div class="row justify-content-center">
             <div class="col-md-auto">
@@ -55,7 +54,6 @@
                     <th>Descripción</th>
                     <th>Cantidad</th>
                     <th>Precio</th>
-                    <th>Descuento</th>
                     <th>Subtotal</th>
                     <th>Editar</th>
                     <th>Eliminar</th>
@@ -71,7 +69,6 @@
                         <td class="text-black">@factura.Productos?.Nombre</td>
                         <td class="text-black">@factura.Cantidad</td>
                         <td class="text-black">@factura.Productos?.Precio</td>
-                        <td class="text-black">@factura.Productos?.Descuento</td>
                         <td class="text-black">@factura.Subtotal</td>
                         <td>
                             <a href="/Ventas/Facturacion/Edit/@factura.OrdenVenta?.OrdenVentaId" class="btn btn-info btn-sm">
@@ -395,7 +392,6 @@
                                 <th>Descripción</th>
                                 <th>Cantidad</th>
                                 <th>Precio</th>
-                                <th>Descuento</th>
                                 <th>Subtotal</th>
                             </tr>
                         </thead>
@@ -409,7 +405,6 @@
                                     <td>@factura.Productos?.Nombre</td>
                                     <td>@factura.Cantidad</td>
                                     <td>@factura.Productos?.Precio</td>
-                                    <td>@factura.Productos?.Descuento</td>
                                     <td>@factura.Subtotal</td>
                                 </tr>
                             }
