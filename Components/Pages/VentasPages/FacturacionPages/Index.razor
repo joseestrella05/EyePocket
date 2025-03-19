@@ -586,7 +586,13 @@
 
         if (!string.IsNullOrWhiteSpace(valorFiltro))
         {
-            var producto = await productoService.BuscarNombre(valorFiltro);
+            // Intentar buscar tanto por código como por nombre
+            var productoPorCodigo = await productoService.BuscarCodigo(valorFiltro);
+            var productoPorNombre = await productoService.BuscarNombre(valorFiltro);
+
+            // Tomar el primero que se encuentre
+            var producto = productoPorCodigo ?? productoPorNombre;
+
             if (producto != null)
             {
                 ListaFacturas.Add(new OrdenVentaDetalle
@@ -605,9 +611,10 @@
         }
         else
         {
-            MostrarToast(ToastType.Warning, "Atención", "Ingrese un nombre de producto");
+            MostrarToast(ToastType.Warning, "Atención", "Ingrese un nombre o código de producto");
         }
     }
+
 
     private void ConfirmarEliminacion(string? codigoProducto)
     {
