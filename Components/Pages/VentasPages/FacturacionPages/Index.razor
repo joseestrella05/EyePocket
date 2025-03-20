@@ -1,4 +1,6 @@
 ﻿@page "/Ventas/Facturacion/Index"
+@using EyePocket.Models
+@inject ClienteServices clienteServices
 @inject ProductosService productoService
 @inject OrdenVentaService OrdenVentaService
 @inject OrdenVentasDetalleService OrdenVentasDetalleService
@@ -68,8 +70,8 @@
                         <td class="text-black">@factura.Productos?.Codigo</td>
                         <td class="text-black">@factura.Productos?.Nombre</td>
                         <td class="text-black">@factura.Cantidad</td>
-                        <td class="text-black">@factura.Productos?.Precio</td>
-                        <td class="text-black">@factura.Subtotal</td>
+                        <td class="text-black">@factura.Productos?.Precio.ToString("C2")</td>
+                        <td class="text-black">@factura.Subtotal.ToString("C2")</td>
                         <td>
                             <a href="/Ventas/Facturacion/Edit/@factura.OrdenVenta?.OrdenVentaId" class="btn btn-info btn-sm">
                                 <i class="bi bi-eye"></i>
@@ -91,9 +93,9 @@
             <i class="bi bi-cash me-2"></i> Cobrar
         </button>
 
-        <button class="btn btn-info d-flex align-items-center px-3 py-2 rounded-pill" onclick="location.href='/Ventas/Facturacion/Edit'">
+        @* <button class="btn btn-info d-flex align-items-center px-3 py-2 rounded-pill" onclick="location.href='/Ventas/Facturacion/Edit'">
             <i class="bi bi-eye me-2"></i> Ver Factura
-        </button>
+        </button> *@
 
         <div class="p-3 rounded-3 shadow" style="background-color: #004b55; color: white; min-width: 200px;">
             <h4 class="m-0 text-start" style="font-size: 1.5rem;">Total $@ListaFacturas.Sum(f => f.Subtotal)</h4>
@@ -184,9 +186,15 @@
                 <div class="modal-body">
                     <div class="payment-container" style="font-family: Arial; background-color: #fff; padding: 20px; border-radius: 12px;">
                         <h2 class="text-center">Pago por Tarjeta</h2>
-                        <form>
-                            <label for="Name">Nombre</label>
-                            <input type="name" id="Name" name="Nombre" class="form-control" required>
+                        <form>                          
+                            <label for="cliente">Seleccionar Cliente</label>
+                            <select id="cliente" class="form-control" @bind="ClienteSeleccionadoId">
+                                <option value="0">Seleccione un cliente</option>
+                                @foreach (var cliente in ListaClientes)
+                                {
+                                    <option value="@cliente.ClienteId">@cliente.Nombre</option>
+                                }
+                            </select>
 
                             <label for="card-number">Número de Tarjeta</label>
                             <input type="text" id="card-number" name="card-number" class="form-control" placeholder="1234 1234 1234 1234" required>
@@ -236,7 +244,7 @@
                                 <option value="DK">Dinamarca</option>
                             </select>
 
-                            <button type="button" @onclick="ConfirmarPagoTarjeta" class="btn btn-success mt-3 bi bi-currency-dollar">Confirmar Pago</button>
+                            <button type="button" @onclick="ConfirmarPago" class="btn btn-success mt-3 bi bi-currency-dollar">Confirmar Pago</button>
                             <button type="button" @onclick="CerrarModalPagoTarjeta" class="btn btn-danger mt-3 bi bi-arrow-left-circle">Volver</button>
                         </form>
                     </div>
@@ -263,21 +271,23 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group mb-3">
-                                            <label for="nombre">Nombre</label>
-                                            <input type="text" id="nombre" class="form-control" placeholder="Ingrese Nombre" />
+                                            <label for="cliente">Seleccionar Cliente</label>
+                                            <select id="cliente" class="form-control" @bind="ClienteSeleccionadoId">
+                                                <option value="0">Seleccione un cliente</option>
+                                                @foreach (var cliente in ListaClientes)
+                                                {
+                                                    <option value="@cliente.ClienteId">@cliente.Nombre</option>
+                                                }
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-group mb-3">
-                                            <label for="identificacion">Identificación</label>
-                                            <input type="text" id="identificacion" class="form-control" placeholder="001-0000000-1" />
-                                        </div>
+                                        <label>Identificación</label>
+                                        <input type="number" class="form-control" value="@ClienteSeleccionado?.Cedula" disabled />
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-group mb-3">
-                                            <label for="telefono">Teléfono</label>
-                                            <input type="text" id="telefono" class="form-control" placeholder="809-000-0000" />
-                                        </div>
+                                        <label>Teléfono</label>
+                                        <input type="number" class="form-control" value="@ClienteSeleccionado?.Telefono" disabled />
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group mb-3">
@@ -298,7 +308,7 @@
                                         </div>
                                     </div>
                                     <div class="col-12 d-flex justify-content-between">
-                                        <button class="btn btn-success bi bi-currency-dollar" @onclick="ConfirmarPagoaCredito">Confirmar Pago</button>
+                                        <button class="btn btn-success bi bi-currency-dollar" @onclick="ConfirmarPago">Confirmar Pago</button>
                                         <button class="btn btn-danger bi bi-arrow-left-circle" @onclick="CerrarModalPagoaCredito">Cancelar</button>
                                     </div>
                                 </div>
@@ -328,8 +338,14 @@
                             <div class="container">
                                 <div class="row">
                                     <div class="form-group w-40">
-                                        <label for="nombre">Nombre</label>
-                                        <input type="text" id="nombre" placeholder="Ingrese Nombre" class="form-control">
+                                        <label for="cliente">Seleccionar Cliente</label>
+                                        <select id="cliente" class="form-control" @bind="ClienteSeleccionadoId">
+                                            <option value="0">Seleccione un cliente</option>
+                                            @foreach (var cliente in ListaClientes)
+                                            {
+                                                <option value="@cliente.ClienteId">@cliente.Nombre</option>
+                                            }
+                                        </select>
                                     </div>
 
                                     <div class="form-group w-40">
@@ -353,7 +369,7 @@
                                     </div>
 
                                     <div class="col-12 d-flex justify-content-left" style="margin-top: 16px;">
-                                        <button class="btn btn-success bi bi-currency-dollar" @onclick="ConfirmarPagoEfectivo">Confirmar Pago</button>
+                                        <button class="btn btn-success bi bi-currency-dollar" @onclick="ValidarPagoEfectivo">Confirmar Pago</button>
                                         <button class="btn btn-danger bi bi-arrow-left-circle" @onclick="CerrarModalPagoEfectivo">Cancelar</button>
                                     </div>
                                 </div>
@@ -382,7 +398,7 @@
                     <div class="invoice-details">
                         <p>Factura n°: 001</p>
                         <p>Fecha: @DateTime.Now.ToString("dd/MM/yyyy")</p>
-                        <p>Cliente: Nombre del Cliente</p>
+                        <p>Cliente: @NombreClienteSeleccionado</p>
                     </div>
                     <table class="invoice-table table table-bordered">
                         <thead>
@@ -404,7 +420,7 @@
                                     <td>@factura.Productos?.Codigo</td>
                                     <td>@factura.Productos?.Nombre</td>
                                     <td>@factura.Cantidad</td>
-                                    <td>@factura.Productos?.Precio</td>
+                                    <td>@factura.Productos?.Precio.ToString("C2")</td>
                                     <td>@factura.Subtotal</td>
                                 </tr>
                             }
@@ -412,7 +428,7 @@
                     </table>
                     <div class="invoice-total text-right">
                         <p>Subtotal: $@ListaFacturas.Sum(f => f.Subtotal)</p>
-                        <p>Descuento Total: $0.00</p>
+                        <p>Cambio: $@Cambio</p>
                         <p><strong>TOTAL: $@ListaFacturas.Sum(f => f.Subtotal)</strong></p>
                     </div>
                     <div class="invoice-contact-payment d-flex justify-content-between">
@@ -446,6 +462,10 @@
 @code {
     [Parameter] public int OrdenVentaId { get; set; }
     public List<OrdenVentaDetalle> ListaFacturas { get; set; } = new();
+    public List<Clientes> ListaClientes { get; set; }
+
+    private int? ClienteSeleccionadoId;
+    private string NombreClienteSeleccionado => ListaClientes.FirstOrDefault(c => c.ClienteId == ClienteSeleccionadoId)?.Nombre ?? "Cliente no encontrado";
     private string valorFiltro = "";
     private int cantidad;
     private double Efectivo { get; set; } = 0.00;
@@ -460,6 +480,20 @@
     private bool mostrarModalPagoaCredito = false;
     private bool mostrarModalPagoEfectivo = false;
     private string? codigoProductoAEliminar;
+
+    private Clientes? ClienteSeleccionado => ListaClientes.FirstOrDefault(c => c.ClienteId == ClienteSeleccionadoId);
+
+    private void ActualizarDatosCliente(ChangeEventArgs e)
+    {
+        ClienteSeleccionadoId = int.Parse(e.Value?.ToString() ?? "0");
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaClientes = await clienteServices.Listar(c => true);
+    }
+
 
     private void MostrarModalFactura() => mostrarModalFactura = true;
     private void CerrarModalFactura() => mostrarModalFactura = false;
@@ -498,51 +532,82 @@
         mostrarModalCobro = false;
         mostrarModalPagoEfectivo = true;
     }
-
-    private async Task ConfirmarPagoEfectivo()
+    private void CerrarModalPagoEfectivo()
     {
-        // Crear la Orden de Venta
-        var nuevaOrdenVenta = new OrdenVenta
-            {
-                ClienteId = 4, // Asegurar que este ID esté disponible
-                FechaEmision = DateTime.Now,
-                NumeroFactura = 001.ToString(), // Generar un número único
-                MontoTotal = Total,
-                Estado = true, // Asumiendo que la venta está completada
-                RNC = "123456789" // Reemplazar con el valor real
-            };
+        mostrarModalCobro = true;
+        mostrarModalPagoEfectivo = false;
+    }
 
-        // Guardar la Orden de Venta usando el servicio
-        if (await OrdenVentaService.Guardar(nuevaOrdenVenta))
+    private void  ValidarPagoEfectivo()
+    {
+        if (Efectivo < Total)
         {
-            // Crear los detalles de la Orden de Venta
-            foreach (var factura in ListaFacturas)
-            {
-                var detalle = new OrdenVentaDetalle
-                    {
-                        OrdenVentaId = nuevaOrdenVenta.OrdenVentaId, // Asociar con la orden creada
-                        ProductoId = factura.ProductoId,
-                        Cantidad = factura.Cantidad,
-                        Subtotal = factura.Subtotal
-                    };
+            MostrarToast(ToastType.Warning, "Atención", "El monto en efectivo debe ser igual o mayor al total a pagar");
+            return;
+        }
+        ConfirmarPago();
+    }
+    private async Task ConfirmarPago()
+    {
+        if (ClienteSeleccionadoId == null || ClienteSeleccionadoId == 0)
+        {
+            MostrarToast(ToastType.Warning, "Atención", "Debe seleccionar un cliente antes de continuar");
+            return;
+        }
 
-                // Guardar cada detalle de la venta usando el servicio
-                await OrdenVentasDetalleService.Guardar(detalle);
-            }
+        bool guardadoExitoso = await GuardarOrdenVenta();
 
-            // Mostrar mensaje de éxito
+        if (guardadoExitoso)
+        {
             MostrarToast(ToastType.Success, "Éxito", "Los datos se guardaron con éxito");
-            await Task.Delay(2000);
+
+            mostrarModalPagoEfectivo = false;
+            StateHasChanged(); 
+
+            await Task.Delay(200);
+
+   
+            mostrarModalFactura = true;
+            StateHasChanged(); 
         }
         else
         {
             MostrarToast(ToastType.Danger, "Error", "No se pudo guardar la orden de venta");
         }
+    }
 
-        // Navegar a la página de facturación
-        CerrarModalPagoEfectivo();
-        MostrarModalFactura();
-        //NavigationManager.NavigateTo("/Ventas/Facturacion/Index", true);
+
+    private async Task<bool> GuardarOrdenVenta()
+    {
+        var nuevaOrdenVenta = new OrdenVenta
+            {
+                ClienteId = ClienteSeleccionadoId.Value,
+                FechaEmision = DateTime.Now,
+                NumeroFactura = Guid.NewGuid().ToString().Substring(0, 6),
+                MontoTotal = Total,
+                Estado = true,
+                RNC = "123456789"
+            };
+
+        if (!await OrdenVentaService.Guardar(nuevaOrdenVenta))
+        {
+            return false; 
+        }
+
+        foreach (var factura in ListaFacturas)
+        {
+            var detalle = new OrdenVentaDetalle
+                {
+                    OrdenVentaId = nuevaOrdenVenta.OrdenVentaId,
+                    ProductoId = factura.ProductoId,
+                    Cantidad = factura.Cantidad,
+                    Subtotal = factura.Subtotal
+                };
+
+            await OrdenVentasDetalleService.Guardar(detalle);
+        }
+
+        return true; 
     }
 
     private async Task Confirm()
@@ -550,24 +615,7 @@
         NavigationManager.NavigateTo("/Ventas/Facturacion/Index", true);
     }
 
-    private async Task ConfirmarPagoTarjeta()
-    {
-        MostrarModalFactura();
-    }
-
-    private async Task ConfirmarPagoaCredito()
-    {
-        MostrarModalFactura();
-
-    }
-
-
-
-    private void CerrarModalPagoEfectivo()
-    {
-        mostrarModalCobro = true;
-        mostrarModalPagoEfectivo = false;
-    }
+   
 
 
     private async Task Restablecer()
@@ -586,11 +634,9 @@
 
         if (!string.IsNullOrWhiteSpace(valorFiltro))
         {
-            // Intentar buscar tanto por código como por nombre
             var productoPorCodigo = await productoService.BuscarCodigo(valorFiltro);
             var productoPorNombre = await productoService.BuscarNombre(valorFiltro);
 
-            // Tomar el primero que se encuentre
             var producto = productoPorCodigo ?? productoPorNombre;
 
             if (producto != null)
