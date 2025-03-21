@@ -4,147 +4,118 @@
 
 <PageTitle>Historial</PageTitle>
 
-<EditForm Model="ListaFacturas" class="border shadow-lg p-3 rounded">
-    <div class="card-header text-center py-2 rounded-3" style="background-color: #004b55; color: white;">
-        <h3 class="mb-0 font-weight-bold" style="font-weight: bold;">Historial</h3>
-    </div>
+<div class="card-header text-center py-2 rounded-3" style="background-color: #004b55; color: white;">
+    <h3 class="mb-0 font-weight-bold" style="font-weight: bold;">Historial</h3>
+</div>
 
-    <div class="container mt-4">
-        <div class="row justify-content-center">
-            <div class="col-md-auto">
-                <div class="card  border-0 rounded-3">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-md-3 text-center text-md-end mb-3 mb-md-0">
-                                <label class="d-inline-block fs-4 fw-bold text-black">
-                                    Buscar  
-                                </label>
-                            </div>
-                            <!-- Filtro -->
-                            <div class="col-md-4 d-flex align-items-center mb-3 mb-md-0">
-                                <label for="Filtro" class="form-label fw-bold me-3">Filtrar:</label>
-                                <select @bind="filtro" class="form-select form-select-lg">
-                                    <option value="fecha">Fecha</option>
-                                </select>
-                            </div>
-
-                            <!-- Barra de Búsqueda -->
-                            <div class="col-md-5 col-12 d-flex align-items-center mb-3 mb-md-0">
-                                <label for="ValorFiltro" class="form-label fw-bold me-3"></label>
-                                <div class="input-group input-group-lg w-100">
-                                    <input @bind="valorFiltro" class="form-control" placeholder="Buscar..." />
-                                    <button @onclick="Buscar" class="btn btn-primary" type="button">
-                                        <span class="bi bi-search"></span> Buscar
-                                    </button>
-                                </div>
-                                <!-- Restablecer -->
-                                <div class="col-md-2 d-flex align-items-center  ms-3">
-                                    <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2" @onclick="Restablecer">
-                                        <span class="bi bi-arrow-counterclockwise"></span>
-                                    </button>
-                                </div>
-                            </div>
-
-
-                            <!-- FiltroFecha - Mostrar solo si se selecciona "fecha" en el filtro -->
-                            @if (filtro == "fecha")
-                            {
-                                <div class="row mt-3">
-                                    <!-- Desde -->
-                                    <div class="col-3">
-                                        <label class="col-form-label"><strong>Desde</strong></label>
-                                        <InputDate class="form-control" @bind-Value="Desde"></InputDate>
-                                    </div>
-
-                                    <!-- Hasta -->
-                                    <div class="col-3">
-                                        <label class="col-form-label"><strong>Hasta</strong></label>
-                                        <div class="input-group">
-                                            <InputDate class="form-control" @bind-Value="Hasta"></InputDate>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                           
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-auto">
+            <div class="card  border-0 rounded-3">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-3 text-center text-md-end mb-3 mb-md-0">
+                            <label class="d-inline-block fs-4 fw-bold text-black">
+                                Buscar  
+                            </label>
                         </div>
+                        <!-- Filtro -->
+                        <div class="col-md-4 d-flex align-items-center mb-3 mb-md-0">
+                            <label for="Filtro" class="form-label fw-bold me-3">Filtrar:</label>
+                            <select @bind="filtro" class="form-select form-select-lg">
+                                <option value="factura">Factura</option>
+                                <option value="fecha">Fecha</option>
+                                <option value="cliente">Cliente</option>
+                            </select>
+                        </div>
+
+                        <!-- Barra de Búsqueda -->
+                        <div class="col-md-5 col-12 d-flex align-items-center mb-3 mb-md-0">
+                            <label for="ValorFiltro" class="form-label fw-bold me-3"></label>
+                            <div class="input-group input-group-lg w-100">
+                                <input @bind="valorFiltro" class="form-control" placeholder="Buscar..." />
+                                <button @onclick="Buscar" class="btn btn-primary" type="button">
+                                    <span class="bi bi-search"></span> Buscar
+                                </button>
+                            </div>
+                            <!-- Restablecer -->
+                            <div class="col-md-2 d-flex align-items-center  ms-3">
+                                <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2" @onclick="Restablecer">
+                                    <span class="bi bi-arrow-counterclockwise"></span>
+                                </button>
+                            </div>
+                        </div>
+
+
+                        <!-- FiltroFecha - Mostrar solo si se selecciona "fecha" en el filtro -->
+                        @if (filtro == "fecha")
+                        {
+                            <div class="row mt-3">
+                                <!-- Desde -->
+                                <div class="col-3">
+                                    <label class="col-form-label"><strong>Desde</strong></label>
+                                    <InputDate class="form-control" @bind-Value="Desde"></InputDate>
+                                </div>
+
+                                <!-- Hasta -->
+                                <div class="col-3">
+                                    <label class="col-form-label"><strong>Hasta</strong></label>
+                                    <div class="input-group">
+                                        <InputDate class="form-control" @bind-Value="Hasta"></InputDate>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+
                     </div>
                 </div>
             </div>
         </div>
-
-          <div class="form-group">
-            <label for="tarjeta">Pagos con Tarjeta:</label>
-            <input type="text" id="tarjeta" name="tarjeta" disabled size="7">
-        </div>
-
-        <div class="form-group">
-            <label for="caja">Dinero en Caja:</label>
-            <input type="text" id="caja" name="caja" disabled size="7">
-        </div>
-
-        <div class="form-group">
-            <label for="inicial">Caja Inicial:</label>
-            <input type="text" id="inicial" name="inicial" disabled size="7">
-        </div>
-
-        <div class="form-group">
-            <label for="inversion">Inversion Total:</label>
-            <input type="text" id="inversion" name="inversion" disabled size="7">
-        </div>
-
-        <div class="form-group">
-            <label for="garantia">Garancia Total:</label>
-            <input type="text" id="garantia" name="garantia" disabled size="7">
-        </div>
-
-        <div class="form-group">
-            <label for="ventas">Ventas Totales:</label>
-            <input type="text" id="ventas" name="ventas" disabled size="7">
-        </div>
     </div>
 
-    <!-- Tabla -->
-    <table class="table table-striped table-hover table-bordered text-center align-middle">
-        <thead class="bg-dark">
-            <tr>
-                <th>Fecha</th>
-                <th>Dinero en Caja</th>
-                <th>Caja Inicial</th>
-                <th>Inversion Total</th>
-                <th>Ganancia Total</th>
-                <th>Pagos con Tarjeta</th>
-                <th>Ventas Totales</th>
-            </tr>
-        </thead>
-    </table>
-     <style>
-        .form-group {
-            display: inline-block;
-            margin-right: 7px; 
-        }
-       .form-group label {
-            display: inline-block;
-            margin-right: 2.5px; 
-        }
-        .form-group input {
-            width: 100px;
-        }
+    
+</div>
 
-        .table thead.bg-dark th {
-            color: black;
-        }
-    </style>
-  @*   <div class="card-footer text-start">
-        <p>Total de Contacto: @ListaContacto.Count</p>
-    </div>
-    <div style="height: 415px;"></div> *@
-</EditForm>
+<!-- Tabla -->
+<table class="table table-striped table-hover table-bordered text-center align-middle">
+    <thead class="bg-dark">
+        <tr>
+            <th>Factura</th>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Total Pagado</th>
+            <th>Detalle</th>
+        </tr>
+    </thead>
+</table>
+<style>
+    .form-group {
+    display: inline-block;
+    margin-right: 7px; 
+    }
+    .form-group label {
+    display: inline-block;
+    margin-right: 2.5px; 
+    }
+    .form-group input {
+    width: 100px;
+    }
+
+    .table thead.bg-dark th {
+    color: black;
+    }
+</style>
+@*   <div class="card-footer text-start">
+    <p>Total de Contacto: @ListaContacto.Count</p>
+</div>
+<div style="height: 415px;"></div> *@
 
 
 
 
 @code {
+    public OrdenVenta ordenventa { get; set; }
     public List<OrdenVentaDetalle> ListaFacturas { get; set; }
     private string valorFiltro = "";
     private string filtro = "id";
