@@ -19,8 +19,22 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<OrdenCompraDetalle> ordenCompraDetalles { get; set; }
     public DbSet<EstadoOrdenCompra> estadoOdCompra { get; set; }
 
+    public DbSet<Pago> pago { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Pago>()
+        .HasOne(p => p.MetodoPago)
+        .WithMany()
+        .HasForeignKey(p => p.MetodoPagoId)
+        .OnDelete(DeleteBehavior.NoAction); // Cambio a NoAction
+
+        modelBuilder.Entity<Pago>()
+            .HasOne(p => p.CuentaPorPagar)
+            .WithMany()
+            .HasForeignKey(p => p.CuentaPorPagarId)
+            .OnDelete(DeleteBehavior.NoAction); // Cambio a NoAction
+
         modelBuilder.Entity<Estados>().HasData(
             new List<Estados>()
             {
