@@ -19,11 +19,11 @@ public class Compras
     public int EstadoId { get; set; }
 
     [ForeignKey("EstadoId")]
-    public Estados Estado { get; set; }
+    public Estados? Estado { get; set; } 
 
     public int ProvedorId { get; set; }
 
     [ForeignKey("ProvedorId")]
-    public Provedores Provedor { get; set; }
-    public virtual ICollection<ComprasDetalles> ComprasDetalles { get; set; } = [];
+    public Provedores? Provedor { get; set; }
+    public ICollection<ComprasDetalles> ComprasDetalles { get; set; } = new List<ComprasDetalles>();
 }

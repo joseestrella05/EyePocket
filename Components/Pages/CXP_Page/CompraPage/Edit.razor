@@ -1,8 +1,8 @@
-﻿@page "/CxP/Compra/Create"
+﻿@page "/CxP/Compra/Edit/{CompraId:int}"
 @inject ProvedoresServices provedoresService
 @inject CompraServices compraService
 @inject EstadoServices estadoServices
-@inject ProductosService productosServices
+@inject ProductosService productoService
 @inject NavigationManager navigation
 
 <EditForm Model="Compra" OnValidSubmit="Guardar">
@@ -43,9 +43,9 @@
 		<div class="border border-success p-3 mt-3">
 			<h5>Detalles de la Compra</h5>
 			<ProductoPicker ListProductos="ListaProductos"
-							ProductoId="DetalleSeleccionado.ProductoId"
-							Cantidad="DetalleSeleccionado.Cantidad"
-							ProductoSeleccionado="AgregarDetalle" />
+			ProductoId="DetalleSeleccionado.ProductoId"
+			Cantidad="DetalleSeleccionado.Cantidad"
+			ProductoSeleccionado="AgregarDetalle" />
 
 			<table class="table table-light text-center">
 				<thead class="thead-light">
@@ -54,6 +54,7 @@
 						<th>Producto</th>
 						<th>Cantidad</th>
 						<th>Remover</th>
+
 					</tr>
 				</thead>
 				<tbody>
@@ -95,6 +96,8 @@
 </EditForm>
 
 @code {
+	[Parameter]
+	public int CompraId { get; set; }
 	public Compras Compra { get; set; } = new Compras();
 	public List<Provedores> Provedores { get; set; } = new List<Provedores>();
 	public List<Estados> Estados { get; set; } = new List<Estados>();
@@ -104,9 +107,11 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		ListaProductos = await productosServices.Listar(p => true);
+		Compra = await compraService.Buscar(CompraId);
+		ListaProductos = await productoService.Listar(p => true);
 		Provedores = await provedoresService.Listar(C => true);
 		Estados = await estadoServices.Listar(C => true);
+
 	}
 
 	private async Task AgregarDetalle((Productos producto, int cantidad) selection)

@@ -28,8 +28,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder); // Asegura que Identity est� bien configurado
-
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<IdentityUserLogin<string>>()
             .HasKey(login => new { login.LoginProvider, login.ProviderKey });
 

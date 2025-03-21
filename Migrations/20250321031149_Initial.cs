@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EyePocket.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -411,9 +411,9 @@ namespace EyePocket.Migrations
                     DetalleId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CompraId = table.Column<int>(type: "int", nullable: false),
-                    ProductoId = table.Column<int>(type: "int", nullable: false),
                     Cantidad = table.Column<int>(type: "int", nullable: false),
-                    ProductosProductoId = table.Column<int>(type: "int", nullable: false),
+                    Precio = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ProductoId = table.Column<int>(type: "int", nullable: false),
                     ComprasCompraId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -425,8 +425,8 @@ namespace EyePocket.Migrations
                         principalTable: "Compras",
                         principalColumn: "CompraId");
                     table.ForeignKey(
-                        name: "FK_ComprasDetalles_Productos_ProductosProductoId",
-                        column: x => x.ProductosProductoId,
+                        name: "FK_ComprasDetalles_Productos_ProductoId",
+                        column: x => x.ProductoId,
                         principalTable: "Productos",
                         principalColumn: "ProductoId",
                         onDelete: ReferentialAction.Cascade);
@@ -642,9 +642,9 @@ namespace EyePocket.Migrations
                 column: "ComprasCompraId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ComprasDetalles_ProductosProductoId",
+                name: "IX_ComprasDetalles_ProductoId",
                 table: "ComprasDetalles",
-                column: "ProductosProductoId");
+                column: "ProductoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CuentasXCobrar_EstadoId",

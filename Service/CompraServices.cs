@@ -43,15 +43,17 @@ public class CompraServices(IDbContextFactory<ApplicationDbContext> DbFactory)
     public async Task<Compras?> Buscar(int id)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Compras.AsNoTracking().
+        return await contexto.Compras.AsNoTracking()
+            .Include(c => c.ComprasDetalles).
             FirstOrDefaultAsync(p => p.CompraId == id);
     }
     public async Task<List<Compras>> Listar(Expression<Func<Compras, bool>> criterio)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.Compras
+            .Include(p => p.Provedor)
             .Include(c => c.ComprasDetalles)
-                 .ThenInclude(p => p.Productos)
+                 .ThenInclude(d => d.Productos)
             .Where(criterio)
             .ToListAsync();
     }

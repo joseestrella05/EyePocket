@@ -244,17 +244,17 @@ namespace EyePocket.Migrations
                     b.Property<int?>("ComprasCompraId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductoId")
-                        .HasColumnType("int");
+                    b.Property<decimal>("Precio")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("ProductosProductoId")
+                    b.Property<int>("ProductoId")
                         .HasColumnType("int");
 
                     b.HasKey("DetalleId");
 
                     b.HasIndex("ComprasCompraId");
 
-                    b.HasIndex("ProductosProductoId");
+                    b.HasIndex("ProductoId");
 
                     b.ToTable("ComprasDetalles");
                 });
@@ -867,7 +867,7 @@ namespace EyePocket.Migrations
 
                     b.HasOne("EyePocket.Models.Productos", "Productos")
                         .WithMany()
-                        .HasForeignKey("ProductosProductoId")
+                        .HasForeignKey("ProductoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

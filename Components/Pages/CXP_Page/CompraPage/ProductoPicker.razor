@@ -1,53 +1,48 @@
 ﻿﻿<div class="col-auto input-group align-items-center">
-    <label class="col-form-label input-group-text">Seleccione:</label>
 
-    <InputSelect class="form-control form-select" @bind-Value="ProductoId">
-        <option disabled value="0">-- Seleccione un Producto --</option>
-        @foreach (var ciudad in Producto)
-        {
-            <option value="@ciudad.ProductoId">@ciudad.ProductoId - @ciudad.Nombre ($@ciudad.Precio.ToString("N2"))</option>
-        }
-    </InputSelect>
-    <label class="col-form-label input-group-text">Cantidad:</label>
-    <InputNumber class="form-control" id="quantity-input" @bind-Value="Monto" min="0" />
+	<InputSelect class="form-select" @bind-Value="ProductoId">
 
-    <button type="button" class="btn btn-outline-success bi bi-plus" @onclick="TriggerSelection">Agregar</button>
+		<option disabled value="0">--- Seleccione un articulo ---</option>
+		@foreach (var productos in ListProductos)
+		{
+			<option value="@productos.ProductoId">@productos.Nombre</option>
+		}
+
+	</InputSelect>
+
+	<label class="col-form-label input-group-text">Cantidad </label>
+	<InputNumber class="form-control" @bind-Value="Cantidad" placeholder="0"></InputNumber>
+
+	<button type="button" class="btn btn-outline-success bi bi-plus mt-2" @onclick="ElegirProducto">Agregar detalle</button>
 </div>
-@if (ErrorMessage != null)
-{
-    <div class="alert alert-danger" role="alert">
-        @ErrorMessage
-    </div>
-}
 
 @code {
-    [Parameter]
-    public List<Productos> Producto { get; set; } = [];
+	[Parameter]
+	public List<Productos> ListProductos { get; set; } = [];
 
-    [Parameter]
-    public int ProductoId { get; set; }
+	[Parameter]
+	public int ProductoId { get; set; }
 
-    [Parameter]
-    public int Monto { get; set; }
+	[Parameter]
+	public int Cantidad { get; set; }
 
-    [Parameter]
-    public EventCallback<(Productos Producto, int Monto)> CiudadSelected { get; set; }
+	[Parameter]
+	public EventCallback<(Productos Productos, int cantidad)> ProductoSeleccionado { get; set; }
 
-    private string? ErrorMessage { get; set; } = null;
+	public string? ErrorMensaje { get; set; }
 
-    private async Task TriggerSelection()
-    {
-        ErrorMessage = null;
-        if (ProductoId > 0)
-        {
-            var CiudaSeleccionada = Producto.Single(p => p.ProductoId == ProductoId);
-
-            if (Monto <= 0)
-            {
-                ErrorMessage = "No es posible Agregar un monto menor que cero ";
-                return;
-            }
-            await CiudadSelected.InvokeAsync((CiudaSeleccionada, Monto));
-        }
-    }
-}
+	private async Task ElegirProducto()
+	{
+		ErrorMensaje = null;
+			if (ProductoId > 0)
+		{
+				var Articulo = ListProductos.Single(p => p.ProductoId == ProductoId);
+		
+			await ProductoSeleccionado.InvokeAsync((Articulo, Cantidad));
+		}
+		else
+		{
+			ErrorMensaje = "No hay un Articulo Seleccionado o la cantidad es cero o menor";
+		}
+	}
+} 
