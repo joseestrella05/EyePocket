@@ -87,6 +87,14 @@
     public async Task<bool> Validar()
     {
         var existeNombre = await provedoresService.BuscarNombres(provedores.Nombre);
-        return existeNombre != null;
+
+        if (existeNombre == null)
+            return false;
+
+        if (existeNombre.ProvedorId == provedores.ProvedorId)
+            return false;
+
+        return true;
     }
+
 }
