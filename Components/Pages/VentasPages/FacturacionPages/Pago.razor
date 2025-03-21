@@ -8,63 +8,93 @@
 </div>
 
 <div class="container">
-    <div class="card">
-        <div class="card-body">
-            <div class="invoice-header text-center">
-                <h1>FACTURA</h1>
+    <div class="left-container">
+        <div class="card">
+            <h2>Recibo</h2>
+            <div class="box">
+                <div class="label">Fecha</div>
+                <div class="value">27-02-2025 22:17</div>
             </div>
-            <div class="invoice-details">
-                <p>Factura n°: </p>
-                <p>Fecha: </p>
-                <p>Cliente: </p>
+            <div class="box">
+                <div class="label">Peso</div>
+                <div class="value">0.00 LB</div>
             </div>
-            <table class="invoice-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Código</th>
-                        <th>Descripción</th>
-                        <th>Cantidad</th>
-                        <th>Precio</th>
-                        <th>Descuento</th>
-                        <th>Subtotal</th>
-                    </tr>
-                </thead>
-            </table>
-            <div class="invoice-total text-right">
-                <p>Subtotal: $</p>
-                <p>Descuento Total: $</p>
-                <p><strong>TOTAL: $</strong></p>
+            <div class="box">
+                <div class="label">Artículos</div>
+                <div class="value">39</div>
             </div>
-            <div class="invoice-contact-payment d-flex justify-content-between">
-                <div class="invoice-contact">
-                    <p><strong>Contacto:</strong></p>
-                    <p>(809) 126 - 3631</p>
-                    <p>EyePocket@gmail.com</p>
-                    <p>www.EyePocket.com</p>
-                    <p>Calle Duarte</p>
+            <div class="box">
+                <div class="label">ITBIS</div>
+                <div class="value">508.61</div>
+            </div>
+            <div class="box">
+                <div class="label">Subtotal</div>
+                <div class="value">4,713.82</div>
+            </div>
+            <div class="box">
+                <div class="label">Descuento</div>
+                <div class="value">-59.68</div>
+            </div>
+            <div class="box total">
+                <div class="label">Total</div>
+                <div class="value">4,654.14</div>
+            </div>
+            <div class="box saldo">
+                <div class="label">Saldo</div>
+                <div class="value">4,654.14</div>
+            </div>
+        </div>
+    </div>
+    <div class="container center-container flex-grow-1">
+        <div class="card">
+            <div class="card-body">
+                <div class="invoice-header text-center">
+                    <h1>FACTURA</h1>
                 </div>
-                <div class="invoice-payment">
-                    <p><strong>Información de pago:</strong></p>
-                    <p>Nombre del tercero</p>
-                    <p>Nombre de cuentas</p>
-                    <p>Alto de cuenta</p>
-                    <p>Fecha de pago</p>
-                    <p>6125 4547 5901</p>
+                <div class="invoice-details">
+                    <p>Factura n°: </p>
+                    <p>Fecha: </p>
+                    <p>Cliente: </p>
+                </div>
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Código</th>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Descuento</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                </table>
+                <div class="invoice-total text-right">
+                    <p>Subtotal: $</p>
+                    <p>Descuento Total: $</p>
+                    <p><strong>TOTAL: $</strong></p>
                 </div>
             </div>
         </div>
     </div>
-    <div class="text-center mt-3">
-        <button class="btn btn-primary" @onclick="Volver">Volver</button>
-    </div>
+</div>
+
+<div class="text-center mt-3">
+    <button class="btn btn-primary" @onclick="Volver">Volver</button>
 </div>
 
 <style>
-    .container {
-        max-width: 800px;
-        margin: auto;
-        padding: 10px;
+    .main-container {
+        display: flex;
+        gap: 20px;
+    }
+
+    .left-container {
+        flex: 0 0 300px;
+    }
+
+    .center-container {
+        flex: 1;
     }
 
     .card {
@@ -93,6 +123,45 @@
         background-color: #0d5c63;
         border: none;
     }
+
+    .recibo {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        padding: 20px;
+        max-width: 100%;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+        .recibo h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .recibo .box {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+            .recibo .box .label {
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            .recibo .box .value {
+                font-size: 1.2em;
+            }
+
+        .recibo .total {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .recibo .saldo {
+            font-weight: bold;
+            margin-top: 20px;
+        }
 </style>
 
 @code {
@@ -101,4 +170,3 @@
         navigation.NavigateTo("/Ventas");
     }
 }
-
