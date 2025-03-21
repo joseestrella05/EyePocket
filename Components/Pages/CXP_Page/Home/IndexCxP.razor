@@ -3,6 +3,7 @@
 @inject CompraServices CompraServices
 @inject CXPServices cxpServices
 
+
 <h2 class="text-center">Cuentas por Pagar y Compra</h2>
 <h4>Bienvenido a Compra y Cuenta por Pagar</h4>
 
@@ -36,6 +37,17 @@
             </div>
         </div>
     </div>
+
+
+    <div class="col-md-4">
+        <div class="card shadow-lg text-white" style="background-color: #085559;">
+            <div class="card-body text-center">
+                <i class="bi bi-cart-fill display-4"></i>
+                <h4 class="card-title mt-3">Cuentas Por Pagar</h4>
+                <h6 class="m-lg-4">Cant.: @CXP.Count</h6>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -45,6 +57,7 @@
     public List<Compras> Compras { get; set; } = new();
     public List<CXP> cxp { get; set; } = new();
     public List<OrdenCompra> OrdenCompras { get; set; } = new List<OrdenCompra>();
+    public List<CXP> CXP { get; set; } = new List<CXP>();
 
     protected override async Task OnInitializedAsync()
     {

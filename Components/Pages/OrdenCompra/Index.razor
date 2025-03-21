@@ -85,7 +85,6 @@
 	</div>
 </div>
 
-
 @if (mostrarModal)
 {
 	<div class="modal fade show" tabindex="-1" style="display: block;" aria-modal="true" role="dialog">
@@ -108,8 +107,6 @@
 	</div>
 	<div class="modal-backdrop fade show" @onclick="CerrarModal"></div>
 }
-
-
 
 @code {
 	public string searchBarValue { get; set; } = string.Empty;
@@ -171,14 +168,14 @@
 			OCIdSeleccionado = 0;
 			TipoNotificacion = ToastType.Success;
 			TituloNotificacion = "Enhorabuena";
-			MensajeNotificacion = "¡Se ha eliminado el provedor exitosamente!";
+			MensajeNotificacion = "¡Se ha eliminado el pago!";
 			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 		}
 		catch (Exception ex)
 		{
 			TipoNotificacion = ToastType.Danger;
 			TituloNotificacion = "Error";
-			MensajeNotificacion = "Hubo un error al eliminar el provedor.";
+			MensajeNotificacion = "Hubo un error al eliminar la orden de compra.";
 			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 		}
 	}
@@ -198,3 +195,4 @@
 		MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 	}
 }
+
