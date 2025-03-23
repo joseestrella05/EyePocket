@@ -1,7 +1,6 @@
-using System.Linq.Expressions;
 using EyePocket.Data;
-using EyePocket.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace EyePocket.Service;
 
@@ -58,5 +57,4 @@ public class AgenteServices(IDbContextFactory<ApplicationDbContext> DbFactory)
             .Where(criterio)
             .ToListAsync();
     }
-    
 }

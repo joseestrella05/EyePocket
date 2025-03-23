@@ -25,6 +25,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Inventarios> Inventarios { get; set; }
     public DbSet<Compras> Compras { get; set; }
     public DbSet<ComprasDetalles> ComprasDetalles { get; set; }
+    public DbSet<SolicitudesCredito> SolicitudesCredito { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
