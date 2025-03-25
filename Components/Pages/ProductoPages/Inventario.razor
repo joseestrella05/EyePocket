@@ -36,9 +36,10 @@
         </div>
         <div class="col text-end">
             <a href="/Inventario/Entrada" class="btn btn-secondary">Entrada</a>
-            <a href="/Inventario/Salida" class="btn btn-primary">Salida</a>
             <a href="/Mermas/Index" class="btn btn-info">Historial Mermas</a>
+            <a href="/Distribuciones" class="btn btn-warning">Distribuciones</a>
         </div>
+
     </div>
 
     <div class="card shadow-lg w-100">
@@ -79,7 +80,6 @@
                                 <td>
                                     <button type="button" @onclick="() => MostrarModal(inventario.InventarioId)" class="btn btn-outline-danger bi bi-trash"></button>
                                     <button type="button" @onclick="() => AgregarEntrada(inventario.InventarioId)" class="btn btn-outline-success bi bi-plus-circle"></button>
-                                    <button type="button" @onclick="() => RegistrarSalida(inventario.InventarioId)" class="btn btn-outline-warning bi bi-dash-circle"></button>
                                 </td>
                             </tr>
                         }
@@ -131,20 +131,6 @@
         else
         {
             toastService.Notify(new(ToastType.Warning, "Error", "Hubo un problema al registrar la entrada"));
-        }
-    }
-
-    private async Task RegistrarSalida(int inventarioId)
-    {
-        var exito = await inventarioService.RegistrarSalida(inventarioId, 1);
-        if (exito)
-        {
-            await CargarInventario();
-            toastService.Notify(new(ToastType.Success, "Éxito", "Salida registrada correctamente"));
-        }
-        else
-        {
-            toastService.Notify(new(ToastType.Warning, "Error", "No hay suficiente stock"));
         }
     }
 
