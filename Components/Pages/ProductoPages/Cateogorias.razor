@@ -1,0 +1,158 @@
+﻿@page "/Categorias"
+@inject CategoriaService categoriaService
+@inject Blazored.Toast.Services.IToastService ToastService
+@inject NavigationManager NavigationManager
+
+<h3>Gestión de Categorías</h3>
+
+@if (categorias != null && categorias.Count > 0)
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var categoria in categorias)
+            {
+                <tr>
+                    <td>@categoria.Nombre</td>
+                    <td>@categoria.Descripcion</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => Editar(categoria)">Editar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(categoria.CategoriaId)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No hay categorías registradas.</p>
+}
+
+<!-- Botón para crear una nueva categoría -->
+<button class="btn btn-primary" @onclick="MostrarFormularioCrear">Agregar Categoría</button>
+
+<!-- Botón de Volver -->
+<button class="btn btn-secondary mt-3" @onclick="Volver">Volver a Productos</button>
+
+<!-- Formulario de creación y edición de categorías -->
+@if (mostrarFormulario)
+{
+    <div class="card mt-3">
+        <div class="card-header">
+            @if (categoriaEditando != null)
+            {
+                <h5>Editar Categoría</h5>
+            }
+            else
+            {
+                <h5>Crear Nueva Categoría</h5>
+            }
+        </div>
+        <div class="card-body">
+            <EditForm Model="@categoriaEditando" OnValidSubmit="@GuardarCategoria">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <InputText id="nombre" class="form-control" @bind-Value="categoriaEditando.Nombre" />
+                </div>
+
+                <div class="form-group mt-2">
+                    <label for="descripcion">Descripción</label>
+                    <InputText id="descripcion" class="form-control" @bind-Value="categoriaEditando.Descripcion" />
+                </div>
+
+                <button type="submit" class="btn btn-success mt-3">Guardar</button>
+                <button type="button" class="btn btn-secondary mt-3" @onclick="CancelarFormulario">Cancelar</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Categoria> categorias = new List<Categoria>();
+    private Categoria? categoriaEditando = null;
+    private bool mostrarFormulario = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        categorias = await categoriaService.Listar(c => true);
+    }
+
+    private async Task Eliminar(int categoriaId)
+    {
+        var resultado = await categoriaService.Eliminar(categoriaId);
+        if (resultado)
+        {
+            ToastService.ShowSuccess("Categoría eliminada correctamente.");
+            categorias = await categoriaService.Listar(c => true); // Recargar lista
+        }
+        else
+        {
+            ToastService.ShowError("Error al eliminar la categoría.");
+        }
+    }
+
+    private void Editar(Categoria categoria)
+    {
+        categoriaEditando = categoria;
+        mostrarFormulario = true;
+    }
+
+    private void MostrarFormularioCrear()
+    {
+        categoriaEditando = new Categoria(); // Crear un nuevo objeto
+        mostrarFormulario = true;
+    }
+
+    private async Task GuardarCategoria()
+    {
+        if (categoriaEditando.CategoriaId == 0) // Si el ID es 0, es una creación
+        {
+            var resultado = await categoriaService.Insertar(categoriaEditando);
+            if (resultado)
+            {
+                ToastService.ShowSuccess("Categoría creada correctamente.");
+            }
+            else
+            {
+                ToastService.ShowError("Error al crear la categoría.");
+            }
+        }
+        else // Si tiene ID, es una edición
+        {
+            var resultado = await categoriaService.Modificar(categoriaEditando);
+            if (resultado)
+            {
+                ToastService.ShowSuccess("Categoría modificada correctamente.");
+            }
+            else
+            {
+                ToastService.ShowError("Error al modificar la categoría.");
+            }
+        }
+
+        // Recargar las categorías y ocultar el formulario
+        categorias = await categoriaService.Listar(c => true);
+        CancelarFormulario();
+    }
+
+    private void CancelarFormulario()
+    {
+        categoriaEditando = null;
+        mostrarFormulario = false;
+    }
+
+    private void Volver()
+    {
+        NavigationManager.NavigateTo("/Productos/Index"); // Redirige a la página de productos
+    }
+}
