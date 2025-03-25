@@ -58,6 +58,8 @@ builder.Services.AddScoped<EstadoServices>();
 builder.Services.AddScoped<CompraServices>();
 builder.Services.AddScoped<OrdenVentasDetalleService>();
 builder.Services.AddScoped<SolicitudesCreditoService>();
+builder.Services.AddScoped<CategoriaService>();
+builder.Services.AddScoped<DistribucionInventarioService>();
 
 
 
