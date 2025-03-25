@@ -1,207 +1,291 @@
 ﻿@page "/Productos/Create"
 @inject ProductosService productoService
 @inject ProvedoresServices provedoreServices
+@inject CategoriaService categoriaService
 @inject Blazored.Toast.Services.IToastService ToastService
-@rendermode InteractiveServer
 @inject NavigationManager Navigation
-
+@rendermode InteractiveServer
 
 @if (!string.IsNullOrEmpty(MensajeNotificacion))
 {
-	<div class="alert alert-info">@MensajeNotificacion</div>
+    <div class="alert alert-info">@MensajeNotificacion</div>
 }
 
 <div class="row" style="background-color:white; padding:10px; margin:10px;">
-	<div class="col">
-		<div class="text-left">
-			<h2 class="text-black"><i class="bi bi-clipboard2-plus m-1"></i> Registro de Productos</h2>
-		</div>
-	</div>
+    <div class="col">
+        <div class="text-left">
+            <h2 class="text-black"><i class="bi bi-clipboard2-plus m-1"></i> Registro de Productos</h2>
+        </div>
+    </div>
 </div>
 
 <div class="container">
-	<div class="card-body">
-		<EditForm Model="@producto" OnValidSubmit="@Guardar">
-			<DataAnnotationsValidator />
-			<div class="grid-container">
-				<div class="form-group">
-					<label>Código</label>
-					<InputText class="input-field" @bind-Value="producto.Codigo" />
-				</div>
-				<div class="form-group">
-					<label>Precio</label>
-					<InputNumber class="input-field" @bind-Value="producto.Precio" />
-				</div>
-				<div class="form-group">
-					<label>Costo</label>
-					<InputNumber class="input-field" @bind-Value="producto.Costo" />
-				</div>
-				<div class="form-group">
-					<label>Categoría</label>
-					<InputSelect class="input-field" @bind-Value="producto.Categoria">
-						<option value="">Seleccione una categoria</option>
-						@foreach (var categoria in new List<string> { "Alimentos", "Electrónica", "Belleza", "Hogar", "Ferreteria", "Papeleria" })
-						{
-							<option value="@categoria">@categoria</option>
-						}
-					</InputSelect>
-				</div>
-				<div class="form-group full-width">
-					<label>Nombre Producto</label>
-					<InputText class="input-field" @bind-Value="producto.Nombre" />
-				</div>
-				<div class="row ">
-					<div class="col">
-						<div class="row">
-							<div class="col">
-								<div class="form-group">
-									<label>Provedor</label>
-									<InputSelect class="input-field" @bind-Value="producto.ProveedorId">
-										<option value="">Seleccione un provedor</option>
-										@foreach (var provedores in provedores)
-										{
-											<option value="@provedores.ProvedorId">@provedores.Nombre</option>
-										}
-									</InputSelect>
-								</div>
-							</div>
-							<div class="col">
-								<div class="form-group">
-									<label>Fecha Ingreso</label>
-									<InputDate class="input-field" @bind-Value="producto.FechaIngreso" />
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="form-group full-width">
-					<label>Descripción</label>
-					<InputText class="input-field" @bind-Value="producto.Descripcion" Rows="3" />
-				</div>
+    <div class="card-body">
+        <EditForm Model="@producto" OnValidSubmit="@Guardar">
+            <DataAnnotationsValidator />
+            <div class="grid-container">
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <InputSelect class="input-field" @bind-Value="producto.CategoriaId" @onchange="ActualizarCodigo">
+                        <option value="">Seleccione una categoría</option>
+                        @foreach (var categoria in categoriasDisponibles)
+                        {
+                            <option value="@categoria.CategoriaId">@categoria.CategoriaId - @categoria.Nombre</option>
+                        }
+                    </InputSelect>
+                </div>
 
-			</div>
+                <div class="form-group">
+                    <!-- Botón Generar Código debajo de la categoría -->
+                    <div class="form-group">
+                        <label>Código</label>
+                        <div class="d-flex">
+                            <InputText class="input-field" @bind-Value="producto.Codigo" readonly style="width: 150px;" />
+                            <button type="button" class="btn btn-secondary btn-sm bi bi-file-earmark-code ms-2" @onclick="GenerarCodigo" style="width: auto; min-width: 120px; padding-left: 10px; padding-right: 10px; font-size: 12px;">
+                                Generar Código
+                            </button>
+                        </div>
+                    </div>
 
 
+                </div>
 
-			<div class="buttons">
-				<button type="button" class="btn btn-secondary bi bi-x-square" @onclick="Cancelar"> Cancelar</button>
-				<button type="submit" class="btn btn-primary bi bi-plus-square"> Guardar</button>
-			</div>
-		</EditForm>
-	</div>
+                <div class="form-group">
+                    <label>Precio</label>
+                    <InputNumber class="input-field" @bind-Value="producto.Precio" />
+                </div>
+                <div class="form-group">
+                    <label>Costo</label>
+                    <InputNumber class="input-field" @bind-Value="producto.Costo" />
+                </div>
+                <div class="form-group full-width">
+                    <label>Nombre Producto</label>
+                    <InputText class="input-field" @bind-Value="producto.Nombre" />
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Proveedor</label>
+                                    <InputSelect class="input-field" @bind-Value="producto.ProveedorId">
+                                        <option value="">Seleccione un proveedor</option>
+                                        @foreach (var proveedor in provedores)
+                                        {
+                                            <option value="@proveedor.ProvedorId">@proveedor.ProvedorId - @proveedor.Nombre</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Fecha Ingreso</label>
+                                    <InputDate class="input-field" @bind-Value="producto.FechaIngreso" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label>Descripción</label>
+                    <InputText class="input-field" @bind-Value="producto.Descripcion" Rows="3" />
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button type="button" class="btn btn-secondary bi bi-x-square" @onclick="Cancelar"> Cancelar</button>
+                <button type="submit" class="btn btn-primary bi bi-plus-square"> Guardar</button>
+            </div>
+        </EditForm>
+    </div>
 </div>
 
 <div class="card-footer text-end">
-	<h4><strong>EyePocket</strong></h4>
+    <h4><strong>EyePocket</strong></h4>
 </div>
+
 <style>
-	body {
-		background-color: #f5f5f5;
-	}
+    body {
+        background-color: #f5f5f5;
+    }
 
-	.container {
-		margin-bottom: 20px;
-		padding: 20px;
-		background: white;
-		box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-	}
+    .container {
+        margin-bottom: 20px;
+        padding: 20px;
+        background: white;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-	.card-header {
-		display: flex;
-		align-items: center;
-		border-bottom: 2px solid #ddd;
-		padding-bottom: 10px;
-		margin-bottom: 20px;
-	}
+    .card-header {
+        display: flex;
+        align-items: center;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
 
-	.header-icon {
-		font-size: 28px;
-		color: black;
-	}
+    .header-icon {
+        font-size: 28px;
+        color: black;
+    }
 
-	.header-title {
-		font-size: 22px;
-		font-weight: bold;
-		color: black;
-	}
+    .header-title {
+        font-size: 22px;
+        font-weight: bold;
+        color: black;
+    }
 
-	.grid-container {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: 15px;
-	}
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
 
-	.full-width {
-		grid-column: span 2;
-	}
+    .full-width {
+        grid-column: span 2;
+    }
 
-	.form-group {
-		display: flex;
-		flex-direction: column;
-	}
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
 
-	.input-field {
-		padding: 8px;
-		border: 1px solid #ccc;
-		border-radius: 5px;
-	}
+    .input-field {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
 
-	.buttons {
-		display: flex;
-		justify-content: flex-end;
-		gap: 10px;
-		margin-top: 20px;
-	}
+    .buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
 
-	.btn-cancel {
-		background-color: #a94442;
-		color: white;
-		border: none;
-		padding: 10px 20px;
-		border-radius: 5px;
-		cursor: pointer;
-	}
+    .btn-cancel {
+        background-color: #a94442;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
 
-	.btn-save {
-		background-color: #004085;
-		color: white;
-		border: none;
-		padding: 10px 20px;
-		border-radius: 5px;
-		cursor: pointer;
-	}
+    .btn-save {
+        background-color: #004085;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
 </style>
 
 @code {
-	private Productos producto = new Productos();
-	private string MensajeNotificacion = string.Empty;
-	public List<Provedores> provedores { get; set; } = new();
+    private Productos producto = new Productos();
+    private string MensajeNotificacion = string.Empty;
+    public List<Provedores> provedores { get; set; } = new();
+    public List<Categoria> categoriasDisponibles { get; set; } = new();
 
-	protected override async Task OnInitializedAsync()
-	{
-		provedores = await provedoreServices.Listar(a => true);
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        provedores = await provedoreServices.Listar(a => true);
+        categoriasDisponibles = await categoriaService.Listar(a => true);
+    }
 
+    private async Task ActualizarCodigo(ChangeEventArgs e)
+    {
+        var nuevoValor = e.Value?.ToString();
+        if (int.TryParse(e.Value?.ToString(), out int categoriaId))
+        {
+            producto.CategoriaId = categoriaId;
+            await GenerarCodigo();
+        }
+    }
 
-	private async Task Guardar()
-	{
-		if (await productoService.Guardar(producto))
-		{
-			MensajeNotificacion = "Se ha guardado el producto correctamente";
-			producto = new Productos();
-		}
-		else
-		{
-			MensajeNotificacion = "Ha ocurrido un error, el producto no se ha podido registrar";
-		}
-		StateHasChanged();
-	}
+    private async Task GenerarCodigo()
+    {
+        if (producto.CategoriaId == null || producto.CategoriaId == 0)
+        {
+            MensajeNotificacion = "Debe seleccionar una categoría.";
+            return;
+        }
 
-	private void Cancelar()
-	{
-		producto = new Productos();
-		MensajeNotificacion = string.Empty;
-		StateHasChanged();
-		Navigation.NavigateTo("/Productos/Index");
-	}
+        char categoriaLetra = (char)('A' + (producto.CategoriaId - 1));
+        int siguienteNumero = await ObtenerSiguienteNumeroDisponible(producto.CategoriaId);
+
+        producto.Codigo = $"{categoriaLetra}{siguienteNumero:D4}";
+
+        // Mostrar el código generado
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task<int> ObtenerSiguienteNumeroDisponible(int categoriaId)
+    {
+        var productosDeCategoria = await productoService.Listar(p => p.CategoriaId == categoriaId);
+        if (productosDeCategoria.Any())
+        {
+            var codigos = productosDeCategoria
+                .Select(p => p.Codigo)
+                .Select(ExtraerNumeroCodigo)
+                .Where(n => n > 0)
+                .OrderBy(n => n)
+                .ToList();
+
+            return codigos.Any() ? codigos.Last() + 1 : 1;
+        }
+        return 1;
+    }
+
+    private int ExtraerNumeroCodigo(string codigo)
+    {
+        if (string.IsNullOrEmpty(codigo) || codigo.Length < 2) return 0;
+
+        string numeroParte = new string(codigo.Skip(1).Where(char.IsDigit).ToArray());
+        return int.TryParse(numeroParte, out int numero) ? numero : 0;
+    }
+
+    private async Task Guardar()
+    {
+        if (string.IsNullOrEmpty(producto.Codigo))
+        {
+            MensajeNotificacion = "Debe generar un código para el producto.";
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        if (producto.Costo > producto.Precio)
+        {
+            MensajeNotificacion = "El costo no puede ser mayor que el precio.";
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        if (producto.ProveedorId == null || producto.ProveedorId == 0)
+        {
+            MensajeNotificacion = "Debe seleccionar un proveedor.";
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        if (await productoService.Guardar(producto))
+        {
+            MensajeNotificacion = "Producto guardado correctamente.";
+            producto = new Productos();
+            await InvokeAsync(StateHasChanged);
+        }
+        else
+        {
+            MensajeNotificacion = "Error al guardar el producto.";
+        }
+    }
+
+    private void Cancelar()
+    {
+        producto = new Productos();
+        MensajeNotificacion = string.Empty;
+        StateHasChanged();
+        Navigation.NavigateTo("/Productos/Index");
+    }
 }
