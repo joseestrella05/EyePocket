@@ -10,12 +10,11 @@ public class Devoluciones
     [Required(ErrorMessage = "Este campo es requerido")] 
     [StringLength(100, ErrorMessage = "El asusnto no puede exceder los 100 caracteres")] 
     public string Asunto { get; set; }
-    
+    [Required(ErrorMessage = "Este campo es requerido")]
     public DateTime Fecha { get; set; } = DateTime.Today;
-    
-    [ForeignKey("ClienteId")] 
-    public Clientes Cliente { get; set; } = null!;
-    
-    [ForeignKey("ProductoId")]
-    public Productos Producto { get; set; } = null!;
+    [Required(ErrorMessage = "Este campo es requerido")]
+    public string Cliente { get; set; } = null!;
+    [Required(ErrorMessage = "Este campo es requerido")]
+    public string Producto { get; set; } = null!;
+    public int ProductoId { get; set; }
 }
