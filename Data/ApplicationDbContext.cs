@@ -7,6 +7,7 @@ namespace EyePocket.Data;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
 {
+    public DbSet<Devoluciones> Devoluciones { get; set; }
     public DbSet<Clientes> Clientes { get; set; }
     public DbSet<Estados> Estados { get; set; }
     public DbSet<Citas> Citas { get; set; }
@@ -50,11 +51,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         modelBuilder.Entity<Categoria>().HasData(
             new Categoria { CategoriaId = 1, Nombre = "Alimentos", Descripcion = "Productos comestibles y bebidas." },
-            new Categoria { CategoriaId = 2, Nombre = "Electrónica", Descripcion = "Dispositivos electrónicos y accesorios." },
-            new Categoria { CategoriaId = 3, Nombre = "Belleza", Descripcion = "Cosméticos y productos de cuidado personal." },
-            new Categoria { CategoriaId = 4, Nombre = "Hogar", Descripcion = "Productos para el hogar y decoración." },
-            new Categoria { CategoriaId = 5, Nombre = "Ferreteria", Descripcion = "Herramientas y suministros de construcción." },
-            new Categoria { CategoriaId = 6, Nombre = "Papeleria", Descripcion = "Artículos de oficina y escolar." }
+            new Categoria { CategoriaId = 2, Nombre = "Electrï¿½nica", Descripcion = "Dispositivos electrï¿½nicos y accesorios." },
+            new Categoria { CategoriaId = 3, Nombre = "Belleza", Descripcion = "Cosmï¿½ticos y productos de cuidado personal." },
+            new Categoria { CategoriaId = 4, Nombre = "Hogar", Descripcion = "Productos para el hogar y decoraciï¿½n." },
+            new Categoria { CategoriaId = 5, Nombre = "Ferreteria", Descripcion = "Herramientas y suministros de construcciï¿½n." },
+            new Categoria { CategoriaId = 6, Nombre = "Papeleria", Descripcion = "Artï¿½culos de oficina y escolar." }
         );
     }
 
