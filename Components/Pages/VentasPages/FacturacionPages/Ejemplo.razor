@@ -1,5 +1,5 @@
 ﻿@page "/Ventas/Facturacion/Edit"
-@using EyePocket.Services
+@using EyePocket.Service
 @inject ProductosService productoService
 @inject ToastService toastService
 @inject NavigationManager NavigationManager
@@ -69,202 +69,204 @@
                         <td class="text-black">@factura.Productos?.Nombre</td>
                         <td class="text-black">@factura.Cantidad</td>
                         <td class="text-black">@factura.Productos?.Precio</td>
-                        <td class="text-black">@factura.Productos?.Descuento</td>
-                        <td class="text-black">@factura.Subtotal</td>
-                        <td>
-                            <a href="/Ventas/Facturacion/Edit/@factura.OrdenVenta?.OrdenVentaId" class="btn btn-info btn-sm">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                        </td>
-                        <td>
-                            <button class="btn btn-danger btn-sm" @onclick="() => ConfirmarEliminacion(factura.Productos?.Codigo)">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                    <!--
+                     <td class="text-black">@factura.Productos?.Descuento</td>
+                     -->
+                     <td class="text-black">@factura.Subtotal</td>
+                     <td>
+                         <a href="/Ventas/Facturacion/Edit/@factura.OrdenVenta?.OrdenVentaId" class="btn btn-info btn-sm">
+                             <i class="bi bi-eye"></i>
+                         </a>
+                     </td>
+                     <td>
+                         <button class="btn btn-danger btn-sm" @onclick="() => ConfirmarEliminacion(factura.Productos?.Codigo)">
+                             <i class="bi bi-trash"></i>
+                         </button>
+                     </td>
+                 </tr>
+             }
+         </tbody>
+     </table>
+ </div>
 
-    <div class="d-flex justify-content-between align-items-center mt-4">
-        <button class="btn btn-danger d-flex align-items-center px-3 py-2 rounded-pill" @onclick="MostrarModalCobro">
-            <i class="bi bi-cash me-2"></i> Cobrar
-        </button>
+ <div class="d-flex justify-content-between align-items-center mt-4">
+     <button class="btn btn-danger d-flex align-items-center px-3 py-2 rounded-pill" @onclick="MostrarModalCobro">
+         <i class="bi bi-cash me-2"></i> Cobrar
+     </button>
 
-        <div class="p-3 rounded-3 shadow" style="background-color: #004b55; color: white; min-width: 200px;">
-            <h4 class="m-0 text-start" style="font-size: 1.5rem;">Total $@ListaFacturas.Sum(f => f.Subtotal)</h4>
-            <p class="m-0 text-start" style="font-size: 1rem;">SubTotal $@ListaFacturas.Sum(f => f.Subtotal)</p>
-        </div>
-    </div>
+     <div class="p-3 rounded-3 shadow" style="background-color: #004b55; color: white; min-width: 200px;">
+         <h4 class="m-0 text-start" style="font-size: 1.5rem;">Total $@ListaFacturas.Sum(f => f.Subtotal)</h4>
+         <p class="m-0 text-start" style="font-size: 1rem;">SubTotal $@ListaFacturas.Sum(f => f.Subtotal)</p>
+     </div>
+ </div>
 
-    <div class="card-footer text-start">
-        <p>Total de Productos: @ListaFacturas.Count</p>
-    </div>
+ <div class="card-footer text-start">
+     <p>Total de Productos: @ListaFacturas.Count</p>
+ </div>
 </EditForm>
 
 
 
 @code {
-    [Parameter] public int OrdenVentaId { get; set; }
-    public List<OrdenVentaDetalle> ListaFacturas { get; set; } = new();
-    private string valorFiltro = "";
-    private int cantidad;
-    private double Efectivo { get; set; } = 0.00;
-    private double Total => ListaFacturas.Sum(f => f.Subtotal);
-    private double Cambio => Efectivo > 0 ? Math.Max(Efectivo - Total, 0) : 0.00;
-    private bool mostrarModalFactura = false;
+ [Parameter] public int OrdenVentaId { get; set; }
+ public List<OrdenVentaDetalle> ListaFacturas { get; set; } = new();
+ private string valorFiltro = "";
+ private int cantidad;
+ private double Efectivo { get; set; } = 0.00;
+ private double Total => ListaFacturas.Sum(f => f.Subtotal);
+ private double Cambio => Efectivo > 0 ? Math.Max(Efectivo - Total, 0) : 0.00;
+ private bool mostrarModalFactura = false;
 
 
-    private bool mostrarModalConfirmacion = false;
-    private bool mostrarModalCobro = false;
-    private bool mostrarModalPagoTarjeta = false;
-    private bool mostrarModalPagoaCredito = false;
-    private bool mostrarModalPagoEfectivo = false;
-    private string? codigoProductoAEliminar;
+ private bool mostrarModalConfirmacion = false;
+ private bool mostrarModalCobro = false;
+ private bool mostrarModalPagoTarjeta = false;
+ private bool mostrarModalPagoaCredito = false;
+ private bool mostrarModalPagoEfectivo = false;
+ private string? codigoProductoAEliminar;
 
-    private void MostrarModalFactura() => mostrarModalFactura = true;
-    private void CerrarModalFactura() => mostrarModalFactura = false;
+ private void MostrarModalFactura() => mostrarModalFactura = true;
+ private void CerrarModalFactura() => mostrarModalFactura = false;
 
-    private void MostrarModalCobro() => mostrarModalCobro = true;
-    private void CerrarModalCobro() => mostrarModalCobro = false;
-
-
-    private void MostrarModalPagoaCredito()
-    {
-        mostrarModalCobro = false;
-        mostrarModalPagoaCredito = true;
-    }
+ private void MostrarModalCobro() => mostrarModalCobro = true;
+ private void CerrarModalCobro() => mostrarModalCobro = false;
 
 
-    private void CerrarModalPagoaCredito()
-    {
-        mostrarModalCobro = true;
-        mostrarModalPagoaCredito = false;
-    }
-
-    private void MostrarModalPagoTarjeta()
-    {
-        mostrarModalCobro = false;
-        mostrarModalPagoTarjeta = true;
-    }
-
-    private void CerrarModalPagoTarjeta()
-    {
-        mostrarModalCobro = true;
-        mostrarModalPagoTarjeta = false;
-    }
-
-    private void MostrarModalPagoEfectivo()
-    {
-        mostrarModalCobro = false;
-        mostrarModalPagoEfectivo = true;
-    }
-
-    private async Task ConfirmarPagoEfectivo()
-    {
-        MostrarToast(ToastType.Success, "Éxito", "Los datos se guardaron con éxito");
-        await Task.Delay(2000);
-        NavigationManager.NavigateTo("/Ventas/Facturacion/Index", true);
-    }
+ private void MostrarModalPagoaCredito()
+ {
+     mostrarModalCobro = false;
+     mostrarModalPagoaCredito = true;
+ }
 
 
-    private void CerrarModalPagoEfectivo()
-    {
-        mostrarModalCobro = true;
-        mostrarModalPagoEfectivo = false;
-    }
+ private void CerrarModalPagoaCredito()
+ {
+     mostrarModalCobro = true;
+     mostrarModalPagoaCredito = false;
+ }
+
+ private void MostrarModalPagoTarjeta()
+ {
+     mostrarModalCobro = false;
+     mostrarModalPagoTarjeta = true;
+ }
+
+ private void CerrarModalPagoTarjeta()
+ {
+     mostrarModalCobro = true;
+     mostrarModalPagoTarjeta = false;
+ }
+
+ private void MostrarModalPagoEfectivo()
+ {
+     mostrarModalCobro = false;
+     mostrarModalPagoEfectivo = true;
+ }
+
+ private async Task ConfirmarPagoEfectivo()
+ {
+     MostrarToast(ToastType.Success, "Éxito", "Los datos se guardaron con éxito");
+     await Task.Delay(2000);
+     NavigationManager.NavigateTo("/Ventas/Facturacion/Index", true);
+ }
 
 
-    private async Task Restablecer()
-    {
-        valorFiltro = "";
-        cantidad = 0;
-    }
+ private void CerrarModalPagoEfectivo()
+ {
+     mostrarModalCobro = true;
+     mostrarModalPagoEfectivo = false;
+ }
 
-    private async Task Añadir()
-    {
-        if (cantidad < 1)
-        {
-            MostrarToast(ToastType.Warning, "Atención", "La cantidad debe ser mayor o igual a 1");
-            return;
-        }
 
-        if (!string.IsNullOrWhiteSpace(valorFiltro))
-        {
-            var producto = await productoService.BuscarNombre(valorFiltro);
-            if (producto != null)
-            {
-                ListaFacturas.Add(new OrdenVentaDetalle
-                    {
-                        OrdenVentaId = OrdenVentaId,
-                        ProductoId = producto.ProductoId,
-                        Productos = producto,
-                        Cantidad = cantidad,
-                        Subtotal = (double)(producto.Precio * cantidad)
-                    });
-            }
-            else
-            {
-                MostrarToast(ToastType.Danger, "Error", "Producto no encontrado");
-            }
-        }
-        else
-        {
-            MostrarToast(ToastType.Warning, "Atención", "Ingrese un nombre de producto");
-        }
-    }
+ private async Task Restablecer()
+ {
+     valorFiltro = "";
+     cantidad = 0;
+ }
 
-    private void ConfirmarEliminacion(string? codigoProducto)
-    {
-        codigoProductoAEliminar = codigoProducto;
-        mostrarModalConfirmacion = true;
-    }
+ private async Task Añadir()
+ {
+     if (cantidad < 1)
+     {
+         MostrarToast(ToastType.Warning, "Atención", "La cantidad debe ser mayor o igual a 1");
+         return;
+     }
 
-    private void EliminarConfirmado()
-    {
-        if (!string.IsNullOrWhiteSpace(codigoProductoAEliminar))
-        {
-            var productoAEliminar = ListaFacturas.FirstOrDefault(f => f.Productos?.Codigo == codigoProductoAEliminar);
+     if (!string.IsNullOrWhiteSpace(valorFiltro))
+     {
+         var producto = await productoService.BuscarNombre(valorFiltro);
+         if (producto != null)
+         {
+             ListaFacturas.Add(new OrdenVentaDetalle
+                 {
+                     OrdenVentaId = OrdenVentaId,
+                     ProductoId = producto.ProductoId,
+                     Productos = producto,
+                     Cantidad = cantidad,
+                     Subtotal = (double)(producto.Precio * cantidad)
+                 });
+         }
+         else
+         {
+             MostrarToast(ToastType.Danger, "Error", "Producto no encontrado");
+         }
+     }
+     else
+     {
+         MostrarToast(ToastType.Warning, "Atención", "Ingrese un nombre de producto");
+     }
+ }
 
-            if (productoAEliminar != null)
-            {
-                ListaFacturas.Remove(productoAEliminar);
-                MostrarToast(ToastType.Success, "Eliminado", "Producto eliminado correctamente");
-            }
-            else
-            {
-                MostrarToast(ToastType.Danger, "Error", "Producto no encontrado");
-            }
-        }
-        else
-        {
-            MostrarToast(ToastType.Danger, "Error", "Código de producto inválido");
-        }
+ private void ConfirmarEliminacion(string? codigoProducto)
+ {
+     codigoProductoAEliminar = codigoProducto;
+     mostrarModalConfirmacion = true;
+ }
 
-        mostrarModalConfirmacion = false;
-        codigoProductoAEliminar = null;
-    }
+ private void EliminarConfirmado()
+ {
+     if (!string.IsNullOrWhiteSpace(codigoProductoAEliminar))
+     {
+         var productoAEliminar = ListaFacturas.FirstOrDefault(f => f.Productos?.Codigo == codigoProductoAEliminar);
 
-    private void CancelarEliminacion()
-    {
-        mostrarModalConfirmacion = false;
-        codigoProductoAEliminar = null;
-    }
+         if (productoAEliminar != null)
+         {
+             ListaFacturas.Remove(productoAEliminar);
+             MostrarToast(ToastType.Success, "Eliminado", "Producto eliminado correctamente");
+         }
+         else
+         {
+             MostrarToast(ToastType.Danger, "Error", "Producto no encontrado");
+         }
+     }
+     else
+     {
+         MostrarToast(ToastType.Danger, "Error", "Código de producto inválido");
+     }
 
-    private void CalcularCambio(ChangeEventArgs e)
-    {
-        double.TryParse(e.Value?.ToString(), out double efectivo);
-        Efectivo = efectivo;
-    }
+     mostrarModalConfirmacion = false;
+     codigoProductoAEliminar = null;
+ }
 
-    private void Cobrar()
-    {
-        MostrarToast(ToastType.Success, "Cobro Exitoso", "La transacción se ha realizado correctamente.");
-        CerrarModalCobro();
-    }
+ private void CancelarEliminacion()
+ {
+     mostrarModalConfirmacion = false;
+     codigoProductoAEliminar = null;
+ }
 
-    public void MostrarToast(ToastType tipo, string titulo, string cuerpo) =>
-        toastService.Notify(new(tipo, titulo, cuerpo));
+ private void CalcularCambio(ChangeEventArgs e)
+ {
+     double.TryParse(e.Value?.ToString(), out double efectivo);
+     Efectivo = efectivo;
+ }
+
+ private void Cobrar()
+ {
+     MostrarToast(ToastType.Success, "Cobro Exitoso", "La transacción se ha realizado correctamente.");
+     CerrarModalCobro();
+ }
+
+ public void MostrarToast(ToastType tipo, string titulo, string cuerpo) =>
+     toastService.Notify(new(tipo, titulo, cuerpo));
 }
 

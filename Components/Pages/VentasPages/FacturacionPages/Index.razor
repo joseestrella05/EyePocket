@@ -1,5 +1,6 @@
-﻿@page "/Ventas/Facturacion/Index"
-@using EyePocket.Services
+﻿<!--
+@page "/Ventas/Facturacion/Index"
+@using EyePocket.Service
 @inject ProductosService productoService
 @inject OrdenVentaService OrdenVentaService
 @inject OrdenVentasDetalleService OrdenVentasDetalleService
@@ -446,9 +447,10 @@
         </div>
     </div>
 }
-
+-->
 
 @code {
+    /*
     [Parameter] public int OrdenVentaId { get; set; }
     public List<OrdenVentaDetalle> ListaFacturas { get; set; } = new();
     private string valorFiltro = "";
@@ -670,4 +672,5 @@
 
     public void MostrarToast(ToastType tipo, string titulo, string cuerpo) =>
         toastService.Notify(new(tipo, titulo, cuerpo));
+    */
 }
