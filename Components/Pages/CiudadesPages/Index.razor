@@ -1,0 +1,130 @@
+@page "/Servicio/Ciudades/Index"
+@inject CiudadesService ciudadesServices
+@inject ToastService toastService
+
+@rendermode InteractiveServer
+
+<PageTitle>Gestión de Ciudades</PageTitle>
+<div class="row" style="background-color:white; padding:10px; margin:10px;">
+    <div class="col">
+        <div class="text-left">
+            <h2 class="text-black"><i class="bi bi-building m-1"></i> Gestión de Ciudades</h2>
+        </div>
+    </div>
+    <div class="col">
+        <a href="/Servicio/Ciudades/Create" class="btn btn-secondary">Crear nueva ciudad</a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-4">
+                    <div class="input-group" style="width: 250px">
+                        <div class="form-floating">
+                            <InputSelect class="form-select" id="floatingSelect" aria-label="Filtro" @bind-Value="valorFiltro">
+                                <option value="" selected disabled>--- Selecciona ---</option>
+                                <option value="idciudad">ID Ciudad</option>
+                                <option value="nombre">Nombre</option>
+                            </InputSelect>
+                            <label for="floatingSelect"><strong>Filtrar por...</strong></label>
+                        </div>
+                        <button type="button" class="btn btn-secondary bi bi-arrow-counterclockwise" @onclick="Restablecer"></button>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="input-group" style="width: 500px">
+                        <div class="form-floating d-flex align-items-center">
+                            <InputText @bind-Value="searchBarValue" class="form-control" placeholder="" id="floatingSearch" />
+                            <label for="floatingSearch">Buscar</label>
+                        </div>
+                        <button @onclick="Buscar" class="btn btn-secondary bi bi-search" type="button"></button>
+                    </div>
+                </div>
+            </div>
+
+            <br />
+
+            <table class="table table-light table-hover">
+                <thead class="table table-striped">
+                    <tr class="text-center">
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Cliente</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var ciudad in listaCiudades)
+                {
+                    <tr class="text-center">
+                        <td>@ciudad.CiudadId</td>
+                        <td>@ciudad.CiudadNombre</td>
+                        <td>@ciudad.Cliente</td>
+                        <td>
+                            <a href="/Servicio/Ciudades/Edit/@ciudad.CiudadId" class="btn btn-outline-info bi bi-pencil-square"></a>
+                            <button type="button" @onclick="() => Eliminar(ciudad.CiudadId)" class="btn btn-outline-danger bi bi-trash"></button>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+                <caption>Cant. de ciudades: @listaCiudades.Count</caption>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    public string searchBarValue { get; set; } = string.Empty;
+    public string valorFiltro { get; set; } = string.Empty;
+    public List<Ciudades> listaCiudades { get; set; } = new List<Ciudades>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        listaCiudades = await ciudadesServices.Listar(c => true);
+    }
+
+    public async Task Buscar()
+    {
+        if (string.IsNullOrEmpty(valorFiltro))
+        {
+            toastService.Notify(new(ToastType.Warning, "Aviso", "Debe seleccionar una opción en el filtro."));
+            listaCiudades = await ciudadesServices.Listar(c => true);
+            return;
+        }
+
+        searchBarValue = searchBarValue.Trim().ToLower();
+
+        switch (valorFiltro)
+        {
+            case "idciudad":
+                if (int.TryParse(searchBarValue, out int id))
+                    listaCiudades = await ciudadesServices.Listar(c => c.CiudadId == id);
+                break;
+
+            case "nombre":
+                listaCiudades = await ciudadesServices.Listar(c => c.CiudadNombre.ToLower().Contains(searchBarValue));
+                break;
+
+            default:
+                listaCiudades = await ciudadesServices.Listar(c => true);
+                break;
+        }
+    }
+
+    public async Task Eliminar(int ciudadId)
+    {
+        await ciudadesServices.Eliminar(ciudadId);
+        listaCiudades = await ciudadesServices.Listar(c => true);
+    }
+
+    public async Task Restablecer()
+    {
+        listaCiudades = await ciudadesServices.Listar(c => true);
+        searchBarValue = string.Empty;
+        valorFiltro = string.Empty;
+        toastService.Notify(new(ToastType.Info, "Aviso", "Se han restablecido los criterios de búsqueda."));
+    }
+}
