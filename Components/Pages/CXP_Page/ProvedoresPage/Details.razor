@@ -2,47 +2,51 @@
 @inject ProvedoresServices provedoresService
 @inject NavigationManager navigation
 
+
 <div class="container">
     <div class="card">
-        <div class="card-body">
-            <div class="section-title">Datos del Proveedor</div>
+        <div class="card-body text-center">
+            <div class="section-title"><strong>Datos del Proveedor</strong></div>
 
-            <div class="row">
-                <div class="col">
-                    <label class="font-weight-bold">Proveedor ID:</label>
-                    <span>@Proveedor.ProvedorId</span>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col">
-                    <label class="font-weight-bold">Nombre:</label>
+            <div class="row mb-3 justify-content-center">
+                <div class="col-8">
+                    <label class="font-weight-bold d-block">Nombre:</label>
                     <span>@Proveedor.Nombre</span>
                 </div>
             </div>
 
-            <div class="section-title">Datos de contacto</div>
+            <div class="row mb-3 justify-content-center">
+                <div class="col-8">
+                    <label class="font-weight-bold d-block">Dirección:</label>
+                    <span>@Proveedor.Direccion</span>
+                </div>
+            </div>
 
-            <div class="row">
-                <div class="col">
-                    <label class="font-weight-bold">Telefono:</label>
+            <div class="section-title"><strong>Datos de contacto</strong></div>
+
+            <div class="row mb-3 justify-content-center">
+                <div class="col-8">
+                    <label class="font-weight-bold d-block">Teléfono:</label>
                     <span>@Proveedor.Telefono</span>
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col">
-                    <label class="font-weight-bold"></label>
-                    <label class="font-weight-bold">Correo:</label>
+            <div class="row mb-3 justify-content-center">
+                <div class="col-8">
+                    <label class="font-weight-bold d-block">Correo:</label>
                     <span>@Proveedor.Correo</span>
                 </div>
             </div>
         </div>
     </div>
+
     <div class="text-center mt-3">
         <a href="/CxP/Provedores/Index" class="btn btn-secondary">Volver</a>
     </div>
 </div>
+
+
+
 
 @code {
 
