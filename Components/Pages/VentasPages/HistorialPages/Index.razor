@@ -1,5 +1,6 @@
 ﻿@page "/Ventas/Historial"
-@inject OrdenVentasDetalleService ordenVentasDetalleService
+@using System.Globalization
+@inject OrdenVentaService ordenVentaService
 @inject NavigationManager navigationManager
 
 <PageTitle>Historial</PageTitle>
@@ -16,7 +17,7 @@
                     <div class="row align-items-center">
                         <div class="col-md-3 text-center text-md-end mb-3 mb-md-0">
                             <label class="d-inline-block fs-4 fw-bold text-black">
-                                Buscar  
+                                Buscar
                             </label>
                         </div>
                         <!-- Filtro -->
@@ -74,7 +75,7 @@
         </div>
     </div>
 
-    
+
 </div>
 
 <!-- Tabla -->
@@ -88,22 +89,39 @@
             <th>Detalle</th>
         </tr>
     </thead>
+
+    <tbody>
+        @foreach (var venta in ListaOrdenVenta)
+        {
+
+            <tr>
+                <td>@venta.NumeroFactura</td>
+                <td>@venta.FechaEmision</td>
+                <td>@venta.Clientes?.Nombre</td>
+                <td>@venta.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+
+
+            </tr>
+        }
+    </tbody>
 </table>
 <style>
     .form-group {
-    display: inline-block;
-    margin-right: 7px; 
-    }
-    .form-group label {
-    display: inline-block;
-    margin-right: 2.5px; 
-    }
-    .form-group input {
-    width: 100px;
+        display: inline-block;
+        margin-right: 7px;
     }
 
+        .form-group label {
+            display: inline-block;
+            margin-right: 2.5px;
+        }
+
+        .form-group input {
+            width: 100px;
+        }
+
     .table thead.bg-dark th {
-    color: black;
+        color: black;
     }
 </style>
 @*   <div class="card-footer text-start">
@@ -116,7 +134,7 @@
 
 @code {
     public OrdenVenta ordenventa { get; set; }
-    public List<OrdenVentaDetalle> ListaFacturas { get; set; }
+    public List<OrdenVenta> ListaOrdenVenta { get; set; } = new List<OrdenVenta>();
     private string valorFiltro = "";
     private string filtro = "id";
     public DateTime? Desde { get; set; }
@@ -124,7 +142,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ListaFacturas = await ordenVentasDetalleService.Listar(u => true);
+        ListaOrdenVenta = await ordenVentaService.Listar(u => true);
+
     }
 
     public async Task Buscar()
@@ -132,15 +151,15 @@
         // if (!string.IsNullOrWhiteSpace(valorFiltro))
         // {
         //    if (filtro == "fecha" && DateTime.TryParse(valorFiltro, out DateTime fecha))
-                // {
-                //     ListaEvento = await eventosService.Listar(t => t.fecha == fecha);
-                // }
-        //   
+        // {
+        //     ListaEvento = await eventosService.Listar(t => t.fecha == fecha);
         // }
-     // else if (filtro == "fecha" && Desde.HasValue && Hasta.HasValue)
-     //    {
-     //        ListaEvento = await eventosService.Listar(t => t.fecha >= Desde.Value && t.fecha <= Hasta.Value);
-     //    }
+        //
+        // }
+        // else if (filtro == "fecha" && Desde.HasValue && Hasta.HasValue)
+        //    {
+        //        ListaEvento = await eventosService.Listar(t => t.fecha >= Desde.Value && t.fecha <= Hasta.Value);
+        //    }
         // else
         // {
         //     ListaContacto = await contactoService.Listar(u => true);
