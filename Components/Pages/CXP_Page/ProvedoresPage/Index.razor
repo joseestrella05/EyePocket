@@ -140,30 +140,48 @@
 		ProvedoreIdSeleccionado = 0;
 		EmailProvedoresSelecionado = "";
 	}
-
 	private async Task Buscar()
 	{
-		if (!string.IsNullOrWhiteSpace(valorFiltro))
+		if (!string.IsNullOrWhiteSpace(valorFiltro) && !string.IsNullOrWhiteSpace(searchBarValue))
 		{
-			if (valorFiltro == "id" && int.TryParse(valorFiltro, out int ProvedoreId))
+			switch (valorFiltro)
 			{
-				ListaProvedores = await provedoresService.Listar(s => s.ProvedorId == ProvedoreId);
-			}
-			else if (valorFiltro == "Nombre")
-			{
-				ListaProvedores = await provedoresService.Listar(s => s.Nombre.ToLower().Contains(valorFiltro.ToLower()));
-			}
-			else if (valorFiltro == "Telefono")
-			{
-				ListaProvedores = await provedoresService.Listar(s => s.Telefono.ToLower().Contains(valorFiltro.ToLower()));
-			}
+				case "id":
+					if (int.TryParse(searchBarValue, out int ProvedoreId))
+					{
+						ListaProvedores = await provedoresService.Listar(s => s.ProvedorId == ProvedoreId);
+					}
+					else
+					{
+						TipoNotificacion = ToastType.Warning;
+						TituloNotificacion = "Aviso";
+						MensajeNotificacion = "Debe ingresar un ID válido.";
+						MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					}
+					break;
 
+				case "Nombres":
+					ListaProvedores = await provedoresService.Listar(s => s.Nombre.ToLower().Contains(searchBarValue.ToLower()));
+					break;
+
+				case "Correo":
+					ListaProvedores = await provedoresService.Listar(s => s.Correo.ToLower().Contains(searchBarValue.ToLower()));
+					break;
+
+				default:
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "Seleccione un filtro válido.";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					break;
+			}
 		}
 		else
 		{
 			ListaProvedores = await provedoresService.Listar(p => true);
 		}
 	}
+
 
 	public async Task Eliminar()
 	{
