@@ -1,1 +1,70 @@
 ﻿@page "/Ventas/Estadisticas"
+@using SkiaSharp
+@using SkiaSharp.Views.Blazor
+
+<button @onclick="GeneratePieChart">Generar Gráfico de Pastel</button>
+<SKCanvasView @ref="_canvasView" Width="600" Height="400" />
+
+@code {
+    private SKCanvasView _canvasView;
+    private string imageUrl;
+
+    // Datos de ejemplo para los productos
+    private List<(string Producto, float Valor)> productos = new List<(string Producto, float Valor)>
+    {
+        ("Producto A", 30),
+        ("Producto B", 40),
+        ("Producto C", 20),
+        ("Producto D", 10)
+    };
+
+    private void GeneratePieChart()
+    {
+        if (_canvasView == null) return;
+
+        using var surface = SKSurface.Create(new SKImageInfo(600, 400));
+        var canvas = surface.Canvas;
+
+        // Limpiar el canvas
+        canvas.Clear(SKColors.White);
+
+        // Calcular el total de los valores
+        float total = productos.Sum(p => p.Valor);
+
+        // Dibujar gráfico de pastel
+        float startAngle = 0f;
+        using var paint = new SKPaint
+            {
+                IsAntialias = true,
+                Style = SKPaintStyle.Fill
+            };
+
+        foreach (var producto in productos)
+        {
+            float sweepAngle = (producto.Valor / total) * 360;
+
+            // Elegir un color para cada segmento
+            paint.Color = GetRandomColor();
+
+            // Dibujar el segmento del pastel
+            canvas.DrawArc(new SKRect(100, 100, 500, 500), startAngle, sweepAngle, true, paint);
+
+            // Actualizar el ángulo de inicio para el siguiente segmento
+            startAngle += sweepAngle;
+        }
+
+        // Convertir a imagen
+        using var image = surface.Snapshot();
+        using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+        imageUrl = $"data:image/png;base64,{Convert.ToBase64String(data.ToArray())}";
+
+        StateHasChanged();
+    }
+
+    private SKColor GetRandomColor()
+    {
+        // Genera colores aleatorios
+        Random random = new Random();
+        return new SKColor((byte)random.Next(256), (byte)random.Next(256), (byte)random.Next(256));
+    }
+}
