@@ -1,0 +1,61 @@
+﻿@page "/CxP/Provedores/Details/{ProveedorId:int}"
+@inject ProvedoresServices provedoresService
+@inject NavigationManager navigation
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <div class="section-title">Datos del Proveedor</div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold">Proveedor ID:</label>
+                    <span>@Proveedor.ProvedorId</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold">Nombre:</label>
+                    <span>@Proveedor.Nombre</span>
+                </div>
+            </div>
+
+            <div class="section-title">Datos de contacto</div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold">Telefono:</label>
+                    <span>@Proveedor.Telefono</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold"></label>
+                    <label class="font-weight-bold">Correo:</label>
+                    <span>@Proveedor.Correo</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-3">
+        <a href="/CxP/Provedores/Index" class="btn btn-secondary">Volver</a>
+    </div>
+</div>
+
+@code {
+
+
+    [Parameter]
+    public int ProveedorId { get; set; }
+    public Provedores Proveedor { get; set; } = new Provedores();
+
+
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Proveedor = await provedoresService.Buscar(ProveedorId);
+    }
+}

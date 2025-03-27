@@ -70,6 +70,7 @@
     {
         ToastService = toastService;
     }
+
     public async Task Crear()
     {
         if (!await Validar())
@@ -78,6 +79,7 @@
             ToastService.Notify(new(ToastType.Success, "Exito", $"Provedor Editado correctamente."));
             navigation.NavigateTo("/CxP/Provedores/Index");
         }
+
         else
         {
             ToastService.Notify(new(ToastType.Danger, "Error", $"Provedor ya existe."));
@@ -87,6 +89,13 @@
     public async Task<bool> Validar()
     {
         var existeNombre = await provedoresService.BuscarNombres(provedores.Nombre);
-        return existeNombre != null;
+
+        if (existeNombre == null)
+            return false;
+
+        if (existeNombre.ProvedorId == provedores.ProvedorId)
+            return false;
+
+        return true;
     }
 }
