@@ -41,6 +41,8 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 builder.Services.AddBlazorBootstrap();
 
 //inject services
+builder.Services.AddScoped<DevolucionesService>();
+builder.Services.AddScoped<CiudadesService>();
 builder.Services.AddScoped<ClienteServices>();
 builder.Services.AddScoped<ProductosService>();
 builder.Services.AddScoped<MermasService>();
