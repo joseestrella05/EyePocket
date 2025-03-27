@@ -60,8 +60,10 @@ builder.Services.AddScoped<OrdenVentasDetalleService>();
 builder.Services.AddScoped<SolicitudesCreditoService>();
 builder.Services.AddScoped<CategoriaService>();
 builder.Services.AddScoped<DistribucionInventarioService>();
-
-
+builder.Services.AddScoped<CXPService>();
+builder.Services.AddScoped<PagoService>();
+builder.Services.AddScoped<EstadoCXPService>();
+builder.Services.AddScoped<MetodosPagoService>();
 
 
 
