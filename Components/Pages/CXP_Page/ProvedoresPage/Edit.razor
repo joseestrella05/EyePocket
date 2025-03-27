@@ -60,30 +60,53 @@
     [Parameter]
     public int ProvedorId { get; set; }
     public Provedores provedores { get; set; } = new Provedores();
+    private Provedores provedorOriginal { get; set; } = new Provedores();
+
     [Inject] protected ToastService ToastService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        provedores = await provedoresService.Buscar(ProvedorId);  
-    }
-    public Edit(ToastService toastService)
-    {
-        ToastService = toastService;
+        provedores = await provedoresService.Buscar(ProvedorId);
+        if (provedores != null)
+        {
+            // Clonar el estado original para comparar después
+            provedorOriginal = new Provedores
+                {
+                    ProvedorId = provedores.ProvedorId,
+                    Nombre = provedores.Nombre,
+                    Direccion = provedores.Direccion,
+                    Telefono = provedores.Telefono,
+                    Correo = provedores.Correo
+                };
+        }
     }
 
     public async Task Crear()
     {
+        if (SinCambios())
+        {
+            ToastService.Notify(new(ToastType.Warning, "Atención", "Por favor, modifique un valor antes de guardar."));
+            return;
+        }
+
         if (!await Validar())
         {
             await provedoresService.Guardar(provedores);
-            ToastService.Notify(new(ToastType.Success, "Exito", $"Provedor Editado correctamente."));
+            ToastService.Notify(new(ToastType.Success, "Éxito", "Proveedor editado correctamente."));
             navigation.NavigateTo("/CxP/Provedores/Index");
         }
-
         else
         {
-            ToastService.Notify(new(ToastType.Danger, "Error", $"Provedor ya existe."));
+            ToastService.Notify(new(ToastType.Danger, "Error", "El proveedor ya existe."));
         }
+    }
+
+    private bool SinCambios()
+    {
+        return provedorOriginal.Nombre == provedores.Nombre &&
+               provedorOriginal.Direccion == provedores.Direccion &&
+               provedorOriginal.Telefono == provedores.Telefono &&
+               provedorOriginal.Correo == provedores.Correo;
     }
 
     public async Task<bool> Validar()
