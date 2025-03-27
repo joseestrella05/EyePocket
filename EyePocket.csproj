@@ -19,8 +19,4 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Components\Pages\CXP_Page\PagoPage\" />
-  </ItemGroup>
 </Project>
