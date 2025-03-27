@@ -8,6 +8,7 @@ using EyePocket.Service;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Syncfusion.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,6 +58,7 @@ builder.Services.AddScoped<ProvedoresServices>();
 builder.Services.AddScoped<EstadoServices>();
 builder.Services.AddScoped<CompraServices>();
 builder.Services.AddScoped<OrdenVentasDetalleService>();
+
 
 
 
