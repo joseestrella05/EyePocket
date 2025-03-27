@@ -1,0 +1,108 @@
+﻿@page "/Pago/Edit/{PagoId:int}"
+@inject PagoService pagoService
+@inject MetodosPagoService metodoPagoService
+@inject CXPService cxpService
+@rendermode InteractiveServer
+@inject NavigationManager navigation
+
+
+<EditForm Model="pago" OnValidSubmit="Editar">
+    <DataAnnotationsValidator />
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="section-title">Datos de la cuenta</div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Metodo pago</label>
+                        <InputSelect class="form-control" @bind-Value="pago.MetodoPagoId" placeholder="MetodoPago">
+                            <option disabled value="0">Seleccione un metodo de pago</option>
+                            @foreach (var metodoPago in MetodoPagoList)
+                            {
+                                <option value="@metodoPago.MetodoPagoId">@metodoPago.Descripcion</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => pago.MetodoPagoId)" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Cuenta por pagar</label>
+                        <InputSelect class="form-control" @bind-Value="pago.CuentaPorPagarId" placeholder="CuentaPorPagar">
+                            <option disabled value="0">Seleccione una cuenta</option>
+                            @foreach (var cuenta in cxpList)
+                            {
+                                <option value="@cuenta.CuentaId">@cuenta.CuentaId</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => pago.CuentaPorPagarId)" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Fecha Pago</label>
+                        <InputDate class="form-control" @bind-Value="pago.FechaPago" placeholder="FechaPago"></InputDate>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Monto</label>
+                        <InputNumber class="form-control" @bind-Value="pago.monto" placeholder="Monto"></InputNumber>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="text-center">
+        <button type="submit" class="btn btn-success">Modificar</button>
+        <a href="/Pago/Index" class="btn btn-secondary">Volver</a>
+    </div>
+</EditForm>
+
+
+
+@code {
+
+    [Parameter]
+    public int PagoId { get; set; }
+    public int CxpId { get; set; }
+    public int MetodoPagoId { get; }
+    public PagoCXP pago { get; set; } = new PagoCXP();
+    public List<MetodosPago> MetodoPagoList = new List<MetodosPago>();
+    public List<CXP> cxpList = new List<CXP>();
+    public MetodosPago metodoPago = new MetodosPago();
+
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        pago = await pagoService.Buscar(PagoId);
+        MetodoPagoList = await metodoPagoService.Listar(C => true);
+        cxpList = await cxpService.Listar(C => true);
+    }
+
+    public Edit(ToastService toastService)
+    {
+        ToastService = toastService;
+    }
+    public async Task Editar()
+    {
+        if (pago.PagoId > 0)
+        {
+            await pagoService.Guardar(pago);
+            ToastService.Notify(new(ToastType.Success, "Exito", $"Pago Modificado con exito."));
+            navigation.NavigateTo("/Pago/Index");
+        }
+        else
+        {
+            ToastService.Notify(new(ToastType.Danger, "Error", $"Pago ya existe."));
+        }
+    }
+
+}
