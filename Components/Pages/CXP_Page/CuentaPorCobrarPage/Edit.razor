@@ -1,5 +1,104 @@
-﻿<h3>Edit</h3>
+﻿@page "/CXPs/Edit/{CuentaId:int}"
+@inject CXPService cxpService
+@inject EstadoCXPService estadoCXPService
+@inject MetodosPagoService metodoPagoService
+@inject NavigationManager navigation
+
+<EditForm Model="Cxp" OnValidSubmit="Editar">
+    <DataAnnotationsValidator />
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+
+
+                <div class="section-title">Datos de la cuenta</div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Saldo pendiente</label>
+                        <InputNumber class="form-control" @bind-Value="Cxp.SaldoPendiente" placeholder="SaldoPendiente"></InputNumber>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Ultimo Pago</label>
+                        <InputNumber class="form-control" @bind-Value="Cxp.UltimoPago" placeholder="UltimoPago"></InputNumber>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Metodo Pago</label>
+                        <InputSelect class="form-control form-select" @bind-Value="Cxp.MetodoPagoId">
+                            <option value="0" selected disabled>Elija una opción</option>
+                            @foreach (var MetodoPago in MetodoPago)
+                            {
+                                <option value="@MetodoPago.MetodoPagoId">@MetodoPago.Descripcion</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label>Estado de la cuenta</label>
+                            <InputSelect class="form-control form-select" @bind-Value="Cxp.EstadoCXPId">
+                                <option value="0" selected disabled>Elija una opción</option>
+                                @foreach (var Estado in estado)
+                                {
+                                    <option value="@Estado.EstadoCXPId">@Estado.descripcion</option>
+                                }
+                            </InputSelect>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-center">
+        <button type="submit" class="btn btn-success">Modificar</button>
+        <a href="/CXPs/Index" class="btn btn-secondary">Volver</a>
+    </div>
+</EditForm>
+
+
 
 @code {
+
+    [Parameter]
+    public int CuentaId { get; set; }
+    public CXP Cxp { get; set; } = new CXP();
+    public List<CXP> ListaCxp { get; set; } = new List<CXP>();
+    public List<EstadoCXP> estado { get; set; } = new List<EstadoCXP>();
+    public List<MetodosPago> MetodoPago { get; set; } = new List<MetodosPago>();
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Cxp = await cxpService.Buscar(CuentaId);
+        estado = await estadoCXPService.Listar(C => true);
+        MetodoPago = await metodoPagoService.Listar(C => true);
+    }
+
+    public Edit(ToastService toastService)
+    {
+        ToastService = toastService;
+    }
+
+    public async Task Editar()
+    {
+        if (Cxp.CuentaId > 0)
+        {
+            await cxpService.Guardar(Cxp);
+            ToastService.Notify(new(ToastType.Success, "Exito", $"Cuenta Editada correctamente."));
+            navigation.NavigateTo("/CXPS/Index");
+        }
+        else
+        {
+            ToastService.Notify(new(ToastType.Danger, "Error", $"Cuenta ya existe."));
+        }
+    }
+
 
 }

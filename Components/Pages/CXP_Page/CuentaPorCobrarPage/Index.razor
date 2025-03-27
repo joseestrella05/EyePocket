@@ -71,8 +71,8 @@
 								<td>@(cxp.UltimoPago)</td>
 								<td>@(metodoPago?.Descripcion)</td>
 								<td class="text-center" style="display: flex; justify-content: center; gap: 5px;">
-									<a href="/CXP/Details/@cxp.CuentaId" class="btn btn-outline-dark bi-eye"></a>
-									<a href="/CXP/Edit/@cxp.CuentaId" class="btn btn-outline-info bi bi-pencil-square"></a>
+									<a href="/CXPs/Details/@cxp.CuentaId" class="btn btn-outline-dark bi-eye"></a>
+									<a href="/CXPs/Edit/@cxp.CuentaId" class="btn btn-outline-info bi bi-pencil-square"></a>
 									<button type="button" @onclick="() => MostrarModal(cxp.CuentaId, cxp.SaldoPendiente)" class="btn btn-outline-danger bi bi-trash"></button>
 								</td>
 							</tr>
