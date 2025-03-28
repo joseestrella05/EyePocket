@@ -93,7 +93,7 @@
             <i class="bi bi-cash me-2"></i> Cobrar
         </button>
 
-      @*   <button class="btn btn-info d-flex align-items-center px-3 py-2 rounded-pill" onclick="location.href='/Ventas/Facturacion/Edit'">
+        @*   <button class="btn btn-info d-flex align-items-center px-3 py-2 rounded-pill" onclick="location.href='/Ventas/Facturacion/Edit'">
             <i class="bi bi-eye me-2"></i> Ver Factura
         </button> *@
 
@@ -186,7 +186,7 @@
                 <div class="modal-body">
                     <div class="payment-container" style="font-family: Arial; background-color: #fff; padding: 20px; border-radius: 12px;">
                         <h2 class="text-center">Pago por Tarjeta</h2>
-                        <form>                          
+                        <form>
                             <label for="cliente">Seleccionar Cliente</label>
                             <select id="cliente" class="form-control" @bind="ClienteSeleccionadoId">
                                 <option value="0">Seleccione un cliente</option>
@@ -349,9 +349,11 @@
                                     </div>
 
                                     <div class="form-group w-40">
-                                        <label for="ncf">NCF</label>
-                                        <input type="text" id="ncf" placeholder="Ingrese el NCF" class="form-control">
+                                        <label for="rnc">RNC</label>
+                                        <input type="text" id="rnc" @bind="RNCIngresado" placeholder="Ingrese el RNC" class="form-control">
                                     </div>
+
+
 
                                     <div class="form-group w-40">
                                         <label for="total">Total a Pagar</label>
@@ -463,6 +465,9 @@
     [Parameter] public int OrdenVentaId { get; set; }
     public List<OrdenVentaDetalle> ListaFacturas { get; set; } = new();
     public List<Clientes> ListaClientes { get; set; }
+    public List<OrdenVenta> ordenVenta { get; set; } = new();
+    private string? RNCIngresado { get; set; }
+
 
     private int? ClienteSeleccionadoId;
     private string NombreClienteSeleccionado => ListaClientes.FirstOrDefault(c => c.ClienteId == ClienteSeleccionadoId)?.Nombre ?? "Cliente no encontrado";
@@ -538,7 +543,7 @@
         mostrarModalPagoEfectivo = false;
     }
 
-    private void  ValidarPagoEfectivo()
+    private void ValidarPagoEfectivo()
     {
         if (Efectivo < Total)
         {
@@ -562,13 +567,13 @@
             MostrarToast(ToastType.Success, "Éxito", "Los datos se guardaron con éxito");
 
             mostrarModalPagoEfectivo = false;
-            StateHasChanged(); 
+            StateHasChanged();
 
             await Task.Delay(200);
 
-   
+
             mostrarModalFactura = true;
-            StateHasChanged(); 
+            StateHasChanged();
         }
         else
         {
@@ -579,6 +584,12 @@
 
     private async Task<bool> GuardarOrdenVenta()
     {
+        if (string.IsNullOrWhiteSpace(RNCIngresado))
+        {
+            MostrarToast(ToastType.Warning, "Atención", "Debe ingresar un RNC antes de continuar");
+            return false;
+        }
+
         var nuevaOrdenVenta = new OrdenVenta
             {
                 ClienteId = ClienteSeleccionadoId.Value,
@@ -586,12 +597,12 @@
                 NumeroFactura = Guid.NewGuid().ToString().Substring(0, 6),
                 MontoTotal = Total,
                 Estado = true,
-                RNC = "123456789"
+                RNC = RNCIngresado
             };
 
         if (!await OrdenVentaService.Guardar(nuevaOrdenVenta))
         {
-            return false; 
+            return false;
         }
 
         foreach (var factura in ListaFacturas)
@@ -607,15 +618,16 @@
             await OrdenVentasDetalleService.Guardar(detalle);
         }
 
-        return true; 
+        return true;
     }
+
 
     private async Task Confirm()
     {
         NavigationManager.NavigateTo("/Ventas/Facturacion/Index", true);
     }
 
-   
+
 
 
     private async Task Restablecer()
