@@ -24,5 +24,6 @@
     </PackageReference>
     <PackageReference Include="SkiaSharp" Version="3.116.1" />
     <PackageReference Include="SkiaSharp.Views.Blazor" Version="3.116.1" />
+    <PackageReference Include="Syncfusion.Blazor" Version="29.1.33" />
   </ItemGroup>
 </Project>
