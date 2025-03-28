@@ -49,6 +49,8 @@ namespace EyePocket.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FechaIngreso = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    FechaNacimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -321,6 +323,37 @@ namespace EyePocket.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SolicitudesCredito",
+                columns: table => new
+                {
+                    SolicitudCreditoId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClienteId = table.Column<int>(type: "int", nullable: false),
+                    MontoSolicitado = table.Column<double>(type: "float", nullable: false),
+                    SueldoFijo = table.Column<double>(type: "float", nullable: false),
+                    Garantia = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DescripcionGarantia = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EstadosId = table.Column<int>(type: "int", nullable: false),
+                    EstatusDataCredito = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SolicitudesCredito", x => x.SolicitudCreditoId);
+                    table.ForeignKey(
+                        name: "FK_SolicitudesCredito_Clientes_ClienteId",
+                        column: x => x.ClienteId,
+                        principalTable: "Clientes",
+                        principalColumn: "ClienteId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SolicitudesCredito_Estados_EstadosId",
+                        column: x => x.EstadosId,
+                        principalTable: "Estados",
+                        principalColumn: "EstadoId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Compras",
                 columns: table => new
                 {
@@ -568,13 +601,27 @@ namespace EyePocket.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "6ac343b0-00ef-4a1c-8f64-68daaca77b0b", "6ac343b0-00ef-4a1c-8f64-68daaca77b0b", "ServicioAlCliente", "SERVICIOALCLIENTE" },
+                    { "6ac343b0-00ef-4a1c-8f64-68daaca77b1b", "6ac343b0-00ef-4a1c-8f64-68daaca77b1b", "Inventario", "INVENTARIO" },
+                    { "6ac343b0-00ef-4a1c-8f64-68daaca77b2b", "6ac343b0-00ef-4a1c-8f64-68daaca77b2b", "CuentasXPagar", "CUENTASXPAGAR" },
+                    { "6ac343b0-00ef-4a1c-8f64-68daaca77b4b", "6ac343b0-00ef-4a1c-8f64-68daaca77b4b", "CuentasXCobrar", "CUENTASXCOBRAR" },
+                    { "6ac343b0-00ef-4a1c-8f64-68daaca77b5b ", "6ac343b0-00ef-4a1c-8f64-68daaca77b5b", "Ventas", "VENTAS" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Estados",
                 columns: new[] { "EstadoId", "Nombre" },
                 values: new object[,]
                 {
                     { 1, "Pendiente" },
                     { 2, "Pagado" },
-                    { 3, "Vencido" }
+                    { 3, "Vencido" },
+                    { 4, "Cancelado" },
+                    { 5, "Aprobado" }
                 });
 
             migrationBuilder.InsertData(
@@ -707,6 +754,16 @@ namespace EyePocket.Migrations
                 column: "ProveedorId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SolicitudesCredito_ClienteId",
+                table: "SolicitudesCredito",
+                column: "ClienteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SolicitudesCredito_EstadosId",
+                table: "SolicitudesCredito",
+                column: "EstadosId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TarjetaPuntos_ClienteId",
                 table: "TarjetaPuntos",
                 column: "ClienteId");
@@ -753,6 +810,9 @@ namespace EyePocket.Migrations
 
             migrationBuilder.DropTable(
                 name: "PagosCXC");
+
+            migrationBuilder.DropTable(
+                name: "SolicitudesCredito");
 
             migrationBuilder.DropTable(
                 name: "TarjetaPuntos");

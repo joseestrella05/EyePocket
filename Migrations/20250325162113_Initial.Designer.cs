@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EyePocket.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250321031149_Initial")]
+    [Migration("20250325162113_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -75,6 +75,12 @@ namespace EyePocket.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime>("FechaIngreso")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaNacimiento")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -369,6 +375,16 @@ namespace EyePocket.Migrations
                         {
                             EstadoId = 3,
                             Nombre = "Vencido"
+                        },
+                        new
+                        {
+                            EstadoId = 4,
+                            Nombre = "Cancelado"
+                        },
+                        new
+                        {
+                            EstadoId = 5,
+                            Nombre = "Aprobado"
                         });
                 });
 
@@ -609,6 +625,46 @@ namespace EyePocket.Migrations
                     b.ToTable("Provedores");
                 });
 
+            modelBuilder.Entity("EyePocket.Models.SolicitudesCredito", b =>
+                {
+                    b.Property<int>("SolicitudCreditoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SolicitudCreditoId"));
+
+                    b.Property<int>("ClienteId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DescripcionGarantia")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EstadosId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("EstatusDataCredito")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Garantia")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("MontoSolicitado")
+                        .HasColumnType("float");
+
+                    b.Property<double>("SueldoFijo")
+                        .HasColumnType("float");
+
+                    b.HasKey("SolicitudCreditoId");
+
+                    b.HasIndex("ClienteId");
+
+                    b.HasIndex("EstadosId");
+
+                    b.ToTable("SolicitudesCredito");
+                });
+
             modelBuilder.Entity("EyePocket.Models.TarjetaPuntos", b =>
                 {
                     b.Property<int>("TarjetaId")
@@ -735,6 +791,43 @@ namespace EyePocket.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "6ac343b0-00ef-4a1c-8f64-68daaca77b5b ",
+                            ConcurrencyStamp = "6ac343b0-00ef-4a1c-8f64-68daaca77b5b",
+                            Name = "Ventas",
+                            NormalizedName = "VENTAS"
+                        },
+                        new
+                        {
+                            Id = "6ac343b0-00ef-4a1c-8f64-68daaca77b4b",
+                            ConcurrencyStamp = "6ac343b0-00ef-4a1c-8f64-68daaca77b4b",
+                            Name = "CuentasXCobrar",
+                            NormalizedName = "CUENTASXCOBRAR"
+                        },
+                        new
+                        {
+                            Id = "6ac343b0-00ef-4a1c-8f64-68daaca77b2b",
+                            ConcurrencyStamp = "6ac343b0-00ef-4a1c-8f64-68daaca77b2b",
+                            Name = "CuentasXPagar",
+                            NormalizedName = "CUENTASXPAGAR"
+                        },
+                        new
+                        {
+                            Id = "6ac343b0-00ef-4a1c-8f64-68daaca77b1b",
+                            ConcurrencyStamp = "6ac343b0-00ef-4a1c-8f64-68daaca77b1b",
+                            Name = "Inventario",
+                            NormalizedName = "INVENTARIO"
+                        },
+                        new
+                        {
+                            Id = "6ac343b0-00ef-4a1c-8f64-68daaca77b0b",
+                            ConcurrencyStamp = "6ac343b0-00ef-4a1c-8f64-68daaca77b0b",
+                            Name = "ServicioAlCliente",
+                            NormalizedName = "SERVICIOALCLIENTE"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -976,6 +1069,25 @@ namespace EyePocket.Migrations
                         .IsRequired();
 
                     b.Navigation("Proveedor");
+                });
+
+            modelBuilder.Entity("EyePocket.Models.SolicitudesCredito", b =>
+                {
+                    b.HasOne("EyePocket.Models.Clientes", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("ClienteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EyePocket.Models.Estados", "Estados")
+                        .WithMany()
+                        .HasForeignKey("EstadosId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cliente");
+
+                    b.Navigation("Estados");
                 });
 
             modelBuilder.Entity("EyePocket.Models.TarjetaPuntos", b =>
