@@ -139,18 +139,18 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header" style="background-color: #004b55; color: white;">
-                    <h5 class="modal-title">Historial @ordenSeleccionada.NumeroFactura</h5>
+                    <h5 class="modal-title">Historial - Factura: @ordenSeleccionada.NumeroFactura</h5>
                     <button type="button" class="btn-close" @onclick="CerrarModalDetalleHistorial"></button>
                 </div>
                 <div class="modal-body">
                     <div class="container">
                         <div class="row mb-3">
                             <div class="col-6">
-                                <label class="fw-bold">Factura:</label>
+                                <label class="fw-bold">N&uacute;mero de factura:</label>
                                 <p>@ordenSeleccionada.NumeroFactura</p>
                             </div>
                             <div class="col-6">
-                                <label class="fw-bold">Fecha:</label>
+                                <label class="fw-bold">Fecha de emisi&oacute;n:</label>
                                 <p>@ordenSeleccionada.FechaEmision.ToString("dd/MM/yyyy")</p>
                             </div>
                         </div>
@@ -161,12 +161,12 @@
                                 <p>@ordenSeleccionada.Clientes?.Nombre</p>
                             </div>
                             <div class="col-6">
-                                <label class="fw-bold">Total a Pagar:</label>
+                                <label class="fw-bold">Total pagado:</label>
                                 <p>@ordenSeleccionada.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</p>
                             </div>
 
                             <div class="col-6">
-                                <label class="fw-bold">Cantidad: </label>
+                                <label class="fw-bold">Cantidad de productos: </label>
                                 <p>@ordenVentaDetalle.Cantidad</p>
                             </div>
 
@@ -204,11 +204,20 @@
         ListaOrdenVenta = await ordenVentaService.Listar(u => true);
     }
 
-    private void MostrarModalDetalleHistorial(OrdenVenta orden)
+    private async Task MostrarModalDetalleHistorial(OrdenVenta orden)
     {
         ordenSeleccionada = orden;
+
+        var detalles = await ordenVentaDetalleService.Listar(d => d.OrdenVentaId == orden.OrdenVentaId);
+
+        if (detalles.Any())
+        {
+            ordenVentaDetalle = detalles.First();
+        }
+
         mostrarModalFactura = true;
     }
+
 
     private void CerrarModalDetalleHistorial()
     {
