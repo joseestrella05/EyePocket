@@ -2,14 +2,16 @@ using Blazored.Toast;
 using EyePocket.Components;
 using EyePocket.Components.Account;
 using EyePocket.Data;
-using EyePocket.Models;
 using EyePocket.Service;
 
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 
 var modelbuilder = WebApplication.CreateBuilder(args);
+
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
 // Add services to the container.
 modelbuilder.Services.AddRazorComponents()
