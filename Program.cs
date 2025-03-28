@@ -41,23 +41,26 @@ modelbuilder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEm
 modelbuilder.Services.AddBlazorBootstrap();
 
 //inject services
-modelbuilder.Services.AddScoped<ClienteServices>();
-modelbuilder.Services.AddScoped<ProductosService>();
-modelbuilder.Services.AddScoped<MermasService>();
-modelbuilder.Services.AddScoped<TicketServices>();
-modelbuilder.Services.AddScoped<T_PuntosServices>();
-modelbuilder.Services.AddScoped<AgenteServices>();
-modelbuilder.Services.AddScoped<CitasService>();
-modelbuilder.Services.AddScoped<CuentasXCobrarService>();
-modelbuilder.Services.AddScoped<OrdenVentaService>();
-modelbuilder.Services.AddScoped<PagosCXCService>();
-modelbuilder.Services.AddScoped<CuotasCXCService>();
-modelbuilder.Services.AddScoped<InventarioService>();
-modelbuilder.Services.AddScoped<ProvedoresServices>();
-modelbuilder.Services.AddScoped<EstadoServices>();
-modelbuilder.Services.AddScoped<CompraServices>();
-modelbuilder.Services.AddScoped<OrdenVentasDetalleService>();
-modelbuilder.Services.AddScoped<SolicitudesCreditoService>();
+builder.Services.AddScoped<ClienteServices>();
+builder.Services.AddScoped<ProductosService>();
+builder.Services.AddScoped<MermasService>();
+builder.Services.AddScoped<TicketServices>();
+builder.Services.AddScoped<T_PuntosServices>();
+builder.Services.AddScoped<AgenteServices>();
+builder.Services.AddScoped<CitasService>();
+builder.Services.AddScoped<CuentasXCobrarService>();
+builder.Services.AddScoped<OrdenVentaService>();
+builder.Services.AddScoped<PagosCXCService>();
+builder.Services.AddScoped<CuotasCXCService>();
+builder.Services.AddScoped<InventarioService>();
+builder.Services.AddScoped<ProvedoresServices>();
+builder.Services.AddScoped<EstadoServices>();
+builder.Services.AddScoped<CompraServices>();
+builder.Services.AddScoped<OrdenVentasDetalleService>();
+builder.Services.AddScoped<SolicitudesCreditoService>();
+builder.Services.AddScoped<CategoriaService>();
+builder.Services.AddScoped<DistribucionInventarioService>();
+
 
 
 

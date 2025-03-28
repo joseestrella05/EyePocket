@@ -1,0 +1,306 @@
+﻿@page "/distribuciones"
+@inject ProductosService productosService
+@inject CategoriaService categoriaService
+@inject InventarioService inventarioService
+@inject DistribucionInventarioService distribucionInventarioService
+@rendermode InteractiveServer
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: auto;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .btn-blue {
+        background-color: #007bff;
+    }
+
+        .btn-blue:hover {
+            background-color: #0056b3;
+        }
+
+    .btn-green {
+        background-color: #28a745;
+    }
+
+        .btn-green:hover {
+            background-color: #218838;
+        }
+
+    .btn-red {
+        background-color: #dc3545;
+    }
+
+        .btn-red:hover {
+            background-color: #c82333;
+        }
+
+    .footer {
+        text-align: center;
+        padding: 10px;
+        margin-top: 20px;
+        background: #007bff;
+        color: white;
+        border-radius: 5px;
+    }
+</style>
+
+<div class="container">
+    <h3 class="text-2xl font-bold mb-6 text-gray-800">Distribución de Inventario</h3>
+
+    <div class="p-4 border rounded mb-4">
+        <EditForm Model="NuevaDistribucion" OnValidSubmit="GuardarDistribucion">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label class="block font-semibold">Categoría de Producto:</label>
+                <InputSelect @bind-Value="CategoriaSeleccionada" class="w-full p-2 border rounded">
+                    <option value="">Seleccione una categoría</option>
+                    @foreach (var categoria in Categorias)
+                    {
+                        <option value="@categoria.CategoriaId">@categoria.Nombre</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <button type="button" class="btn btn-blue mb-4" @onclick="FiltrarProductos">Buscar Productos</button>
+
+            <div class="mb-3 flex items-center">
+                <label class="block font-semibold mr-2">Producto:</label>
+                <InputSelect @bind-Value="NuevaDistribucion.ProductoId" @onchange="ActualizarInventario" class="w-full p-2 border rounded">
+                    <option value="">Seleccione un producto</option>
+                    @foreach (var producto in ProductosFiltrados)
+                    {
+                        <option value="@producto.ProductoId">@producto.Nombre</option>
+                    }
+                </InputSelect>
+                <button type="button" class="btn btn-blue ml-2" @onclick="ActualizarCantidadDisponible">Actualizar Cantidad</button>
+            </div>
+
+            <div class="mb-3">
+                <label class="block font-semibold">Cantidad Disponible: @CantidadDisponible</label>
+                <label class="block font-semibold">Cantidad Ya Distribuida: @CantidadDistribuida</label>
+            </div>
+
+            <div class="mb-3">
+                <label class="block font-semibold">Ubicación de Estantería:</label>
+                <InputSelect @bind-Value="NuevaDistribucion.UbicacionEstanteria" class="w-full p-2 border rounded">
+                    <option value="">Seleccione una ubicación</option>
+                    @foreach (var ubicacion in Ubicaciones)
+                    {
+                        <option value="@ubicacion">@ubicacion</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="mb-3 flex items-center">
+                <label class="block font-semibold">Cantidad:</label>
+                <button type="button" class="btn btn-blue" @onclick="() => CambiarCantidad(-1)">-</button>
+                <InputNumber @bind-Value="NuevaDistribucion.Cantidad" class="w-16 text-center border mx-2" />
+                <button type="button" class="btn btn-blue" @onclick="() => CambiarCantidad(1)">+</button>
+            </div>
+
+            <div class="flex space-x-2">
+                <button type="submit" class="btn btn-green">@(NuevaDistribucion.DistribucionId > 0 ? "Actualizar" : "Guardar")</button>
+                <button type="button" class="btn btn-blue" @onclick="LimpiarFormulario">Limpiar</button>
+            </div>
+        </EditForm>
+    </div>
+
+    <h4 class="mt-6">Distribuciones Guardadas</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Ubicación</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var distribucion in Distribuciones)
+            {
+                <tr>
+                    <td>@Productos.FirstOrDefault(p => p.ProductoId == distribucion.ProductoId)?.Nombre</td>
+                    <td>@distribucion.Cantidad</td>
+                    <td>@distribucion.UbicacionEstanteria</td>
+                    <td>@distribucion.FechaIngreso.ToShortDateString()</td>
+                    <td>
+                        <button class="btn btn-blue" @onclick="() => EditarDistribucion(distribucion)">Editar</button>
+                        <button class="btn btn-red" @onclick="() => EliminarDistribucion(distribucion)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private DistribucionInventario NuevaDistribucion { get; set; } = new();
+    private List<DistribucionInventario> Distribuciones { get; set; } = new();
+    private List<Productos> Productos { get; set; } = new();
+    private List<Productos> ProductosFiltrados { get; set; } = new();
+    private List<Categoria> Categorias { get; set; } = new();
+    private List<string> Ubicaciones { get; set; } = new();
+    private string CategoriaSeleccionada { get; set; } = "";
+    private int CantidadDisponible { get; set; } = 0;
+    private int CantidadDistribuida { get; set; } = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Ubicaciones = Enumerable.Range(1, 14).SelectMany(n => new[] { $"{n}A", $"{n}B" }).ToList();
+        Categorias = await categoriaService.Listar(c => true);
+        Productos = await productosService.Listar(c => true);
+        Distribuciones = await distribucionInventarioService.Listar(d => true);
+    }
+
+    private void FiltrarProductos()
+    {
+        if (!string.IsNullOrEmpty(CategoriaSeleccionada))
+        {
+            ProductosFiltrados = Productos.Where(p => p.CategoriaId.ToString() == CategoriaSeleccionada).ToList();
+        }
+        else
+        {
+            ProductosFiltrados.Clear();
+        }
+    }
+
+    private async Task ActualizarInventario(ChangeEventArgs e)
+    {
+        if (e.Value != null && !string.IsNullOrEmpty(e.Value.ToString()))
+        {
+            var productoId = int.Parse(e.Value.ToString());
+            await ActualizarDatosProducto(productoId);
+        }
+    }
+
+    private async Task ActualizarCantidadDisponible()
+    {
+        if (NuevaDistribucion.ProductoId > 0)
+        {
+            await ActualizarDatosProducto(NuevaDistribucion.ProductoId);
+        }
+    }
+
+    private async Task ActualizarDatosProducto(int productoId)
+    {
+        // Obtener stock actual del producto
+        var inventario = await inventarioService.ObtenerInventarioPorProducto(productoId);
+        CantidadDisponible = inventario?.Stock ?? 0;
+
+        // Obtener cantidad ya distribuida
+        var distribuciones = await distribucionInventarioService.ObtenerDistribucionesPorProducto(productoId);
+
+        // Si es edición, excluimos la distribución actual
+        if (NuevaDistribucion.DistribucionId > 0)
+        {
+            CantidadDistribuida = distribuciones.Where(d => d.DistribucionId != NuevaDistribucion.DistribucionId).Sum(d => d.Cantidad);
+        }
+        else
+        {
+            CantidadDistribuida = distribuciones.Sum(d => d.Cantidad);
+        }
+    }
+
+    private void CambiarCantidad(int cambio)
+    {
+        var nuevaCantidad = NuevaDistribucion.Cantidad + cambio;
+        if (nuevaCantidad >= 0 && nuevaCantidad <= (CantidadDisponible - CantidadDistribuida))
+        {
+            NuevaDistribucion.Cantidad = nuevaCantidad;
+        }
+    }
+
+    private async Task GuardarDistribucion()
+    {
+        if (NuevaDistribucion.Cantidad > 0 &&
+            !string.IsNullOrEmpty(NuevaDistribucion.UbicacionEstanteria) &&
+            NuevaDistribucion.ProductoId > 0)
+        {
+            if (NuevaDistribucion.DistribucionId > 0)
+            {
+                await distribucionInventarioService.Modificar(NuevaDistribucion);
+            }
+            else
+            {
+                NuevaDistribucion.FechaIngreso = DateTime.Now;
+                await distribucionInventarioService.Insertar(NuevaDistribucion);
+            }
+
+            Distribuciones = await distribucionInventarioService.Listar(d => true);
+            LimpiarFormulario();
+        }
+    }
+
+    private async void EditarDistribucion(DistribucionInventario distribucion)
+    {
+        NuevaDistribucion = new DistribucionInventario
+            {
+                DistribucionId = distribucion.DistribucionId,
+                ProductoId = distribucion.ProductoId,
+                UbicacionEstanteria = distribucion.UbicacionEstanteria,
+                Cantidad = distribucion.Cantidad,
+                FechaIngreso = distribucion.FechaIngreso
+            };
+
+        // Buscar la categoría del producto para cargarla en el selector
+        var producto = Productos.FirstOrDefault(p => p.ProductoId == distribucion.ProductoId);
+        if (producto != null)
+        {
+            CategoriaSeleccionada = producto.CategoriaId.ToString();
+            await ActualizarDatosProducto(distribucion.ProductoId);
+            FiltrarProductos();
+        }
+    }
+
+    private async Task EliminarDistribucion(DistribucionInventario distribucion)
+    {
+        await distribucionInventarioService.Eliminar(distribucion);
+        Distribuciones.Remove(distribucion);
+    }
+
+    private void LimpiarFormulario()
+    {
+        NuevaDistribucion = new DistribucionInventario();
+        CategoriaSeleccionada = "";
+        ProductosFiltrados.Clear();
+        CantidadDisponible = 0;
+        CantidadDistribuida = 0;
+    }
+}

@@ -26,6 +26,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Compras> Compras { get; set; }
     public DbSet<ComprasDetalles> ComprasDetalles { get; set; }
     public DbSet<SolicitudesCredito> SolicitudesCredito { get; set; }
+    public DbSet<Categoria> Categorias { get; set; }
+    public DbSet<DistribucionInventario> DistribucionInventario { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -52,6 +55,15 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             new Estados { EstadoId = 5, Nombre = "Aprobado" },
             new Estados { EstadoId = 6, Nombre = "Denegado" }
 
+        );
+
+        modelBuilder.Entity<Categoria>().HasData(
+            new Categoria { CategoriaId = 1, Nombre = "Alimentos", Descripcion = "Productos comestibles y bebidas." },
+            new Categoria { CategoriaId = 2, Nombre = "Electrónica", Descripcion = "Dispositivos electrónicos y accesorios." },
+            new Categoria { CategoriaId = 3, Nombre = "Belleza", Descripcion = "Cosméticos y productos de cuidado personal." },
+            new Categoria { CategoriaId = 4, Nombre = "Hogar", Descripcion = "Productos para el hogar y decoración." },
+            new Categoria { CategoriaId = 5, Nombre = "Ferreteria", Descripcion = "Herramientas y suministros de construcción." },
+            new Categoria { CategoriaId = 6, Nombre = "Papeleria", Descripcion = "Artículos de oficina y escolar." }
         );
     }
 

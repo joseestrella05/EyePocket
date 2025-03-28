@@ -54,6 +54,7 @@ namespace EyePocket.Service
             await using var contexto = await DbFactory.CreateDbContextAsync();
             return await contexto.Productos.Include(p => p.Proveedor)
                 .Where(criterio)
+                 .Include(p => p.Categoria)
                 .ToListAsync();
         }
 
@@ -76,6 +77,6 @@ namespace EyePocket.Service
             await using var contexto = await DbFactory.CreateDbContextAsync();
             return await contexto.Productos.FirstOrDefaultAsync(p => p.ProductoId == id);
         }
-        
+
     }
 }

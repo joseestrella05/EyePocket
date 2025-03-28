@@ -16,7 +16,7 @@
 			<div class="mb-3">
 				<label class="form-label">Buscar Producto (Código o Nombre)</label>
 				<input type="text" class="form-control" @bind="Busqueda" @oninput="FiltrarProductos"
-				placeholder="Escriba el código o nombre del producto..." />
+					   placeholder="Escriba el código o nombre del producto..." />
 
 				@if (ProductosFiltrados.Any())
 				{
@@ -24,7 +24,7 @@
 						@foreach (var producto in ProductosFiltrados)
 						{
 							<li class="list-group-item list-group-item-action"
-							@onclick="() => SeleccionarProducto(producto)">
+								@onclick="() => SeleccionarProducto(producto)">
 								@producto.Codigo - @producto.Nombre
 							</li>
 						}
@@ -71,7 +71,7 @@
 	private int ProductoId { get; set; }
 	private string Busqueda { get; set; } = "";
 	private int Cantidad { get; set; } = 1;
-	private int CantidadEnInventario { get; set; } = 0; // Nueva variable para mostrar la cantidad en inventario
+	private int CantidadEnInventario { get; set; } = 0;
 	private DateTime FechaEntrada { get; set; } = DateTime.Today;
 
 	private List<Productos> productos = new();
@@ -107,31 +107,29 @@
 	{
 		ProductoSeleccionado = producto;
 		ProductoId = producto.ProductoId;
-		Busqueda = producto.Nombre;  // Mostrar el nombre del producto seleccionado en el campo de búsqueda.
+		Busqueda = producto.Nombre;
 
 		// Obtener la cantidad actual del producto en inventario (si existe)
 		var inventarios = await inventarioService.Listar(i => i.ProductoId == ProductoId);
 		if (inventarios.Any())
 		{
-			CantidadEnInventario = inventarios.First().Stock; // Mostrar en el campo de solo lectura
+			CantidadEnInventario = inventarios.First().Stock;
 		}
 		else
 		{
-			CantidadEnInventario = 0; // Si no existe inventario, mostramos 0
+			CantidadEnInventario = 0;
 		}
 
-		Cantidad = 1; // Restablecer la cantidad a ingresar
-		ProductosFiltrados.Clear();  // Limpiar los resultados de búsqueda después de seleccionar un producto.
+		Cantidad = 1;
+		ProductosFiltrados.Clear();
 	}
 
 	// Modificar cantidad (añadir o restar)
 	private void ModificarCantidad(int cantidad)
 	{
-		Cantidad = Math.Max(1, Cantidad + cantidad); // Asegura que la cantidad nunca sea menor a 1
+		Cantidad = Math.Max(1, Cantidad + cantidad);
 	}
 
-	// Registrar la entrada del producto
-	// Registrar la entrada del producto
 	private async Task RegistrarEntrada()
 	{
 		if (ProductoId > 0 && Cantidad > 0)
@@ -144,6 +142,7 @@
 				bool resultado = await inventarioService.Modificar(inv);
 				if (resultado)
 				{
+					CantidadEnInventario = inv.Stock + Cantidad;
 					toastService.Notify(new ToastMessage(ToastType.Success, "Éxito", "Entrada registrada correctamente"));
 				}
 				else
@@ -162,6 +161,7 @@
 				bool resultado = await inventarioService.Insertar(nuevoInventario);
 				if (resultado)
 				{
+					CantidadEnInventario = Cantidad;
 					toastService.Notify(new ToastMessage(ToastType.Success, "Éxito", "Nuevo inventario registrado correctamente"));
 				}
 				else
@@ -170,8 +170,7 @@
 				}
 			}
 
-			// Después de guardar, limpiar el formulario automáticamente
-			LimpiarFormulario();
+			Cantidad = 1;
 		}
 		else
 		{
@@ -179,18 +178,16 @@
 		}
 	}
 
-	// Limpiar formulario
 	private void LimpiarFormulario()
 	{
 		ProductoId = 0;
 		Busqueda = "";
 		Cantidad = 1;
-		CantidadEnInventario = 0; // Limpiar también la cantidad en inventario
+		CantidadEnInventario = 0;
 		FechaEntrada = DateTime.Today;
 		ProductosFiltrados.Clear();
 	}
 
-	// Volver a la página de Inventarios
 	private void VolverAInventarios()
 	{
 		Navigation.NavigateTo("/Productos/Inventario");

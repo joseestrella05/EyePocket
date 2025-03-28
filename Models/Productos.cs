@@ -24,17 +24,20 @@ namespace EyePocket.Models
         public decimal Costo { get; set; }
 
         [Required(ErrorMessage = "Debe seleccionar una categoría.")]
-        public string Categoria { get; set; }
+        public int CategoriaId { get; set; }
+        [ForeignKey("CategoriaId")]
+        public Categoria? Categoria { get; set; }
+
         [Required(ErrorMessage = "Debe seleccionar una provedor.")]
-    
         public int ProveedorId { get; set; }
         [ForeignKey("ProveedorId")]
         public Provedores? Proveedor { get; set; }
 
-        [Required(ErrorMessage ="Describa el producto")]
+        [Required(ErrorMessage = "Describa el producto")]
         public string Descripcion { get; set; }
 
         [Required(ErrorMessage = "La fecha de ingreso es obligatoria.")]
         public DateTime FechaIngreso { get; set; } = DateTime.Now;
     }
 }
+
