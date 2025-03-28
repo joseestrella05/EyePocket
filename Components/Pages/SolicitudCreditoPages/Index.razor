@@ -52,6 +52,13 @@
 						<button @onclick="Buscar" class="btn btn-secondary bi bi-search" type="button"></button>
 					</div>
 				</div>
+				<div class="col" style="margin:15px 0 0 100px ">
+					@if(!Canceladas){
+						<button type="button" @onclick="VerCanceladas" class="btn btn-secondary"><i class="bi bi-card-list"></i> Ver solicitudes canceladas</button>
+					}else{
+						<button type="button" @onclick="VerCanceladas" class="btn btn-secondary"><i class="bi bi-card-list"></i> Ver solicitudes en proceso</button>
+					}
+				</div>
 			</div>
 
 			@if (valorFiltro == "fechapago")
@@ -85,6 +92,8 @@
 						<th>Descripción</th>
 						<th>Monto Solicitado</th>
 						<th>Monto Fijo</th>
+						<th>Tu credito</th>
+						<th>Estado Solicitud</th>
 						<th>Acciones</th>
 					</tr>
 				</thead>
@@ -96,11 +105,36 @@
 							<td>@soli.Cliente.Nombre</td>
 							<td>@soli.Garantia</td>
 							<td>@soli.DescripcionGarantia</td>
-							<td>RD$@soli.MontoSolicitado.ToString("N2")</td>
-							<td>RD$@soli.SueldoFijo.ToString("N2")</td>
+							<td>RD$ @soli.MontoSolicitado.ToString("N2")</td>
+							<td>RD$ @soli.SueldoFijo.ToString("N2")</td>
 							<td>
-								<a href="/Solicitudes-De-Credito/View/@soli.SolicitudCreditoId" class="btn btn-sm btn-outline-dark bi-eye"></a>
+								<a href="https://www.transunion.com.do/ICS/pages/subscriptions-six-months.xhtml?gad_source=1&gbraid=0AAAAAC7SF5c2Xggi7NJ023lNacmLMGhGs&gclid=CjwKCAjwnPS-BhBxEiwAZjMF0scKzjfrvt1eH1rQrfgTYaveFHrivdeOrN1lO86xDiD6RaPRPqEELhoCjFkQAvD_BwE#content?utm_source=google&utm_medium=cpc&utm_campaign=categoryaon&utm_content=rsa&agparam=zelva" target="_blank" rel="noopener noreferrer">Consultar crédito</a
+							</td>
+							<td>
+								@switch (soli.EstadosId)
+								{
+									case 1:
+										<span class="badge text-bg-danger">Pendiente</span>
+										break;
+									case 5:
+										<span class="badge btn-success">Aprobado</span>
+										break;
+									case 4:
+										<span class="badge text-bg-warning">Cancelado</span>
+										break;
+									case 6:
+										<span class="badge text-bg-danger">No aprobado</span>
+										break;
+									default:
+										<span class="badge text-bg-danger">Error</span>
+										break;
+								}
+							</td
+							<td>
+								<a href="/SolicitudCredito/View/@soli.SolicitudCreditoId" class="btn btn-sm btn-outline-dark bi-eye"></a>
 								<a href="/Solicitudes-De-Credito/Edit/@soli.SolicitudCreditoId" class="btn btn-sm btn-outline-dark bi-pencil"></a>
+								<button type="button" @onclick="() => MostrarModal(soli.SolicitudCreditoId, soli.Cliente.Nombre)" class="btn btn-sm btn-outline-danger bi bi-ban"></button>
+
 							</td>
 						</tr>
 					}
@@ -117,16 +151,16 @@
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
 				<div class="modal-header" style="background-color: #7B0323; color: white;">
-					<h5 class="modal-title">Eliminar Cliente</h5>
+					<h5 class="modal-title">Cancelar solicitud</h5>
 					<button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					<p>¿Está seguro de que desea eliminar a este cliente?</p>
-					<p>Esta opción no se puede deshacer.</p>
+					<p>¿Está seguro de que desea cancelar la solicitud de <b>@EmailClienteSelecionado</b>?</p>
+					<p><b>Esta opción no se puede deshacer.</b></p>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cancelar</button>
-					<button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar</button>
+					<button type="button" class="btn btn-secondary" @onclick="CerrarModal">Volver</button>
+					<button type="button" class="btn btn-danger" @onclick="Eliminar">Cancelar</button>
 				</div>
 			</div>
 		</div>
@@ -152,11 +186,12 @@
 	public DateTime? Desde { get; set; } = null;
 	public DateTime? Hasta { get; set; } = null;
 	public List<SolicitudesCredito> ListaSolicitudes { get; set; } = new();
+	public bool Canceladas { get; set; } = false;
 
 
 	protected override async Task OnInitializedAsync()
 	{
-		ListaSolicitudes = await solicitudesCreditoService.Listar(C => true);
+		ListaSolicitudes = await solicitudesCreditoService.Listar(C => C.EstadosId != 4);
 	}
 
 	// MODALS
@@ -189,13 +224,13 @@
 			// 	return;
 			// await UserManager.DeleteAsync(user);
 
-			await solicitudesCreditoService.Eliminar(IdSeleccionado);
-			ListaSolicitudes = await solicitudesCreditoService.Listar(x => true);
+			await solicitudesCreditoService.ActulizarEstado(IdSeleccionado,4);
+			ListaSolicitudes = await solicitudesCreditoService.Listar(C => C.EstadosId != 4);
 			mostrarModal = false;
 			IdSeleccionado = 0;
 			TipoNotificacion = ToastType.Success;
 			TituloNotificacion = "Enhorabuena";
-			MensajeNotificacion = "¡Se ha eliminado la solicitud de credito exitosamente!";
+			MensajeNotificacion = "¡Se ha cancelado la solicitud de credito exitosamente!";
 			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 		}
 		catch (Exception ex)
@@ -311,5 +346,20 @@
 		TituloNotificacion = "Aviso";
 		MensajeNotificacion = "Se han restablecido los criterios de búsqueda.";
 		MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+	}
+
+	public async Task VerCanceladas()
+	{
+
+		if(!Canceladas){
+			ListaSolicitudes = await solicitudesCreditoService.Listar(C => C.EstadosId == 4);
+			Canceladas = true;
+		}else{
+			ListaSolicitudes = await solicitudesCreditoService.Listar(C => C.EstadosId != 4);
+            Canceladas = false;
+
+		}
+			
+
 	}
 }
