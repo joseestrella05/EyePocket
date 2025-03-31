@@ -1,0 +1,201 @@
+﻿@page "/Amortizacion-Express"
+
+@rendermode InteractiveServer
+@inject ToastService toast
+@inject CuotasCXCService cuotasCXCService
+@inject IJSRuntime JS
+
+<PageTitle>Amortización Express</PageTitle>
+<div class="container mb-4">
+	<div class="card">
+		<div class="row" style="background-color:white; padding:10px; margin:10px;">
+			<div class="col">
+				<div class="text-left">
+					<h2 class="text-black"><i class="bi bi-bar-chart-line m-1"></i> Amortización Rápida</h2>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+	<div class="card">
+		<div class="card-body">
+			<EditForm Model="Cuota" OnValidSubmit="Calcular">
+				<DataAnnotationsValidator />
+				<div class="row mb-3">
+					<div class="col">
+						<label><strong>Monto *</strong></label>
+						<InputNumber required class="form-control" @bind-Value="Cuota.Monto" placeholder="RD$0.00"></InputNumber>
+					</div>
+					<div class="col">
+						<label><strong>Interés *</strong></label>
+						<InputNumber required class="form-control" @bind-Value="Cuota.Interes" placeholder="RD$0.00"></InputNumber>
+					</div>
+					<div class="col">
+						<label><strong>Periodos *</strong></label>
+						<InputNumber required class="form-control" @bind-Value="Cuota.Periodos" placeholder="RD$0.00"></InputNumber>
+					</div>
+				</div>
+				<div class="d-flex justify-content-lg-center mb-3">
+					@*Btn restablecer y calcular*@
+					<button type="button" @onclick="Restablecer" class="m-2 btn btn-secondary"><i class="m-1 bi bi-arrow-counterclockwise"></i>Restablecer</button>
+					<button type="submit" class="m-2 btn btn-success"><i class="m-1 bi bi-calculator"></i>Calcular</button>
+					<button class="m-2 btn btn-success" @onclick="ExportarAExcel"><i class="m-1 bi bi-file-earmark-spreadsheet"></i>Exportar a Excel</button>
+				</div>
+			</EditForm>
+
+			<table class="table table-sm table-striped table-hover">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Cuota</th>
+						<th>Capital</th>
+						<th>Interés</th>
+						<th>Balance</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var cuota in ListaCuotas)
+					{
+						<tr>
+							<td>@cuota.NumeroCuota</td>
+							<td>RD$@cuota.Monto.ToString("N2")</td>
+							<td>RD$@((cuota.Monto - cuota.Interes).ToString("N2"))</td>
+							<td>RD$@cuota.Interes.ToString("N2")</td>
+							<td>RD$@cuota.SaldoFinal.ToString("N2")</td>
+						</tr>
+					}
+				</tbody>
+				<caption>Cant. de Cuotas: @ListaCuotas.Count</caption>
+			</table>
+		</div>
+	</div>
+</div>
+
+<style>
+	body {
+		background-color: #f5f5f5;
+	}
+
+	.contenedor {
+		max-width: 800px;
+		margin: auto;
+		padding: 10px;
+	}
+
+	.btn-success {
+		background-color: #0d5c63;
+		border: none;
+	}
+
+	.btn-secondary {
+		background-color: #444;
+		color: white;
+		text-decoration: none;
+	}
+
+		.btn-secondary:hover {
+			background-color: #222;
+		}
+</style>
+
+@code {
+	public List<CuotasExpress> ListaCuotas { get; set; } = new();
+	public CuotasExpress Cuota { get; set; } = new();
+
+	public void Calcular()
+	{
+		if (Cuota.Interes <= 0 || Cuota.Monto <= 0 || Cuota.Periodos <= 0)
+		{
+			toast.Notify(new(ToastType.Warning, "Aviso", "Ningún campo puede ser menor o igual a 0"));
+			return;
+		}
+
+		ListaCuotas = new();
+		var monto = Cuota.Monto;
+		var interes = Cuota.Interes / 100;
+		var periodos = Cuota.Periodos;
+		var tasaMensual = interes / 12;
+		var cuota = monto * (tasaMensual) / (1 - Math.Pow(1 + tasaMensual, -periodos));
+		var saldo = monto;
+
+		for (int i = 1; i <= periodos; i++)
+		{
+			var interesCuota = saldo * tasaMensual;
+			var capitalCuota = cuota - interesCuota;
+			saldo -= capitalCuota;
+			if (i == periodos) saldo = 0;
+
+			ListaCuotas.Add(new CuotasExpress
+				{
+					NumeroCuota = i,
+					Monto = Math.Round(cuota, 2),
+					Interes = Math.Round(interesCuota, 2),
+					SaldoFinal = Math.Round(saldo, 2)
+				});
+		}
+
+		ListaCuotas.Where(x => true).ToList();
+		toast.Notify(new(ToastType.Success, "Éxito", "Se calculó la amortización"));
+	}
+
+	public async Task ExportarAExcel()
+	{
+		try
+
+		{
+			if (Cuota.Interes <= 0 || Cuota.Monto <= 0 || Cuota.Periodos <= 0)
+			{
+				toast.Notify(new(ToastType.Warning, "Aviso", "Ningún campo puede ser menor o igual a 0"));
+				return;
+			}
+
+			if (ListaCuotas.Count <= 0)
+			{
+				toast.Notify(new(ToastType.Warning, "Aviso", "Primero debe calcular la amortización antes de exportar a excel"));
+				return;
+			}
+
+			byte[] fileContent;
+
+			using (var package = new ExcelPackage())
+			{
+				var worksheet = package.Workbook.Worksheets.Add("Cuotas");
+				worksheet.Cells[1, 1].Value = "No. de Cuota";
+				worksheet.Cells[1, 2].Value = "Cuota";
+				worksheet.Cells[1, 3].Value = "Capital";
+				worksheet.Cells[1, 4].Value = "Interés";
+				worksheet.Cells[1, 5].Value = "Balance";
+
+				for (int i = 0; i < ListaCuotas.Count; i++)
+				{
+					var cuota = ListaCuotas[i];
+					worksheet.Cells[i + 2, 1].Value = cuota.NumeroCuota;
+					worksheet.Cells[i + 2, 2].Value = cuota.Monto;
+					worksheet.Cells[i + 2, 3].Value = cuota.Monto - cuota.Interes;
+					worksheet.Cells[i + 2, 4].Value = cuota.Interes;
+					worksheet.Cells[i + 2, 5].Value = cuota.SaldoFinal;
+				}
+
+				// Guardamos en un array fuera del using
+				fileContent = package.GetAsByteArray();
+			}
+
+			await JS.InvokeVoidAsync("saveAsFile", "ListaCuotas.xlsx", fileContent);
+		}
+		catch (Exception ex)
+		{
+			toast.Notify(new(ToastType.Danger, "Error", $"Hubo un problema exportando el archivo: {ex.Message}"));
+		}
+	}
+
+	public void Restablecer()
+	{
+		Cuota.Interes = 0;
+		Cuota.Monto = 0;
+		Cuota.Periodos = 0;
+		ListaCuotas.Clear();
+		toast.Notify(new(ToastType.Info, "Aviso", "Se han restablecido todos los campos"));
+	}
+}
