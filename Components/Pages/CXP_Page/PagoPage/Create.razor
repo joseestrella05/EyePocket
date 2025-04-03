@@ -80,10 +80,17 @@
         cxplist = await cxpService.Listar(C => true);
     }
 
+
     public async Task Crear()
     {
         if (pago.PagoId == 0)
         {
+
+            if (pago.CuentaPorPagarId == 0) // Verifica si el estado es inválido
+            {
+                ToastService.Notify(new(ToastType.Warning, "Advertencia", "Debe seleccionar un estado válido."));
+                return; // Detiene la ejecución
+            }
             await pagoService.Guardar(pago);
             ToastService.Notify(new(ToastType.Success, "Exito", $"Pago hecho correctamente."));
             pago = new PagoCXP();
