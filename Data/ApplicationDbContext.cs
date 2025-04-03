@@ -7,6 +7,7 @@ namespace EyePocket.Data;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
 {
+    public DbSet<Ciudades> Ciudades { get; set; }
     public DbSet<Devoluciones> Devoluciones { get; set; }
     public DbSet<Clientes> Clientes { get; set; }
     public DbSet<Estados> Estados { get; set; }
