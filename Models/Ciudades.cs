@@ -11,6 +11,7 @@ public class Ciudades
     [StringLength(maximumLength: 40, ErrorMessage = "El nombre no debe exceder los 40 caracteres")]
     [Required(ErrorMessage = "Este campo es requerido")]
     public string CiudadNombre { get; set; } = null!;
+    public int ClienteId { get; set; }
     
     [Required(ErrorMessage = "Este campo es requerido")]
     public string Cliente { get; set; } = null!;
