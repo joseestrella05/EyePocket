@@ -27,6 +27,8 @@ namespace EyePocket.Models
         [Required(ErrorMessage = "Este campo es obligatorio")]
         public double monto { get; set; }
 
+        public double montoFaltante { get; set; }
+
 
     }
 }
