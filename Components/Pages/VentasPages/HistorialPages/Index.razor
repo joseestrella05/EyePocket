@@ -1,4 +1,4 @@
-﻿@page "/Ventas/Historial"
+﻿ @page "/Ventas/Historial"
 @using System.Globalization
 @inject OrdenVentaService ordenVentaService
 @inject OrdenVentasDetalleService ordenVentaDetalleService
@@ -88,6 +88,7 @@
             <th>Cliente</th>
             <th>Total Pagado</th>
             <th>Detalle</th>
+            <th>Eliminar</th>
         </tr>
     </thead>
 
@@ -101,11 +102,15 @@
                 <td>@venta.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
                 <td>
                     <button class="btn btn-warning btn-sm" @onclick="() => MostrarModalDetalleHistorial(venta)">
-                        <span class="bi bi-eye"></span>Detalle
+                        <span class="bi bi-eye"></span> Detalle
+                    </button>
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-sm" @onclick="() => MostrarModalEliminar(venta)">
+                        <span class="bi bi-trash"></span> Eliminar
                     </button>
                 </td>
             </tr>
-
         }
     </tbody>
 </table>
@@ -186,6 +191,27 @@
     </div>
 }
 
+@if (mostrarModalEliminar && ordenSeleccionada is not null)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #004b55; color: white;">
+                    <h5 class="modal-title">Eliminar Factura</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModalEliminar"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="fw-bold">¿Está seguro de que desea eliminar la factura <strong>@ordenSeleccionada.NumeroFactura</strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CerrarModalEliminar">Cancelar</button>
+                    <button class="btn btn-danger" @onclick="EliminarFactura">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     public OrdenVentaDetalle ordenVentaDetalle { get; set; } = new OrdenVentaDetalle();
     public OrdenVenta ordenventa { get; set; }
@@ -194,6 +220,29 @@
     private string filtro = "id";
     public DateTime? Desde { get; set; }
     public DateTime? Hasta { get; set; }
+    private bool mostrarModalEliminar = false;
+
+    private void MostrarModalEliminar(OrdenVenta orden)
+    {
+        ordenSeleccionada = orden;
+        mostrarModalEliminar = true;
+    }
+
+    private void CerrarModalEliminar()
+    {
+        ordenSeleccionada = null;
+        mostrarModalEliminar = false;
+    }
+
+    private async Task EliminarFactura()
+    {
+        if (ordenSeleccionada != null)
+        {
+            await ordenVentaService.Eliminar(ordenSeleccionada);
+            ListaOrdenVenta.Remove(ordenSeleccionada);
+            CerrarModalEliminar();
+        }
+    }
 
     public OrdenVenta ordenSeleccionada { get; set; } = new OrdenVenta();
 
