@@ -55,6 +55,7 @@
 							<th>Provedor</th>
 							<th>Fecha</th>
 							<th>Estado</th>
+							<th>Monto</th>
 							<th>Acciones</th>
 						</tr>
 					</thead>
@@ -69,8 +70,8 @@
 								<td>@(provedor?.Nombre ?? "no encontrado")</td>
 								<td>@compras.Fecha.ToString("dd/mm/yyyy")</td>
 								<td>@(estado?.Nombre ?? "no encontrado")</td>
+								<td>@compras.Total</td>
 								<td class="text-center" style="display: flex; justify-content: center; gap: 5px;">
-									<a href="/CxP/Compra/Details/@compras.CompraId" class="btn btn-outline-dark bi-eye"></a>
 									<a href="/CxP/Compra/Edit/@compras.CompraId" class="btn btn-outline-info bi bi-pencil-square"></a>
 									<button type="button" @onclick="() => MostrarModal(compras.CompraId, compras.Descripcion)" class="btn btn-outline-danger bi bi-trash"></button>
 								</td>
@@ -111,13 +112,15 @@
 
 
 @code {
+	[Parameter]
+	public int IdSeleccionado { get; set; }
 	public string searchBarValue { get; set; } = string.Empty;
 	public string valorFiltro { get; set; } = string.Empty;
 	public List<Provedores> ListaProvedores { get; set; } = new List<Provedores>();
 	public List<Compras> ListaCompra { get; set; } = new List<Compras>();
+	public Compras compra { get; set; } = new Compras();
 	public List<Estados> ListaEstados { get; set; } = new List<Estados>();
 	private bool mostrarModal = false;
-	private int IdSeleccionado { get; set; }
 	private string ProvedorSelecionado { get; set; } = "";
 
 	public ToastType TipoNotificacion { get; set; }
