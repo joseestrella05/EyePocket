@@ -55,7 +55,7 @@ public class CiudadesService(IDbContextFactory<ApplicationDbContext> DbFactory)
     public async Task<List<Ciudades>> Listar(Expression<Func<Ciudades, bool>> Criterio)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Ciudades.Where(Criterio).AsNoTracking().Include(c => c.Cliente).ToListAsync();
+        return await contexto.Ciudades.Where(Criterio).AsNoTracking().ToListAsync();
     }
 
     public async Task<bool> ExisteNombre(int ciudad, string nombre)
