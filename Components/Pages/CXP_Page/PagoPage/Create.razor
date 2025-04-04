@@ -49,8 +49,15 @@
 
                 <div class="row">
                     <div class="col">
-                        <label>Monto</label>
+                        <label>Monto invertido</label>
                         <InputNumber class="form-control" @bind-Value="pago.monto" placeholder="Monto"></InputNumber>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Monto faltante</label>
+                        <InputNumber class="form-control" @bind-Value="pago.montoFaltante" placeholder="Monto"></InputNumber>
                     </div>
                 </div>
             </div>
@@ -61,7 +68,6 @@
         </div>
     </div>
 
-   
 </EditForm>
 
 
@@ -79,6 +85,7 @@
         metodoPagolist = await metodoPagoService.Listar(C => true);
         cxplist = await cxpService.Listar(C => true);
     }
+
 
 
     public async Task Crear()

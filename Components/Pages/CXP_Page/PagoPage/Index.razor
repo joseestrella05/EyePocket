@@ -55,7 +55,8 @@
 							<th>Cuenta por pagar ID</th>
 							<th>Metodo Pago</th>
 							<th>FechaPago</th>
-							<th>Monto</th>
+							<th>Monto invertido</th>
+							<th>Monto restante</th>
 							<th>Acciones</th>
 						</tr>
 					</thead>
@@ -68,6 +69,7 @@
 								<td>@pago.MetodoPago.Descripcion</td>
 								<td>@pago.FechaPago</td>
 								<td>@pago.monto</td>
+								<td>@pago.montoFaltante</td>
 								<td class="d-flex justify-content-center gap-2">
 									<a href="/Pago/Details/@pago.PagoId" class="btn btn-outline-dark bi-eye btn-md"></a>
 									<a href="/Pago/Edit/@pago.PagoId" class="btn btn-outline-info bi bi-pencil-square btn-md"></a>
@@ -76,7 +78,7 @@
 							</tr>
 						}
 					</tbody>
-					<caption>Cant. De Cuentas por cobrar: @CXPList.Count</caption>
+					<caption>Cant. de Pagos: @CXPList.Count</caption>
 				</table>
 			</div>
 		</div>
@@ -175,7 +177,7 @@
 			MensajeNotificacion = "¡Se ha eliminado el pago correctamente!";
 			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 		}
-		catch (Exception ex)
+		catch (Exception e)
 		{
 			TipoNotificacion = ToastType.Danger;
 			TituloNotificacion = "Error";
