@@ -276,23 +276,38 @@
 
     public async Task Buscar()
     {
-        // if (!string.IsNullOrWhiteSpace(valorFiltro))
-        // {
-        //    if (filtro == "fecha" && DateTime.TryParse(valorFiltro, out DateTime fecha))
-        // {
-        //     ListaEvento = await eventosService.Listar(t => t.fecha == fecha);
-        // }
-        //
-        // }
-        // else if (filtro == "fecha" && Desde.HasValue && Hasta.HasValue)
-        //    {
-        //        ListaEvento = await eventosService.Listar(t => t.fecha >= Desde.Value && t.fecha <= Hasta.Value);
-        //    }
-        // else
-        // {
-        //     ListaContacto = await contactoService.Listar(u => true);
-        // }
+        if (!string.IsNullOrWhiteSpace(valorFiltro))
+        {
+           
+            if (filtro == "factura")
+            {
+                ListaOrdenVenta = await ordenVentaService.Listar(orden => orden.NumeroFactura.Contains(valorFiltro));
+            }
+         
+            else if (filtro == "fecha" && Desde.HasValue && Hasta.HasValue)
+            {
+                ListaOrdenVenta = await ordenVentaService.Listar(orden => orden.FechaEmision >= Desde.Value && orden.FechaEmision <= Hasta.Value);
+            }
+          
+            else if (filtro == "cliente")
+            {
+                ListaOrdenVenta = await ordenVentaService.Listar(
+                    orden => (orden.Clientes != null && orden.Clientes.Nombre.Contains(valorFiltro))
+                );
+            }
+        }
+        else if (filtro == "fecha" && Desde.HasValue && Hasta.HasValue)
+        {
+           
+            ListaOrdenVenta = await ordenVentaService.Listar(orden => orden.FechaEmision >= Desde.Value && orden.FechaEmision <= Hasta.Value);
+        }
+        else
+        {
+           
+            ListaOrdenVenta = await ordenVentaService.Listar(u => true);
+        }
     }
+
     public void Volver()
     {
         navigationManager.NavigateTo("/");
@@ -300,12 +315,14 @@
 
     private async Task Restablecer()
     {
-        // ListaContacto = await contactoService.Listar(t => t.contactoId > 0);
-        // filtro = string.Empty;
-        // valorFiltro = string.Empty;
-        Desde = null;
+        filtro = "id"; 
+        valorFiltro = string.Empty;  
+        Desde = null;  
         Hasta = null;
+
+        ListaOrdenVenta = await ordenVentaService.Listar(u => true);
     }
+
 
 
 }
