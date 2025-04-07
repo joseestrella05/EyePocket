@@ -14,6 +14,7 @@ namespace EyePocket.Service
             return await _contexto.OrdenVentasDetalle
                 .AsNoTracking()
                 .Include(O => O.OrdenVenta)
+                .Include(p => p.Productos)
                 .Where(criterio)
                 .ToListAsync();
         }
