@@ -116,21 +116,21 @@
 </table>
 <style>
     .form-group {
-        display: inline-block;
-        margin-right: 7px;
+    display: inline-block;
+    margin-right: 7px;
     }
 
-        .form-group label {
-            display: inline-block;
-            margin-right: 2.5px;
-        }
+    .form-group label {
+    display: inline-block;
+    margin-right: 2.5px;
+    }
 
-        .form-group input {
-            width: 100px;
-        }
+    .form-group input {
+    width: 100px;
+    }
 
     .table thead.bg-dark th {
-        color: black;
+    color: black;
     }
 </style>
 @*   <div class="card-footer text-start">
@@ -143,53 +143,63 @@
     <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header" style="background-color: #004b55; color: white;">
-                    <h5 class="modal-title">Historial - Factura: @ordenSeleccionada.NumeroFactura</h5>
+                <div class="modal-header" style="background-color: #004b55;">
+                    <h5 class="modal-title fw-bold text-white">Factura - Detalle</h5>
                     <button type="button" class="btn-close" @onclick="CerrarModalDetalleHistorial"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="container">
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label class="fw-bold">N&uacute;mero de factura:</label>
-                                <p>@ordenSeleccionada.NumeroFactura</p>
-                            </div>
-                            <div class="col-6">
-                                <label class="fw-bold">Fecha de emisi&oacute;n:</label>
-                                <p>@ordenSeleccionada.FechaEmision.ToString("dd/MM/yyyy")</p>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label class="fw-bold">Cliente:</label>
-                                <p>@ordenSeleccionada.Clientes?.Nombre</p>
-                            </div>
-                            <div class="col-6">
-                                <label class="fw-bold">Total pagado:</label>
-                                <p>@ordenSeleccionada.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</p>
-                            </div>
-
-                            <div class="col-6">
-                                <label class="fw-bold">Cantidad de productos: </label>
-                                <p>@ordenVentaDetalle.Cantidad</p>
-                            </div>
-
-                            <div class="col-6">
-                                <label class="fw-bold">RNC: </label>
-                                <p>@ordenSeleccionada.RNC</p>
-                            </div>
-                        </div>
-
-                        <div class="col-12 d-flex justify-content-left mt-3">
-                            <button class="btn btn-danger bi bi-arrow-left-circle" @onclick="CerrarModalDetalleHistorial">Cerrar</button>
-                        </div>
+                    <div class="invoice-header text-center mb-4">
+                        <h2>Factura</h2>
+                        <p>Detalle de la factura seleccionada.</p>
                     </div>
+
+                    <div class="invoice-details">
+                        <p><strong>Factura n°:</strong> @ordenSeleccionada.NumeroFactura</p>
+                        <p><strong>Fecha:</strong> @ordenSeleccionada.FechaEmision.ToString("dd/MM/yyyy")</p>
+                        <p><strong>Cliente:</strong> @ordenSeleccionada.Clientes?.Nombre</p>
+                    </div>
+
+                    <table class="invoice-table table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Descripción</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < DetallesSeleccionados.Count; i++)
+                            {
+                                var detalle = DetallesSeleccionados[i];
+                                <tr>
+                                    <td>@detalle.Productos.Codigo</td>
+                                    <td>@detalle.Productos?.Nombre</td>
+                                    <td>@detalle.Cantidad</td>
+                                    <td>@detalle.Productos?.Precio.ToString("C2")</td>
+                                    <td>@detalle.Subtotal.ToString("C2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <div class="invoice-total text-end">
+                        <p><strong>Subtotal:</strong> $@DetallesSeleccionados.Sum(d => d.Subtotal).ToString("N2")</p>
+                        <p><strong>TOTAL:</strong> $@ordenSeleccionada.MontoTotal.ToString("N2")</p>
+                    </div>
+                </div>
+
+                <div class="modal-footer d-flex justify-content-between">
+                    <button class="btn btn-secondary" @onclick="CerrarModalDetalleHistorial">
+                        <i class="bi bi-x-circle"></i> Volver
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 }
+
 
 @if (mostrarModalEliminar && ordenSeleccionada is not null)
 {
@@ -216,21 +226,29 @@
     public OrdenVentaDetalle ordenVentaDetalle { get; set; } = new OrdenVentaDetalle();
     public OrdenVenta ordenventa { get; set; }
     public List<OrdenVenta> ListaOrdenVenta { get; set; } = new List<OrdenVenta>();
+    public List<OrdenVentaDetalle> DetallesSeleccionados { get; set; } = new List<OrdenVentaDetalle>();
     private string valorFiltro = "";
     private string filtro = "id";
     public DateTime? Desde { get; set; }
     public DateTime? Hasta { get; set; }
     private bool mostrarModalEliminar = false;
 
-    private void MostrarModalEliminar(OrdenVenta orden)
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     ListaOrdenVenta = await ordenVentaService.Listar(u => true);
+    // }
+
+    private async Task MostrarModalEliminar(OrdenVenta orden)
     {
         ordenSeleccionada = orden;
+        DetallesSeleccionados = await ordenVentaDetalleService.Listar(d => d.OrdenVentaId == orden.OrdenVentaId);
         mostrarModalEliminar = true;
     }
 
     private void CerrarModalEliminar()
     {
         ordenSeleccionada = null;
+        mostrarModalEliminar = false;
         mostrarModalEliminar = false;
     }
 
@@ -256,13 +274,7 @@
     private async Task MostrarModalDetalleHistorial(OrdenVenta orden)
     {
         ordenSeleccionada = orden;
-
-        var detalles = await ordenVentaDetalleService.Listar(d => d.OrdenVentaId == orden.OrdenVentaId);
-
-        if (detalles.Any())
-        {
-            ordenVentaDetalle = detalles.First();
-        }
+        DetallesSeleccionados = await ordenVentaDetalleService.Listar(d => d.OrdenVentaId == orden.OrdenVentaId);
 
         mostrarModalFactura = true;
     }
@@ -322,7 +334,5 @@
 
         ListaOrdenVenta = await ordenVentaService.Listar(u => true);
     }
-
-
 
 }
