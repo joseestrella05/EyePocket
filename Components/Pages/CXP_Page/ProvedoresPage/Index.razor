@@ -110,11 +110,12 @@
 
 
 @code {
+	[Parameter]
+	public int ProvedoreIdSeleccionado { get; set; }
 	public string searchBarValue { get; set; } = string.Empty;
 	public string valorFiltro { get; set; } = string.Empty;
 	public List<Provedores> ListaProvedores { get; set; } = new List<Provedores>();
 	private bool mostrarModal = false;
-	private int ProvedoreIdSeleccionado { get; set; }
 	private string EmailProvedoresSelecionado { get; set; } = "";
 
 	//NOTIFICACIONES
