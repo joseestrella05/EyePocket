@@ -1,70 +1,119 @@
 ﻿@page "/Ventas/Estadisticas"
-@using SkiaSharp
-@using SkiaSharp.Views.Blazor
+@inject ProductosService productoService
+@inject ToastService toastService
 
-<button @onclick="GeneratePieChart">Generar Gráfico de Pastel</button>
-<SKCanvasView @ref="_canvasView" Width="600" Height="400" />
+@rendermode InteractiveServer
+
+<PageTitle>Estadisticas</PageTitle>
+
+<div class="container-fluid p-3">
+    <div class="card shadow-lg w-100" style="min-height: 70vh;">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col">
+                    <h2 class="text-black"><i class="bi bi-box m-1"></i> Estadisticas</h2>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <div class="form-floating">
+                            <InputSelect class="form-select" id="floatingSelect" @bind-Value="@valorFiltro">
+                                <option value="" selected disabled>--- Selecciona ---</option>
+                                <option value="idproducto">ID Producto</option>
+                                <option value="codigo">Código</option>
+                                <option value="nombre">Nombre</option>
+                            </InputSelect>
+                            <label for="floatingSelect"><strong>Buscar por:</strong></label>
+                        </div>
+                        <button type="button" class="btn btn-secondary bi bi-arrow-counterclockwise" @onclick="Restablecer"></button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <div class="form-floating flex-grow-1">
+                            <InputText @bind-Value="@searchBarValue" class="form-control" id="floatingSearch" />
+                            <label for="floatingSearch">Buscar</label>
+                        </div>
+                        <button @onclick="Buscar" class="btn btn-secondary bi bi-search" type="button"></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive overflow-x-auto">
+                <table class="table table-light table-hover w-100">
+                    <thead class="table table-striped">
+                        <tr class="text-center">
+                            <th>#</th>
+                            <th>Código</th>
+                            <th>Producto</th>
+                            <th>Unidades Vendidas</th>
+                            <th>Ganancias de ventas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var producto in ListaProductos)
+                        {
+                            <tr class="text-center">
+                                <td>@producto.ProductoId</td>
+                                <td>@producto.Codigo</td>
+                                <td>@producto.Nombre</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <caption>Total Productos: @ListaProductos.Count</caption>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 @code {
-    private SKCanvasView _canvasView;
-    private string imageUrl;
+    public string searchBarValue { get; set; } = string.Empty;
+    public string valorFiltro { get; set; } = string.Empty;
+    public List<Productos> ListaProductos { get; set; } = new List<Productos>();
 
-    // Datos de ejemplo para los productos
-    private List<(string Producto, float Valor)> productos = new List<(string Producto, float Valor)>
+    private int ProductoIdSeleccionado { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
     {
-        ("Producto A", 30),
-        ("Producto B", 40),
-        ("Producto C", 20),
-        ("Producto D", 10)
-    };
-
-    private void GeneratePieChart()
-    {
-        if (_canvasView == null) return;
-
-        using var surface = SKSurface.Create(new SKImageInfo(600, 400));
-        var canvas = surface.Canvas;
-
-        // Limpiar el canvas
-        canvas.Clear(SKColors.White);
-
-        // Calcular el total de los valores
-        float total = productos.Sum(p => p.Valor);
-
-        // Dibujar gráfico de pastel
-        float startAngle = 0f;
-        using var paint = new SKPaint
-            {
-                IsAntialias = true,
-                Style = SKPaintStyle.Fill
-            };
-
-        foreach (var producto in productos)
-        {
-            float sweepAngle = (producto.Valor / total) * 360;
-
-            // Elegir un color para cada segmento
-            paint.Color = GetRandomColor();
-
-            // Dibujar el segmento del pastel
-            canvas.DrawArc(new SKRect(100, 100, 500, 500), startAngle, sweepAngle, true, paint);
-
-            // Actualizar el ángulo de inicio para el siguiente segmento
-            startAngle += sweepAngle;
-        }
-
-        // Convertir a imagen
-        using var image = surface.Snapshot();
-        using var data = image.Encode(SKEncodedImageFormat.Png, 100);
-        imageUrl = $"data:image/png;base64,{Convert.ToBase64String(data.ToArray())}";
-
-        StateHasChanged();
+        ListaProductos = await productoService.Listar(p => true);
     }
 
-    private SKColor GetRandomColor()
+    public async Task Buscar()
     {
-        // Genera colores aleatorios
-        Random random = new Random();
-        return new SKColor((byte)random.Next(256), (byte)random.Next(256), (byte)random.Next(256));
+        if (string.IsNullOrEmpty(valorFiltro))
+        {
+            toastService.Notify(new(ToastType.Warning, "Aviso", "Debe seleccionar una opción en el filtro."));
+            return;
+        }
+
+        switch (valorFiltro)
+        {
+            case "idproducto":
+                if (int.TryParse(searchBarValue, out int id))
+                    ListaProductos = await productoService.Listar(p => p.ProductoId == id);
+                break;
+            case "codigo":
+                ListaProductos = await productoService.Listar(p => p.Codigo.Contains(searchBarValue));
+                break;
+            case "nombre":
+                ListaProductos = await productoService.Listar(p => p.Nombre.Contains(searchBarValue));
+                break;
+            default:
+                ListaProductos = await productoService.Listar(p => true);
+                break;
+        }
+    }
+
+    public async Task Restablecer()
+    {
+        ListaProductos = await productoService.Listar(p => true);
+        searchBarValue = string.Empty;
+        valorFiltro = string.Empty;
     }
 }
