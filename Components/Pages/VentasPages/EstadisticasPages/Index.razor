@@ -1,5 +1,6 @@
 ﻿@page "/Ventas/Estadisticas"
 @inject ProductosService productoService
+@inject OrdenVentasDetalleService ordenVentaDetalleService
 @inject ToastService toastService
 
 @rendermode InteractiveServer
@@ -24,6 +25,9 @@
                                 <option value="idproducto">ID Producto</option>
                                 <option value="codigo">Código</option>
                                 <option value="nombre">Nombre</option>
+                                <option value="mayorganancia">Mayor Ganancia</option>
+                                <option value="mayorunidad">Mayor Unidades Vendidas</option>
+
                             </InputSelect>
                             <label for="floatingSelect"><strong>Buscar por:</strong></label>
                         </div>
@@ -53,35 +57,58 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var producto in ListaProductos)
+                        @foreach (var producto in ListaProductosConEstadisticas)
                         {
                             <tr class="text-center">
-                                <td>@producto.ProductoId</td>
-                                <td>@producto.Codigo</td>
-                                <td>@producto.Nombre</td>
+                                <td>@producto.Producto.ProductoId</td>
+                                <td>@producto.Producto.Codigo</td>
+                                <td>@producto.Producto.Nombre</td>
+                                <td>@producto.UnidadesVendidas</td>
+                                <td>@producto.Ganancias.ToString("C")</td>
                             </tr>
                         }
                     </tbody>
-                    <caption>Total Productos: @ListaProductos.Count</caption>
+                    <caption>Total Productos: @ListaProductosConEstadisticas.Count</caption>
                 </table>
             </div>
         </div>
     </div>
 </div>
 
-
-
 @code {
     public string searchBarValue { get; set; } = string.Empty;
     public string valorFiltro { get; set; } = string.Empty;
-    public List<Productos> ListaProductos { get; set; } = new List<Productos>();
 
-    private int ProductoIdSeleccionado { get; set; }
+    public List<ProductoConEstadisticas> ListaProductosConEstadisticas { get; set; } = new();
+
+    private List<Productos> TodosLosProductos { get; set; } = new();
+    private List<OrdenVentaDetalle> TodosLosDetalles { get; set; } = new();
 
 
     protected override async Task OnInitializedAsync()
     {
-        ListaProductos = await productoService.Listar(p => true);
+        TodosLosProductos = await productoService.Listar(p => true);
+        TodosLosDetalles = await ordenVentaDetalleService.Listar(p => true);
+
+        CalcularEstadisticas();
+    }
+
+    private void CalcularEstadisticas()
+    {
+        ListaProductosConEstadisticas = TodosLosProductos.Select(producto =>
+        {
+            var detallesProducto = TodosLosDetalles.Where(d => d.ProductoId == producto.ProductoId);
+
+            int unidadesVendidas = detallesProducto.Sum(d => d.Cantidad);
+            decimal ganancias = unidadesVendidas * producto.Precio;
+
+            return new ProductoConEstadisticas
+                {
+                    Producto = producto,
+                    UnidadesVendidas = unidadesVendidas,
+                    Ganancias = ganancias
+                };
+        }).ToList();
     }
 
     public async Task Buscar()
@@ -92,28 +119,45 @@
             return;
         }
 
+        IEnumerable<ProductoConEstadisticas> productosFiltrados = ListaProductosConEstadisticas;
+
         switch (valorFiltro)
         {
             case "idproducto":
                 if (int.TryParse(searchBarValue, out int id))
-                    ListaProductos = await productoService.Listar(p => p.ProductoId == id);
+                    productosFiltrados = ListaProductosConEstadisticas.Where(p => p.Producto.ProductoId == id);
                 break;
             case "codigo":
-                ListaProductos = await productoService.Listar(p => p.Codigo.Contains(searchBarValue));
+                productosFiltrados = ListaProductosConEstadisticas.Where(p => p.Producto.Codigo.Contains(searchBarValue, StringComparison.OrdinalIgnoreCase));
                 break;
             case "nombre":
-                ListaProductos = await productoService.Listar(p => p.Nombre.Contains(searchBarValue));
+                productosFiltrados = ListaProductosConEstadisticas.Where(p => p.Producto.Nombre.Contains(searchBarValue, StringComparison.OrdinalIgnoreCase));
                 break;
-            default:
-                ListaProductos = await productoService.Listar(p => true);
+            case "mayorganancia":
+                productosFiltrados = ListaProductosConEstadisticas
+                    .OrderByDescending(p => p.Ganancias);
+                break;
+            case "mayorunidad":
+                productosFiltrados = ListaProductosConEstadisticas
+                    .OrderByDescending(p => p.UnidadesVendidas);
                 break;
         }
+
+        ListaProductosConEstadisticas = productosFiltrados.ToList();
     }
+
 
     public async Task Restablecer()
     {
-        ListaProductos = await productoService.Listar(p => true);
+        await OnInitializedAsync(); // Reinicia todo
         searchBarValue = string.Empty;
         valorFiltro = string.Empty;
+    }
+
+    public class ProductoConEstadisticas
+    {
+        public Productos Producto { get; set; } = new();
+        public int UnidadesVendidas { get; set; }
+        public decimal Ganancias { get; set; }
     }
 }
