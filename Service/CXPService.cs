@@ -36,10 +36,20 @@ namespace EyePocket.Service
         public async Task<bool> Eliminar(int id)
         {
             await using var contexto = await DbFactory.CreateDbContextAsync();
-            var cxp = await contexto.CXPs
-                .Where(p => p.CuentaId == id).ExecuteDeleteAsync();
-            return cxp > 0;
+
+            // 1. Eliminar todos los pagos relacionados a esta cuenta
+            var pagosEliminados = await contexto.pagocxp
+                .Where(p => p.CuentaPorPagarId == id)
+                .ExecuteDeleteAsync();
+
+            // 2. Eliminar la cuenta por pagar
+            var cuentaEliminada = await contexto.CXPs
+                .Where(p => p.CuentaId == id)
+                .ExecuteDeleteAsync();
+
+            return cuentaEliminada > 0;
         }
+
         public async Task<CXP?> Buscar(int id)
         {
             await using var contexto = await DbFactory.CreateDbContextAsync();
