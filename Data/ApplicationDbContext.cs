@@ -99,7 +99,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
       );
 
 
-
         modelBuilder.Entity<Categoria>().HasData(
             new Categoria { CategoriaId = 1, Nombre = "Alimentos", Descripcion = "Productos comestibles y bebidas." },
             new Categoria { CategoriaId = 2, Nombre = "Electrónica", Descripcion = "Dispositivos electrónicos y accesorios." },
