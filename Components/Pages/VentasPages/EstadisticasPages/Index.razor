@@ -12,7 +12,7 @@
         <div class="card-body">
             <div class="row mb-3">
                 <div class="col">
-                    <h2 class="text-black"><i class="bi bi-box m-1"></i> Estadisticas</h2>
+                    <h2 class="text-black"><i class="bi bi-box m-1"></i> Estadísticas</h2>
                 </div>
             </div>
 
@@ -27,7 +27,6 @@
                                 <option value="nombre">Nombre</option>
                                 <option value="mayorganancia">Mayor Ganancia</option>
                                 <option value="mayorunidad">Mayor Unidades Vendidas</option>
-
                             </InputSelect>
                             <label for="floatingSelect"><strong>Buscar por:</strong></label>
                         </div>
@@ -45,6 +44,26 @@
                 </div>
             </div>
 
+            @* Apartado de Totales *@
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="card text-white bg-primary mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Unidades Vendidas</h5>
+                            <p class="card-text fs-4">@TotalUnidadesVendidas</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card text-white bg-success mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Ganancias</h5>
+                            <p class="card-text fs-4">@TotalGanancias.ToString("C")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="table-responsive overflow-x-auto">
                 <table class="table table-light table-hover w-100">
                     <thead class="table table-striped">
@@ -53,7 +72,7 @@
                             <th>Código</th>
                             <th>Producto</th>
                             <th>Unidades Vendidas</th>
-                            <th>Ganancias de ventas</th>
+                            <th>Ganancias de Ventas</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -84,6 +103,8 @@
     private List<Productos> TodosLosProductos { get; set; } = new();
     private List<OrdenVentaDetalle> TodosLosDetalles { get; set; } = new();
 
+    public int TotalUnidadesVendidas { get; set; }
+    public decimal TotalGanancias { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -109,6 +130,10 @@
                     Ganancias = ganancias
                 };
         }).ToList();
+
+        // Calcular totales generales
+        TotalUnidadesVendidas = ListaProductosConEstadisticas.Sum(p => p.UnidadesVendidas);
+        TotalGanancias = ListaProductosConEstadisticas.Sum(p => p.Ganancias);
     }
 
     public async Task Buscar()
@@ -144,12 +169,15 @@
         }
 
         ListaProductosConEstadisticas = productosFiltrados.ToList();
-    }
 
+        // Actualizar totales después de la búsqueda
+        TotalUnidadesVendidas = ListaProductosConEstadisticas.Sum(p => p.UnidadesVendidas);
+        TotalGanancias = ListaProductosConEstadisticas.Sum(p => p.Ganancias);
+    }
 
     public async Task Restablecer()
     {
-        await OnInitializedAsync(); // Reinicia todo
+        await OnInitializedAsync();
         searchBarValue = string.Empty;
         valorFiltro = string.Empty;
     }
