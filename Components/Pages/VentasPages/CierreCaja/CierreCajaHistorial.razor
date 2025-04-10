@@ -1,5 +1,157 @@
 ﻿@page "/Ventas/CierreCajaHistorial"
+@using System.Globalization
+@inject CierreCajaService cierreCajaService
+@inject NavigationManager navigationManager
+
+<PageTitle>Historial Cierre de caja</PageTitle>
+
+<div class="card-header text-center py-2 rounded-3" style="background-color: #004b55; color: white;">
+    <h3 class="mb-0 font-weight-bold" style="font-weight: bold;">Historial</h3>
+</div>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-auto">
+            <div class="card border-0 rounded-3">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-3 text-center text-md-end mb-3 mb-md-0">
+                            <label class="d-inline-block fs-4 fw-bold text-black">
+                                Filtrar por Fecha
+                            </label>
+                        </div>
+
+                        <!-- Filtro de Fecha -->
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <label class="form-label fw-bold">Desde:</label>
+                            <InputDate class="form-control form-control-lg" @bind-Value="Desde" />
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <label class="form-label fw-bold">Hasta:</label>
+                            <InputDate class="form-control form-control-lg" @bind-Value="Hasta" />
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="col-md-3 d-flex align-items-end gap-2">
+                            <button @onclick="Buscar" class="btn btn-primary btn-lg w-100">
+                                <span class="bi bi-search"></span> Buscar
+                            </button>
+                            <button @onclick="Restablecer" class="btn btn-outline-secondary btn-lg">
+                                <span class="bi bi-arrow-counterclockwise"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Tabla -->
+<table class="table table-striped table-hover table-bordered text-center align-middle">
+    <thead class="bg-dark">
+        <tr>
+            <th>Id</th>
+            <th>Fecha</th>
+            <th>Monto Apertura</th>
+            <th>Cantidad de ventas</th>
+            <th>Monto de ventas</th>
+            <th>Monto de cierre</th>
+            <th>Detalle</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var historial in ListaCierreCaja)
+        {
+            <tr>
+                <td>@historial.CierreId</td>
+                <td>@historial.Fecha.ToString("dd/MM/yyyy")</td>
+                <td>@historial.MontoApertura.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                <td>@historial.CantidadDeVentas</td>
+                <td>@historial.MontoDeVentas.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                <td>@historial.MontoDeCierre.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" @onclick="() => DetalleHistorial()">
+                        <span class="bi bi-eye"></span> Detalle
+                    </button>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+<style>
+    .form-group {
+    display: inline-block;
+    margin-right: 7px;
+    }
+
+    .form-group label {
+    display: inline-block;
+    margin-right: 2.5px;
+    }
+
+    .form-group input {
+    width: 100px;
+    }
+
+    .table thead.bg-dark th {
+    color: black;
+    }
+</style>
 
 @code {
+    public CierreCaja cierreCaja { get; set; } = new CierreCaja();
+    public List<CierreCaja> ListaCierreCaja { get; set; } = new List<CierreCaja>();
+    private string valorFiltro = "";
+    private string filtro = "id";
+    public DateTime? Desde { get; set; }
+    public DateTime? Hasta { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        ListaCierreCaja = await cierreCajaService.Listar(c => true);
+    }
+
+    private async Task DetalleHistorial()
+    {
+    }
+
+ 
+
+    public async Task Buscar()
+    {
+
+        if (filtro == "fecha" && Desde.HasValue && Hasta.HasValue)
+        {
+            ListaCierreCaja = await cierreCajaService.Listar(
+                c => c.Fecha >= Desde.Value && c.Fecha <= Hasta.Value
+            );
+        }
+   
+        else if (!string.IsNullOrWhiteSpace(valorFiltro))
+        {
+            ListaCierreCaja = await cierreCajaService.Listar(
+                c => c.CierreId.ToString().Contains(valorFiltro)
+            );
+        }
+    
+        else
+        {
+            ListaCierreCaja = await cierreCajaService.Listar(c => true);
+        }
+    }
+
+    private async Task Restablecer()
+    {
+        filtro = "id";
+        valorFiltro = string.Empty;
+        Desde = null;
+        Hasta = null;
+
+        ListaCierreCaja = await cierreCajaService.Listar(c => true);
+    }
 }
