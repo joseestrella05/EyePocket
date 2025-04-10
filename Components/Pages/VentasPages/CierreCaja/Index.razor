@@ -1,0 +1,108 @@
+﻿@page "/Ventas/CierreCaja"
+@using EyePocket.Models
+@inject ToastService toastService
+@inject NavigationManager NavigationManager
+@inject CierreCajaService cierreCajaService
+
+<PageTitle>Cierre de Caja</PageTitle>
+
+<EditForm Model="cierreCaja" OnValidSubmit="GuardarCierre">
+    <DataAnnotationsValidator />
+    <div class="cierre-container">
+        <h3 class="cierre-titulo">Cierre de caja</h3>
+        <p class="cierre-fecha">Fecha: @cierreCaja.Fecha.ToString("dd/MM/yyyy")</p>
+
+        <div class="cierre-field">
+            <label>Apertura</label><br />
+            <InputNumber @bind-Value="cierreCaja.MontoApertura" class="form-control" />
+            <ValidationMessage For="@(() => cierreCaja.MontoApertura)" />
+        </div>
+
+        <div class="cierre-field">
+            <label>Ingresos</label><br />
+            <input type="number" class="form-control" value="@ordenVenta.MontoTotal" readonly />
+        </div>
+
+        <div class="cierre-field ">
+            <label>Monto de cierre</label><br />
+            <input type="number" class="form-control" value="@(cierreCaja.MontoApertura + ordenVenta.MontoTotal)" readonly />
+        </div>
+        <div class="boton-centrado">
+            <button class="btn btn-primary" @onclick="GuardarCierre">Guardar</button>
+        </div>
+    </div>
+</EditForm>
+
+<style>
+    .cierre-container {
+        background-color: #004750;
+        padding: 2rem;
+        border-radius: 20px;
+        max-width: 800px;
+        margin: 3rem auto 0 auto; 
+        color: white;
+        
+    }
+
+    .cierre-titulo {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .cierre-fecha {
+        text-align: right;
+        margin-bottom: 2rem;
+    }
+
+    .cierre-field {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.5rem;
+        border-radius: 5px;
+        border: none;
+    }
+
+    .boton-centrado {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+
+        .boton-centrado .btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 5px;
+        }
+
+</style>
+@code {
+    public CierreCaja cierreCaja { get; set; } = new CierreCaja();
+    public List<OrdenVenta> ListaOrdenVentas { get; set; } = new List<OrdenVenta>();
+    public OrdenVenta ordenVenta { get; set; } = new OrdenVenta();
+    public List<CierreCaja> ListaCierre { get; set; } = new List<CierreCaja>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaCierre = await cierreCajaService.Listar(c => true);
+
+    }
+
+    private async Task GuardarCierre()
+    {
+        cierreCaja.MontoDeCierre = cierreCaja.MontoApertura + ordenVenta.MontoTotal;
+
+        var guardado = await cierreCajaService.Guardar(cierreCaja);
+
+        if (guardado)
+        {
+            MostrarToast(ToastType.Success, "Cierre exitoso", "El cierre de caja se ha realizado correctamente.");
+        }
+        else
+        {
+            MostrarToast(ToastType.Warning, "AtenciÃ³n", "No se pudo realizar el cierre de caja");
+        }
+    }
+    public void MostrarToast(ToastType tipo, string titulo, string cuerpo) =>
+        toastService.Notify(new(tipo, titulo, cuerpo));
+}
