@@ -58,10 +58,7 @@ builder.Services.AddScoped<ProvedoresServices>();
 builder.Services.AddScoped<EstadoServices>();
 builder.Services.AddScoped<CompraServices>();
 builder.Services.AddScoped<OrdenVentasDetalleService>();
-
-
-
-
+builder.Services.AddScoped<CierreCajaService>();
 
 
 //notificacion
