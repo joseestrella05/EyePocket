@@ -71,4 +71,11 @@ public class CierreCajaService(IDbContextFactory<ApplicationDbContext> DbFactory
             .Where(criterio)
             .ToListAsync();
     }
+    public async Task<bool> ExisteCierreDeHoy()
+    {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        var hoy = DateTime.Today;
+        return await contexto.CierreCaja.AnyAsync(c => c.Fecha.Date == hoy);
+    }
+
 }
