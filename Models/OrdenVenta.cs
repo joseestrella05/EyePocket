@@ -13,8 +13,6 @@ public class OrdenVenta
     [ForeignKey("ClienteId")]
     public Clientes? Clientes { get; set; }
 
-    public int CierreId { get; set; }
-    [ForeignKey("CierreId")]
     public CierreCaja? CierreCaja { get; set; }
 
 
