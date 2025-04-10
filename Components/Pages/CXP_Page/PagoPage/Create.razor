@@ -60,6 +60,7 @@
                         <InputNumber class="form-control" @bind-Value="pago.montoFaltante" placeholder="Monto"></InputNumber>
                     </div>
                 </div>
+
             </div>
         </div>
         <div class="text-center">
@@ -79,6 +80,7 @@
     public List<CXP> cxplist { get; set; } = new List<CXP>();
 
     [Inject] protected ToastService ToastService { get; set; }
+    private double pagoTotal => pago.monto + pago.montoFaltante;
 
     protected override async Task OnInitializedAsync()
     {
