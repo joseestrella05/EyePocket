@@ -3,6 +3,7 @@
 @inject ToastService toastService
 @inject NavigationManager NavigationManager
 @inject CierreCajaService cierreCajaService
+@inject OrdenVentaService ordenVentaService
 
 <PageTitle>Cierre de Caja</PageTitle>
 
@@ -14,22 +15,25 @@
 
         <div class="cierre-field">
             <label>Apertura</label><br />
-            <InputNumber @bind-Value="cierreCaja.MontoApertura" class="form-control" />
-            <ValidationMessage For="@(() => cierreCaja.MontoApertura)" />
+            <input type="number" class="form-control" value="@cierreCaja.MontoApertura" readonly />
         </div>
 
         <div class="cierre-field">
-            <label>Ingresos</label><br />
-            <input type="number" class="form-control" value="@ordenVenta.MontoTotal" readonly />
+            <label>Ingresos (Monto total de ventas del día)</label><br />
+            <input type="number" class="form-control" value="@cierreCaja.MontoDeVentas" readonly />
         </div>
 
-        <div class="cierre-field ">
-            <label>Monto de cierre</label><br />
-            <input type="number" class="form-control" value="@(cierreCaja.MontoApertura + ordenVenta.MontoTotal)" readonly />
+        <div class="cierre-field">
+            <label>Cantidad de ventas</label><br />
+            <input type="number" class="form-control" value="@cierreCaja.CantidadDeVentas" readonly />
         </div>
-        <div class="boton-centrado">
-            <button class="btn btn-primary" @onclick="GuardarCierre">Guardar</button>
+
+        <div class="cierre-field">
+            <label>Monto de cierre (Apertura + Ingresos)</label><br />
+            <input type="number" class="form-control" value="@cierreCaja.MontoDeCierre" readonly />
         </div>
+
+        <div class="boton-centrado"><button class="btn btn-primary" type="submit">Guardar</button></div>
     </div>
 </EditForm>
 
@@ -39,9 +43,8 @@
         padding: 2rem;
         border-radius: 20px;
         max-width: 800px;
-        margin: 3rem auto 0 auto; 
+        margin: 3rem auto 0 auto;
         color: white;
-        
     }
 
     .cierre-titulo {
@@ -74,35 +77,58 @@
             padding: 0.5rem 1.5rem;
             border-radius: 5px;
         }
-
 </style>
+
 @code {
     public CierreCaja cierreCaja { get; set; } = new CierreCaja();
-    public List<OrdenVenta> ListaOrdenVentas { get; set; } = new List<OrdenVenta>();
-    public OrdenVenta ordenVenta { get; set; } = new OrdenVenta();
-    public List<CierreCaja> ListaCierre { get; set; } = new List<CierreCaja>();
+    public List<OrdenVenta> ListaOrdenVentas { get; set; } = new();
+    private bool cierreYaHecho = false;
 
     protected override async Task OnInitializedAsync()
     {
-        ListaCierre = await cierreCajaService.Listar(c => true);
+        var hoy = DateTime.Today;
 
+        cierreYaHecho = await cierreCajaService.ExisteCierreDeHoy();
+
+        if (cierreYaHecho)
+        {
+            MostrarToast(ToastType.Danger, "Cierre ya realizado", "Ya se ha realizado el cierre de caja para hoy.");
+            return;
+        }
+
+        ListaOrdenVentas = await ordenVentaService.Listar(o => o.FechaEmision.Date == hoy);
+
+        cierreCaja.Fecha = hoy;
+        cierreCaja.MontoApertura = 5000;
+        cierreCaja.CantidadDeVentas = ListaOrdenVentas.Count;
+        cierreCaja.MontoDeVentas = ListaOrdenVentas.Sum(o => o.MontoTotal);
+        cierreCaja.MontoDeCierre = cierreCaja.MontoApertura + cierreCaja.MontoDeVentas;
     }
 
     private async Task GuardarCierre()
     {
-        cierreCaja.MontoDeCierre = cierreCaja.MontoApertura + ordenVenta.MontoTotal;
+        if (cierreYaHecho)
+        {
+            MostrarToast(ToastType.Danger, "Cierre ya registrado", "Ya existe un cierre de caja para hoy.");
+            return;
+        }
+
+        cierreCaja.MontoDeCierre = cierreCaja.MontoApertura + cierreCaja.MontoDeVentas;
 
         var guardado = await cierreCajaService.Guardar(cierreCaja);
 
         if (guardado)
         {
             MostrarToast(ToastType.Success, "Cierre exitoso", "El cierre de caja se ha realizado correctamente.");
+            NavigationManager.NavigateTo("/Ventas/CierreCaja", forceLoad: true);
         }
         else
         {
-            MostrarToast(ToastType.Warning, "AtenciÃ³n", "No se pudo realizar el cierre de caja");
+            MostrarToast(ToastType.Warning, "Atención", "No se pudo realizar el cierre de caja");
         }
     }
+
     public void MostrarToast(ToastType tipo, string titulo, string cuerpo) =>
         toastService.Notify(new(tipo, titulo, cuerpo));
 }
+
