@@ -59,6 +59,7 @@ modelbuilder.Services.AddScoped<ProvedoresServices>();
 modelbuilder.Services.AddScoped<EstadoServices>();
 modelbuilder.Services.AddScoped<CompraServices>();
 modelbuilder.Services.AddScoped<OrdenVentasDetalleService>();
+modelbuilder.Services.AddScoped<CierreCajaService>();
 modelbuilder.Services.AddScoped<SolicitudesCreditoService>();
 modelbuilder.Services.AddScoped<CategoriaService>();
 modelbuilder.Services.AddScoped<DistribucionInventarioService>();

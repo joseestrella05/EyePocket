@@ -28,6 +28,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<SolicitudesCredito> SolicitudesCredito { get; set; }
     public DbSet<Categoria> Categorias { get; set; }
     public DbSet<DistribucionInventario> DistribucionInventario { get; set; }
+    public DbSet<CierreCaja> CierreCaja { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
