@@ -21,5 +21,4 @@ public class DistribucionInventario
     public int Cantidad { get; set; }
 
     public DateTime FechaIngreso { get; set; } = DateTime.Now;
-    public string CodigoEscaneado { get; set; } = string.Empty;
 }
