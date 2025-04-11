@@ -7,55 +7,65 @@ using EyePocket.Service;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 
-var builder = WebApplication.CreateBuilder(args);
+var modelbuilder = WebApplication.CreateBuilder(args);
+
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
 // Add services to the container.
-builder.Services.AddRazorComponents()
+modelbuilder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddScoped<IdentityUserAccessor>();
-builder.Services.AddScoped<IdentityRedirectManager>();
-builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+modelbuilder.Services.AddCascadingAuthenticationState();
+modelbuilder.Services.AddScoped<IdentityUserAccessor>();
+modelbuilder.Services.AddScoped<IdentityRedirectManager>();
+modelbuilder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
-builder.Services.AddAuthentication(options =>
+modelbuilder.Services.AddAuthentication(options =>
     {
         options.DefaultScheme = IdentityConstants.ApplicationScheme;
         options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
     })
     .AddIdentityCookies();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
+var connectionString = modelbuilder.Configuration.GetConnectionString("SqlConStr");
+modelbuilder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+modelbuilder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+modelbuilder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
-builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-builder.Services.AddBlazorBootstrap();
+modelbuilder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+modelbuilder.Services.AddBlazorBootstrap();
 
 //inject services
-builder.Services.AddScoped<ClienteServices>();
-
-builder.Services.AddScoped<ProductosService>();
-builder.Services.AddScoped<MermasService>();
-
-builder.Services.AddScoped<TicketServices>();
-builder.Services.AddScoped<InventarioService>();
-
-builder.Services.AddScoped<ProvedoresServices>();
-
-
-
+modelbuilder.Services.AddScoped<ClienteServices>();
+modelbuilder.Services.AddScoped<ProductosService>();
+modelbuilder.Services.AddScoped<MermasService>();
+modelbuilder.Services.AddScoped<TicketServices>();
+modelbuilder.Services.AddScoped<T_PuntosServices>();
+modelbuilder.Services.AddScoped<AgenteServices>();
+modelbuilder.Services.AddScoped<CitasService>();
+modelbuilder.Services.AddScoped<CuentasXCobrarService>();
+modelbuilder.Services.AddScoped<OrdenVentaService>();
+modelbuilder.Services.AddScoped<PagosCXCService>();
+modelbuilder.Services.AddScoped<CuotasCXCService>();
+modelbuilder.Services.AddScoped<InventarioService>();
+modelbuilder.Services.AddScoped<ProvedoresServices>();
+modelbuilder.Services.AddScoped<EstadoServices>();
+modelbuilder.Services.AddScoped<CompraServices>();
+modelbuilder.Services.AddScoped<OrdenVentasDetalleService>();
+modelbuilder.Services.AddScoped<SolicitudesCreditoService>();
+modelbuilder.Services.AddScoped<CategoriaService>();
+modelbuilder.Services.AddScoped<DistribucionInventarioService>();
 
 //notificacion
-builder.Services.AddBlazoredToast();
-var app = builder.Build();
+modelbuilder.Services.AddBlazoredToast();
+var app = modelbuilder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -70,7 +80,6 @@ else
 }
 
 app.UseHttpsRedirection();
-
 
 app.UseAntiforgery();
 

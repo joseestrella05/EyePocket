@@ -1,0 +1,168 @@
+﻿@page "/distribuciones"
+@inject ProductosService productosService
+@inject CategoriaService categoriaService
+@inject InventarioService inventarioService
+@inject DistribucionInventarioService distribucionInventarioService
+@rendermode InteractiveServer
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: auto;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn {
+        padding: 10px 16px;
+        margin: 5px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+    }
+
+    .btn-blue {
+        background-color: #0d5c63;
+    }
+
+        .btn-blue:hover {
+            background-color: #084c52;
+        }
+
+    .btn-green {
+        background-color: #28a745;
+    }
+
+        .btn-green:hover {
+            background-color: #218838;
+        }
+
+    .btn-red {
+        background-color: #dc3545;
+    }
+
+        .btn-red:hover {
+            background-color: #c82333;
+        }
+
+    .section {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+
+<div class="container">
+    <h3 class="text-2xl font-bold mb-6 text-gray-800">Distribución por Góndola</h3>
+
+    <button class="btn btn-green" @onclick="IniciarInventario">Iniciar Inventario</button>
+    <button class="btn btn-blue" @onclick="LeerCodigo" disabled="@(!InventarioEnCurso)">Leer Código</button>
+    <button class="btn btn-red" @onclick="FinalizarInventario">Finalizar Inventario</button>
+
+    <div class="section">
+        <h4>Estantería Actual: <strong>@EstanteriaActual</strong></h4>
+    </div>
+
+    <div class="section">
+        <h4>Espacios Disponibles: <strong>@EspaciosDisponibles</strong></h4>
+    </div>
+
+    <div class="section">
+        <h4>Productos en esta estantería:</h4>
+        <ul>
+            @foreach (var producto in ProductosEnEstanteria)
+            {
+                <li>@producto.Nombre - Cantidad: @producto.Cantidad</li>
+            }
+        </ul>
+    </div>
+</div>
+
+@code {
+    private List<string> Estanterias = Enumerable.Range(1, 14)
+        .SelectMany(n => new[] { $"{n}A", $"{n}B" }).ToList();
+    private string EstanteriaActual;
+    private List<(string Nombre, int Cantidad)> ProductosEnEstanteria = new();
+    private int IndiceEstanteria = 0;
+    private bool InventarioEnCurso = false;
+    private int CapacidadEstanteria = 5; // Capacidad máxima por estantería
+
+    private int EspaciosDisponibles => CapacidadEstanteria - ProductosEnEstanteria.Sum(p => p.Cantidad);
+
+    private void IniciarInventario()
+    {
+        if (!InventarioEnCurso)
+        {
+            InventarioEnCurso = true;
+            IndiceEstanteria = 0;
+            CambiarEstanteria();
+        }
+    }
+
+    private void CambiarEstanteria()
+    {
+        if (IndiceEstanteria < Estanterias.Count)
+        {
+            EstanteriaActual = Estanterias[IndiceEstanteria];
+            ProductosEnEstanteria.Clear();
+        }
+        else
+        {
+            FinalizarInventario();
+        }
+    }
+
+    private void LeerCodigo()
+    {
+        if (InventarioEnCurso && EspaciosDisponibles > 0)
+        {
+            var producto = ObtenerProductoAleatorio();
+            var existente = ProductosEnEstanteria.FirstOrDefault(p => p.Nombre == producto);
+
+            if (!string.IsNullOrEmpty(existente.Nombre))
+            {
+                ProductosEnEstanteria.Remove(existente);
+                ProductosEnEstanteria.Add((producto, existente.Cantidad + 1));
+            }
+            else
+            {
+                ProductosEnEstanteria.Add((producto, 1));
+            }
+
+            // Verificar si la estantería se llenó
+            if (EspaciosDisponibles == 0)
+            {
+                IndiceEstanteria++;
+                if (IndiceEstanteria < Estanterias.Count)
+                {
+                    CambiarEstanteria();
+                }
+                else
+                {
+                    FinalizarInventario();
+                }
+            }
+        }
+    }
+
+    private string ObtenerProductoAleatorio()
+    {
+        var productos = new[] { "Producto A", "Producto B", "Producto C", "Producto D" };
+        var random = new Random();
+        return productos[random.Next(productos.Length)];
+    }
+
+    private void FinalizarInventario()
+    {
+        InventarioEnCurso = false;
+        EstanteriaActual = "Inventario Finalizado";
+        ProductosEnEstanteria.Clear();
+    }
+}

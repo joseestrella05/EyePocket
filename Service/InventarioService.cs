@@ -1,4 +1,5 @@
 ﻿using EyePocket.Data;
+using EyePocket.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -17,7 +18,7 @@ public class InventarioService(IDbContextFactory<ApplicationDbContext> DbFactory
         var producto = await contexto.Productos.FindAsync(inventario.ProductoId);
         if (producto != null)
         {
-            inventario.importe = Convert.ToDouble(inventario.Stock * producto.Precio); 
+            inventario.importe = Convert.ToDouble(inventario.Stock * producto.Precio);
         }
         contexto.Inventarios.Add(inventario);
         return await contexto.SaveChangesAsync() > 0;
@@ -26,9 +27,9 @@ public class InventarioService(IDbContextFactory<ApplicationDbContext> DbFactory
     public async Task<bool> Modificar(Inventarios inventario)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        
+
         inventario.Stock = inventario.Entradas - inventario.Salidas;
-        
+
         var producto = await contexto.Productos.FindAsync(inventario.ProductoId);
         if (producto != null)
         {
@@ -72,10 +73,10 @@ public class InventarioService(IDbContextFactory<ApplicationDbContext> DbFactory
         var inventario = await contexto.Inventarios.FindAsync(inventarioId);
         if (inventario == null) return false;
 
-       
+
         inventario.Entradas += cantidad;
-        inventario.Stock = inventario.Entradas - inventario.Salidas;  
-        
+        inventario.Stock = inventario.Entradas - inventario.Salidas;
+
         var producto = await contexto.Productos.FindAsync(inventario.ProductoId);
         if (producto != null)
         {
@@ -84,21 +85,10 @@ public class InventarioService(IDbContextFactory<ApplicationDbContext> DbFactory
         contexto.Entry(inventario).State = EntityState.Modified;
         return await contexto.SaveChangesAsync() > 0;
     }
-
-    public async Task<bool> RegistrarSalida(int inventarioId, int cantidad)
+    public async Task<Inventarios?> ObtenerInventarioPorProducto(int productoId)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        var inventario = await contexto.Inventarios.FindAsync(inventarioId);
-        if (inventario == null || inventario.Stock < cantidad) return false;
-
-        inventario.Salidas += cantidad;
-        inventario.Stock = inventario.Entradas - inventario.Salidas;  
-        var producto = await contexto.Productos.FindAsync(inventario.ProductoId);
-        if (producto != null)
-        {
-            inventario.importe = Convert.ToDouble(inventario.Stock * producto.Precio); 
-        }
-        contexto.Entry(inventario).State = EntityState.Modified;
-        return await contexto.SaveChangesAsync() > 0;
+        return await contexto.Inventarios.FirstOrDefaultAsync(i => i.ProductoId == productoId);
     }
+
 }

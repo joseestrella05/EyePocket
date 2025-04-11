@@ -1,0 +1,285 @@
+﻿@page "/SolicitudCredito/View/{SolicitudCreditoId:int}"
+@inject SolicitudesCreditoService solicitudesCreditoService
+@inject ClienteServices clienteService
+@inject NavigationManager navigation
+
+@rendermode InteractiveServer
+
+<div class="container mb-4">
+	<div class="card">
+		<div class="row" style="background-color:white; padding:10px; margin:10px;">
+			<div class="col">
+				<div class="text-left">
+					<h2 class="text-black"><i class="bi bi-cash-stack"></i> Detalles de Creditos</h2>
+				</div>
+			</div>
+			<div class="col text-end">
+				<a href="/Solicitudes-De-Credito/Index" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> Volver</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+	<div class="card">
+		<div class="card-body">
+
+			<div class="section-title">Datos personales</div>
+			<div class="row mb-6" style="width:750px; margin:auto;">
+				<div class="col">
+					<label><strong>Nombre y Apellido *</strong></label>
+					<InputText required class="form-control" @bind-Value="Clientes.Nombre" Readonly></InputText>
+				</div>
+				<div class="col">
+					<label><strong>DOC. Identidad *</strong></label>
+					<InputText required class="form-control" @bind-Value="Clientes.Cedula" Readonly></InputText>
+				</div>
+			</div>
+
+
+			<table class=" tabla-pequena">
+				<caption class="text-center fs-3 fw-bold" style="caption-side: top;">Estado de Pagos</caption>
+				<thead class="text-center">
+					<tr>
+						<th>Pagos completados</th>
+						<th>Pagos Atrasados</th>
+						<th>Pagos pendientes</th>
+					</tr>
+				</thead>
+				<tbody class="text-center" style="font-size:25px; margin-bottom:10px;">
+					<tr>
+						<td>
+							<span class="badge text-bg-success ">
+								@(Coutas?.Count(C => C.EstadoId == 2) ?? 0) pagos
+							</span>
+						</td>
+						<td>
+							<span class="badge text-bg-warning ">
+								@(Coutas?.Count(C => C.EstadoId == 3) ?? 0) pagos
+							</span>
+						</td>
+						<td>
+							<span class="badge text-bg-danger">
+								@(Coutas?.Count(C => C.EstadoId == 1) ?? 0) pagos
+							</span>
+						</td>
+					</tr>
+				</tbody>
+
+			</table>
+			<table class="table table-sm table-striped table-hover" style="margin-top:15px;">
+				<thead class="text-center">
+					<tr>
+						<th>Nivel de credito</th>
+						<th>Credito Min</th>
+						<th>Credito Max</th>
+						<th>Estado</th>
+						<th>Acciones</th>
+					</tr>
+				</thead>
+				<tbody class="text-center">
+					<tr>
+						<td>Basico</td>
+						<td>RD 5,000.00 $</td>
+						<td>RD 10,000.00 $</td>
+						@if (Coutas.Count(C => C.EstadoId == 2) >= 5)
+						{
+							<td>
+								<span class="badge text-bg-success ">
+									Disponible
+								</span>
+							</td>
+						}
+						else
+						{
+							<td>
+								<span class="badge text-bg-danger ">
+									No disponible
+								</span>
+							</td>
+
+						}
+						@if (Coutas.Count(C => C.EstadoId == 2) >= 5)
+						{
+							<td>
+								<button type="button" @onclick="Aprobar" class="btn btn-sm btn-outline-success bi bi-check-circle"></button>
+								<button type="button" @onclick="Denegar" class="btn btn-sm btn-outline-danger bi bi-x-circle"></button>
+							</td>
+						}
+						else
+						{
+							<td>
+								<span class="badge text-bg-danger ">
+									No puede optar a este credito
+								</span>
+							</td>
+
+						}
+					</tr>
+					<tr>
+						<td>Intermedio</td>
+						<td>RD 10,001.00 $</td>
+						<td>RD 15,000.00 $</td>
+						@if (Coutas.Count(C => C.EstadoId == 2) >= 10)
+						{
+							<td>
+								<span class="badge text-bg-success ">
+									Disponible
+								</span>
+							</td>
+						}
+						else
+						{
+							<td>
+								<span class="badge text-bg-danger ">
+									No disponible
+								</span>
+							</td>
+
+						}
+
+						@if (Coutas.Count(C => C.EstadoId == 2) >= 15)
+						{
+							<td>
+								<button type="button" @onclick="Aprobar" class="btn btn-sm btn-outline-success bi bi-check-circle"></button>
+								<button type="button" @onclick="Denegar" class="btn btn-sm btn-outline-danger bi bi-x-circle"></button>
+							</td>
+						}
+						else
+						{
+							<td>
+								<span class="badge text-bg-danger ">
+									No puede optar a este credito
+								</span>
+							</td>
+
+						}
+
+					</tr>
+					<tr>
+						<td>Avanzado</td>
+						<td>RD 15,001.00 $</td>
+						<td>RD 20,000.00 $</td>
+						@if (Coutas.Count(C => C.EstadoId == 2) >= 15)
+						{
+							<td>
+								<span class="badge text-bg-success ">
+									Disponible
+								</span>
+							</td>
+						}
+						else
+						{
+							<td>
+								<span class="badge text-bg-danger ">
+									No disponible
+								</span>
+							</td>
+
+						}
+						@if (Coutas.Count(C => C.EstadoId == 2) >= 15)
+						{
+							<td>
+								<button type="button" @onclick="Aprobar" class="btn btn-sm btn-outline-success bi bi-check-circle"></button>
+								<button type="button" @onclick="Denegar" class="btn btn-sm btn-outline-danger bi bi-x-circle"></button>
+							</td>
+						}
+						else
+						{
+							<td>
+								<span class="badge text-bg-danger ">
+									No puede optar a este credito
+								</span>
+							</td>
+
+						}
+					</tr>
+
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+
+<style>
+	body {
+	background-color: #f5f5f5;
+	}
+
+	.btn-success {
+	background-color: #0d5c63;
+	border: none;
+	}
+
+	.section-title {
+	background: #0d5c63;
+	color: white;
+	text-align: center;
+	font-weight: bold;
+	padding: 8px;
+	margin: 10px;
+	border-radius: 5px;
+	}
+
+	.tabla-pequena {
+	width: 50%; /* Ajusta el ancho de la tabla */
+	margin: auto; /* Centra la tabla */
+	font-size: 20px; /* Reduce el tamaño del texto */
+	}
+
+	.tabla-pequena caption {
+	font-size: 20px;
+	font-weight: bold;
+	margin-bottom: 2px;
+	}
+
+	.tabla-pequena th, .tabla-pequena td {
+	padding: 5px;
+	}
+</style>
+
+
+@code {
+	[Inject] ToastService toastService { get; set; }
+
+	[Parameter]
+	public int SolicitudCreditoId { get; set; }
+	public SolicitudesCredito Solicitud { get; set; } = new();
+	public List<CuotasCXC> Coutas { get; set; } = [];
+	public Clientes Clientes { get; set; } = new();
+	public ToastType TipoNotificacion { get; set; }
+	public string MensajeNotificacion { get; set; } = string.Empty;
+	public string TituloNotificacion { get; set; } = string.Empty;
+	public void MostrarToast(ToastType tipo, string titulo, string cuerpo)
+	=> toastService.Notify(new(tipo, titulo, cuerpo));
+
+
+	override protected async Task OnInitializedAsync()
+	{
+		Solicitud = await solicitudesCreditoService.Buscar(SolicitudCreditoId);
+		Clientes = await clienteService.Buscar(Solicitud.ClienteId);
+		Coutas = await solicitudesCreditoService.ObtenerCuotas(Solicitud.ClienteId);
+
+	}
+	public async Task Aprobar()
+	{
+		await solicitudesCreditoService.ActulizarEstado(SolicitudCreditoId, 5);
+		TipoNotificacion = ToastType.Success;
+		TituloNotificacion = "Enhorabuena!";
+		MensajeNotificacion = "¡Se ha aprobado la solicitud de credito exitosamente!";
+		MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+		navigation.NavigateTo("/Solicitudes-De-Credito/Index");
+	}
+	public async Task Denegar()
+	{
+		await solicitudesCreditoService.ActulizarEstado(SolicitudCreditoId, 6);
+		navigation.NavigateTo("/Solicitudes-De-Credito/Index");
+		TipoNotificacion = ToastType.Danger;
+		TituloNotificacion = "Mala suerte!";
+		MensajeNotificacion = "¡No se ha aprobado la solicitud de credito!";
+		MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+		navigation.NavigateTo("/Solicitudes-De-Credito/Index");
+
+	}
+}

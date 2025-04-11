@@ -1,0 +1,317 @@
+﻿@page "/Cuentas-Por-Cobrar/Index"
+@inject CuentasXCobrarService DeudaService
+@inject CuotasCXCService cuotasCXCService
+@inject ToastService toastService
+
+@rendermode InteractiveServer
+
+<PageTitle>Cuentas x Cobrar</PageTitle>
+<div class="container mb-4">
+	<div class="card">
+		<div class="row" style="background-color:white; padding:10px; margin:10px;">
+			<div class="col">
+				<div class="text-left">
+					<h2 class="text-black"><i class="bi bi-cash-stack"></i> Cuentas x Cobrar</h2>
+				</div>
+			</div>
+			<div class="col text-end">
+				<a href="/Cuentas-Por-Cobrar/Create" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Nueva CxC</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+	<div class="card">
+		<div class="card-body">
+			<div class="row mb-3">
+				<div class="col-4">
+					<div class="input-group">
+						<div class="form-floating">
+							<InputSelect class="form-select" id="floatingSelect" aria-label="Floating label select example" @bind-Value="@valorFiltro">
+								<option value="" selected disabled>--- Selecciona ---</option>
+								<option value="idcxc">ID CxC</option>
+								<option value="cliente">Cliente</option>
+								<option value="numerofactura">No. de Factura</option>
+							</InputSelect>
+							<label for="floatingSelect"><strong>Filtrar en base a...</strong></label>
+						</div>
+						@*btn restablecer*@
+						<button type="button" class="btn btn-secondary bi bi-arrow-counterclockwise" @onclick="() => Restablecer()"></button>
+					</div>
+				</div>
+
+				@*Btn Buscar*@
+				<div class="col">
+					<div class="input-group" style="width: 400px">
+						@*textbox buscar*@
+						<div class="form-floating">
+							<InputText @bind-Value="@searchBarValue" class="form-control" placeholder="" id="floatingSearch" />
+							<label for="floatingSearch">Buscar</label>
+						</div>
+						<button @onclick="Buscar" class="btn btn-secondary bi bi-search" type="button"></button>
+					</div>
+				</div>
+			</div>
+
+			<table class="table table-sm table-striped table-hover">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>No. de factura</th>
+						<th>Cliente</th>
+						<th>Monto de Orden</th>
+						<th>% de Interés</th>
+						<th>Saldo pendiente</th>
+						<th>Estado</th>
+						<th>Contacto</th>
+						<th>Acciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var cxc in ListaDeudas)
+					{
+						<tr>
+							<td>@cxc.CXCId</td>
+							<td>@cxc.OrdenVenta?.NumeroFactura</td>
+							<td>@cxc.OrdenVenta?.Clientes?.Nombre</td>
+							<td>RD$@cxc.OrdenVenta?.MontoTotal.ToString("N2")</td>
+							<td>@cxc.Interes%</td>
+							<td>RD$@cxc.Capital.ToString("N2")</td>
+							<td>
+								@switch (cxc.EstadoId)
+								{
+									case 1:
+										<span class="badge text-bg-danger">Pendiente</span>
+										break;
+									case 2:
+										<span class="badge btn-success">Pagado</span>
+										break;
+									case 3:
+										<span class="badge text-bg-warning">Pagado Tard&iacute;o</span>
+										break;
+									default:
+										<span class="badge text-bg-secondary">N/A</span>
+										break;
+								}
+							</td>
+							<td>@($"({cxc.OrdenVenta?.Clientes?.Telefono?[..3]}) {cxc.OrdenVenta?.Clientes?.Telefono?[3..6]}-{cxc.OrdenVenta?.Clientes?.Telefono?[6..]}")</td>
+
+							@*Botones*@
+							<td>
+								<a href="/Detalle-Cuenta-Por-Cobrar/@cxc.CXCId" class="btn btn-sm btn-outline-dark bi-eye"></a>
+								<button type="button" @onclick="() => MostrarModal(cxc.CXCId, cxc.OrdenVenta?.Clientes?.Nombre)" class="btn btn-sm btn-outline-danger bi bi-trash"></button>
+							</td>
+						</tr>
+					}
+				</tbody>
+				<caption>Cant. de Cuentas x Cobrar: @ListaDeudas.Count</caption>
+			</table>
+		</div>
+	</div>
+</div>
+
+@if (mostrarModal)
+{
+	<div class="modal fade show" tabindex="-1" style="display: block;" aria-modal="true" role="dialog">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header" style="background-color: #7B0323; color: white;">
+					<h5 class="modal-title">Eliminar Deuda</h5>
+					<button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p>¿Está seguro de que desea eliminar a este Deuda?</p>
+					<p>Esta opción no se puede deshacer.</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cancelar</button>
+					<button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-backdrop fade show" @onclick="CerrarModal"></div>
+}
+
+<style>
+	body {
+		background-color: #f5f5f5;
+	}
+
+	.btn-success {
+		background-color: #0d5c63;
+		border: none;
+	}
+</style>
+
+@code {
+	public string searchBarValue { get; set; } = string.Empty;
+	public string valorFiltro { get; set; } = string.Empty;
+	public DateTime? Desde { get; set; } = null;
+	public DateTime? Hasta { get; set; } = null;
+	public List<CuentasXCobrar> ListaDeudas { get; set; } = new List<CuentasXCobrar>();
+	public List<CuotasCXC> ListaCuotas { get; set; } = new List<CuotasCXC>();
+	public CuotasCXC Cuota { get; set; } = new CuotasCXC();
+
+	protected override async Task OnInitializedAsync()
+	{
+		ListaDeudas = await DeudaService.Listar(C => true);
+	}
+
+	// MODALS
+	private bool mostrarModal = false;
+	private int CXCIdSeleccionado { get; set; }
+	private string EmailClienteSelecionado { get; set; } = "";
+
+	private void MostrarModal(int clienteId, string clienteEmail)
+	{
+		CXCIdSeleccionado = clienteId;
+		EmailClienteSelecionado = clienteEmail;
+		mostrarModal = true;
+	}
+
+	private void CerrarModal()
+	{
+		mostrarModal = false;
+		CXCIdSeleccionado = 0;
+		EmailClienteSelecionado = "";
+	}
+
+	public async Task Eliminar()
+	{
+		try
+		{
+			// OJO: cuando sea necesario se descomentara este codigo
+			//
+			// var user = await UserManager.FindByEmailAsync(EmailClienteSelecionado);
+			// if (user == null)
+			// 	return;
+			// await UserManager.DeleteAsync(user);
+
+			await cuotasCXCService.Eliminar(CXCIdSeleccionado);
+			await DeudaService.Eliminar(CXCIdSeleccionado);
+			ListaDeudas = await DeudaService.Listar(x => true);
+			mostrarModal = false;
+			CXCIdSeleccionado = 0;
+			TipoNotificacion = ToastType.Success;
+			TituloNotificacion = "Enhorabuena";
+			MensajeNotificacion = "¡Se ha eliminado la Cuenta X Cobrar y sus cuotas exitosamente!";
+			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+		}
+		catch (Exception ex)
+		{
+			TipoNotificacion = ToastType.Danger;
+			TituloNotificacion = "Error";
+			MensajeNotificacion = "Hubo un error al eliminar la deuda.";
+			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+		}
+	}
+
+	//NOTIFICACIONES
+	public ToastType TipoNotificacion { get; set; }
+	public string MensajeNotificacion { get; set; } = string.Empty;
+	public string TituloNotificacion { get; set; } = string.Empty;
+
+	public void MostrarToast(ToastType tipo, string titulo, string cuerpo)
+	=> toastService.Notify(new(tipo, titulo, cuerpo));
+
+	// Filtro de busqueda
+	public async Task Buscar()
+	{
+		if (string.IsNullOrEmpty(valorFiltro))
+		{
+			TipoNotificacion = ToastType.Warning;
+			TituloNotificacion = "Aviso";
+			MensajeNotificacion = "Debe seleccionar una opción en el fitro.";
+			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+			ListaDeudas = await DeudaService.Listar(x => true);
+			return;
+		}
+
+		searchBarValue.Trim().ToLower();
+
+		switch (valorFiltro)
+		{
+			case "cliente":
+				if (string.IsNullOrEmpty(searchBarValue))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "Debe proveer un nombre para buscar";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				if (searchBarValue.All(char.IsDigit))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "El criterio de búsqueda solo puede alojar letras";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				ListaDeudas = await DeudaService.Listar(lt => lt.OrdenVenta.Clientes.Nombre == searchBarValue);
+				break;
+
+			case "idcxc":
+				if (string.IsNullOrEmpty(searchBarValue))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "Debe proveer el ID de la CxC para buscar";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				if (!searchBarValue.All(char.IsDigit))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "El criterio de búsqueda solo puede alojar números.";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				if (int.TryParse(searchBarValue, out int id))
+					ListaDeudas = await DeudaService.Listar(lt => lt.CXCId == id);
+				break;
+
+			case "numerofactura":
+				if (string.IsNullOrEmpty(searchBarValue))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "Debe proveer el número de la factura para buscar";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				if (!searchBarValue.All(char.IsDigit))
+				{
+					TipoNotificacion = ToastType.Warning;
+					TituloNotificacion = "Aviso";
+					MensajeNotificacion = "El criterio de búsqueda solo puede alojar números.";
+					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+					return;
+				}
+				ListaDeudas = await DeudaService.Listar(lt => lt.OrdenVenta.NumeroFactura == searchBarValue);
+				break;
+
+			default:
+				ListaDeudas = await DeudaService.Listar(x => true);
+				break;
+		}
+	}
+
+	public async Task Restablecer()
+	{
+		ListaDeudas = await DeudaService.Listar(x => true);
+		searchBarValue = string.Empty;
+		valorFiltro = string.Empty;
+		Desde = null;
+		Hasta = null;
+
+		TipoNotificacion = ToastType.Info;
+		TituloNotificacion = "Aviso";
+		MensajeNotificacion = "Se han restablecido los criterios de búsqueda.";
+		MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
+	}
+}
+

@@ -1,0 +1,170 @@
+﻿@page "/CxP/Compra/Create"
+@inject ProvedoresServices provedoresService
+@inject CompraServices compraService
+@inject EstadoServices estadoServices
+@inject ProductosService productosServices
+@inject NavigationManager navigation
+
+<EditForm Model="Compra" OnValidSubmit="Guardar">
+	<DataAnnotationsValidator />
+	<div class="container">
+		<div class="card">
+			<div class="card-body">
+				<div class="section-title">Datos de compra</div>
+
+				<div class="row">
+					<div class="col">
+						<label>Fecha</label>
+						<InputDate class="form-control" @bind-Value="Compra.Fecha" placeholder="CompraId " readonly></InputDate>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col">
+						<label>Descripcion</label>
+						<InputText class="form-control" @bind-Value="Compra.Descripcion" placeholder="Compra de jose"></InputText>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col">
+						<label>Provedor</label>
+						<InputSelect class="form-control form-select" @bind-Value="Compra.ProvedorId">
+							<option value="0" selected disabled>Elija un provedor</option>
+							@foreach (var provedor in Provedores)
+							{
+								<option value="@provedor.ProvedorId">@provedor.Nombre</option>
+							}
+						</InputSelect>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="border border-success p-3 mt-3">
+			<h5>Detalles de la Compra</h5>
+			<ProductoPicker ListProductos="ListaProductos"
+							ProductoId="DetalleSeleccionado.ProductoId"
+							Cantidad="DetalleSeleccionado.Cantidad"
+							ProductoSeleccionado="AgregarDetalle" />
+
+			<table class="table table-light text-center">
+				<thead class="thead-light">
+					<tr class="text-center">
+						<th>Producto Id</th>
+						<th>Producto</th>
+						<th>Cantidad</th>
+						<th>Remover</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var destalles in Compra.ComprasDetalles)
+					{
+						<tr>
+							<td>@destalles.ProductoId</td>
+							@if (@ListaProductos.Exists(p => p.ProductoId == destalles.ProductoId))
+							{
+								var Producto = ListaProductos.FirstOrDefault(p => p.ProductoId == destalles.ProductoId);
+								<td>@Producto.Nombre</td>
+							}
+							<td>@destalles.Cantidad</td>
+							<td>
+								<button Type="button" class="btn btn-outline-danger bi bi-trash"
+										@onclick="() => RemoverDestalle(destalles)"></button>
+							</td>
+						</tr>
+					}
+				</tbody>
+
+			</table>
+		</div>
+		<div class="row mt-3">
+			<div class="col-6 offsed>t-6">
+				<div class="mb-3">
+					<label class="form-label"><strong>Monto Total</strong></label>
+					<label class="form-control text-end">
+						<strong>@(Compra.ComprasDetalles?.Sum(d => d.Precio * d.Cantidad) ?? 0)</strong>
+					</label>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="text-center">
+		<button type="submit" class="btn btn-success">Guardar</button>
+		<a href="/CxP/Compra/Index" class="btn btn-secondary">Volver</a>
+	</div>
+</EditForm>
+
+@code {
+	public Compras Compra { get; set; } = new Compras();
+	public List<Provedores> Provedores { get; set; } = new List<Provedores>();
+	public List<Estados> Estados { get; set; } = new List<Estados>();
+	public List<Productos> ListaProductos { get; set; } = new List<Productos>();
+	public ComprasDetalles DetalleSeleccionado { get; set; } = new();
+	[Inject] protected ToastService ToastService { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		ListaProductos = await productosServices.Listar(p => true);
+		Provedores = await provedoresService.Listar(C => true);
+		Estados = await estadoServices.Listar(C => true);
+	}
+
+	private async Task AgregarDetalle((Productos producto, int cantidad) selection)
+	{
+		var DetalleExistente = Compra.ComprasDetalles
+				.FirstOrDefault(A => A.ProductoId == selection.producto.ProductoId);
+		if (DetalleExistente != null)
+		{
+			DetalleExistente.Cantidad += selection.cantidad;
+			ToastService.Notify(new(ToastType.Success, "Exito", $"Cantidad actulizada correctamente."));
+
+			return;
+		}
+
+		var destalle = new ComprasDetalles
+			{
+				ProductoId = selection.producto.ProductoId,
+				Precio = selection.producto.Precio,
+				Cantidad = selection.cantidad
+			};
+
+
+		Compra.ComprasDetalles.Add(destalle);
+		DetalleSeleccionado = new ComprasDetalles();
+		await Task.CompletedTask;
+	}
+
+	public async Task Guardar()
+	{
+		try
+		{
+			Compra.EstadoId = 1;
+			Compra.Total = Compra.ComprasDetalles.Sum(d => d.Precio * d.Cantidad);
+			var paso = await compraService.Guardar(Compra);
+
+			if (paso)
+			{
+				ToastService.Notify(new(ToastType.Success, "Exito", $" Creado correctamente."));
+			}
+
+			else
+			{
+				ToastService.Notify(new(ToastType.Danger, "Error", $"No se pudo guardar."));
+			}
+		}
+		catch (Exception ex)
+		{
+			ToastService.Notify(new(ToastType.Danger, "Error", $"Error al guardar: {ex.Message}"));
+			ToastService.Notify(new(ToastType.Danger, $"Detalles del error: {ex.InnerException?.Message}"));
+		}
+	}
+
+	public void RemoverDestalle(ComprasDetalles detalles)
+	{
+		Compra.ComprasDetalles.Remove(detalles);
+		DetalleSeleccionado.Cantidad = detalles.Cantidad;
+		DetalleSeleccionado.ProductoId = detalles.ProductoId;
+		DetalleSeleccionado.Precio = detalles.Precio;
+	}
+
+}

@@ -36,6 +36,8 @@
                 </div>
                 <div class="col text-end">
                     <a href="/Productos/Create" class="btn btn-secondary">Crear nuevo producto</a>
+                    <!-- Botón para gestionar categorías -->
+                    <a href="/Categorias" class="btn btn-primary ms-2">Gestionar Categorías</a>
                 </div>
             </div>
 
@@ -49,6 +51,7 @@
                                 <option value="codigo">Código</option>
                                 <option value="nombre">Nombre</option>
                                 <option value="fechaingreso">Fecha de Ingreso</option>
+                                <option value="categoria">Categoría</option>
                             </InputSelect>
                             <label for="floatingSelect"><strong>Filtrar en base a...</strong></label>
                         </div>
@@ -107,11 +110,11 @@
                                 <td>@producto.ProductoId</td>
                                 <td>@producto.Codigo</td>
                                 <td>@producto.Nombre</td>
-                                <td>@producto.Proveedor</td>
-                                <td>@producto.Precio.ToString("C")</td>
-                                <td>@producto.Costo.ToString("C")</td>
+                                <td>@producto.Proveedor?.Nombre</td>
+                                <td>@producto.Precio.ToString("C2")</td>
+                                <td>@producto.Costo.ToString("C2")</td>
                                 <td>@producto.FechaIngreso.ToString("dd/M/yyyy")</td>
-                                <td>@producto.Categoria</td>
+                                <td>@producto.Categoria?.Nombre</td>
                                 <td>@producto.Descripcion</td>
                                 <td>
                                     <a href="/Productos/Edit/@producto.ProductoId" class="btn btn-outline-info bi bi-pencil-square"></a>
@@ -126,7 +129,6 @@
         </div>
     </div>
 </div>
-
 
 
 @code {
@@ -191,6 +193,11 @@
                 if (Desde != null && Hasta != null)
                     ListaProductos = await productoService.Listar(p => p.FechaIngreso >= Desde && p.FechaIngreso <= Hasta);
                 break;
+            case "categoria":
+                // Suponiendo que tienes el nombre de la categoría en `searchBarValue`
+                ListaProductos = await productoService.Listar(p => p.Categoria.Nombre.Contains(searchBarValue));
+                break;
+
             default:
                 ListaProductos = await productoService.Listar(p => true);
                 break;

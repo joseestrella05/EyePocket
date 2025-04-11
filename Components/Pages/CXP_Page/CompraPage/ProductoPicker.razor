@@ -1,0 +1,48 @@
+﻿﻿<div class="col-auto input-group align-items-center">
+
+	<InputSelect class="form-select" @bind-Value="ProductoId">
+
+		<option disabled value="0">--- Seleccione un articulo ---</option>
+		@foreach (var productos in ListProductos)
+		{
+			<option value="@productos.ProductoId">@productos.Nombre</option>
+		}
+
+	</InputSelect>
+
+	<label class="col-form-label input-group-text">Cantidad </label>
+	<InputNumber class="form-control" @bind-Value="Cantidad" placeholder="0"></InputNumber>
+
+	<button type="button" class="btn btn-outline-success bi bi-plus mt-2" @onclick="ElegirProducto">Agregar detalle</button>
+</div>
+
+@code {
+	[Parameter]
+	public List<Productos> ListProductos { get; set; } = [];
+
+	[Parameter]
+	public int ProductoId { get; set; }
+
+	[Parameter]
+	public int Cantidad { get; set; }
+
+	[Parameter]
+	public EventCallback<(Productos Productos, int cantidad)> ProductoSeleccionado { get; set; }
+
+	public string? ErrorMensaje { get; set; }
+
+	private async Task ElegirProducto()
+	{
+		ErrorMensaje = null;
+			if (ProductoId > 0)
+		{
+				var Articulo = ListProductos.Single(p => p.ProductoId == ProductoId);
+		
+			await ProductoSeleccionado.InvokeAsync((Articulo, Cantidad));
+		}
+		else
+		{
+			ErrorMensaje = "No hay un Articulo Seleccionado o la cantidad es cero o menor";
+		}
+	}
+} 
