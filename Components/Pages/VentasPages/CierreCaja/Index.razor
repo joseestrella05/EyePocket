@@ -140,7 +140,6 @@
         if (cierreYaHecho)
         {
             MostrarToast(ToastType.Danger, "Cierre ya realizado", "Ya se ha realizado el cierre de caja para hoy.");
-            return;
         }
 
         ListaOrdenVentas = await ordenVentaService.Listar(o => o.FechaEmision.Date == hoy);
