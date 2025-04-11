@@ -87,10 +87,6 @@
             <i class="bi bi-cash me-2"></i> Cobrar
         </button>
 
-        @*   <button class="btn btn-info d-flex align-items-center px-3 py-2 rounded-pill" onclick="location.href='/Ventas/Facturacion/Edit'">
-            <i class="bi bi-eye me-2"></i> Ver Factura
-        </button> *@
-
         <div class="p-3 rounded-3 shadow" style="background-color: #004b55; color: white; min-width: 200px;">
             <h4 class="m-0 text-start" style="font-size: 1.5rem;">Total $@ListaFacturas.Sum(f => f.Subtotal)</h4>
             <p class="m-0 text-start" style="font-size: 1rem;">SubTotal $@ListaFacturas.Sum(f => f.Subtotal)</p>
@@ -147,15 +143,9 @@
                             <h3>Total a Pagar</h3>
                             <h1 class="fw-bold">$@ListaFacturas.Sum(f => f.Subtotal).ToString("0.00")</h1>
 
-                            <button class="btn btn-success w-50 mt-4 rounded-pill" @onclick="Cobrar">
-                                <i class="bi bi-cash"></i> Cobrar
-                            </button>
-
                             <button class="btn btn-success w-50 mt-2 rounded-pill" @onclick="MostrarModalFactura">
                                 <i class="bi bi-printer"></i> Imprimir
                             </button>
-
-
 
                             <button class="btn btn-danger w-50 mt-2 rounded-pill" @onclick="CerrarModalCobro">
                                 <i class="bi bi-x-circle"></i> Cancelar
@@ -503,6 +493,7 @@
 
     private void MostrarModalPagoaCredito()
     {
+        RNCIngresado = "123123";
         mostrarModalCobro = false;
         mostrarModalPagoaCredito = true;
     }
@@ -516,6 +507,7 @@
 
     private void MostrarModalPagoTarjeta()
     {
+        RNCIngresado = "123123";
         mostrarModalCobro = false;
         mostrarModalPagoTarjeta = true;
     }
