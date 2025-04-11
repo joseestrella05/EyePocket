@@ -47,7 +47,6 @@
     </div>
 </div>
 
-
 <!-- Tabla -->
 <table class="table table-striped table-hover table-bordered text-center align-middle">
     <thead class="bg-dark">
@@ -73,7 +72,7 @@
                 <td>@historial.MontoDeVentas.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
                 <td>@historial.MontoDeCierre.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
                 <td>
-                    <button class="btn btn-warning btn-sm" @onclick="() => DetalleHistorial()">
+                    <button class="btn btn-warning btn-sm" @onclick="() => DetalleHistorial(historial)">
                         <span class="bi bi-eye"></span> Detalle
                     </button>
                 </td>
@@ -103,6 +102,53 @@
     }
 </style>
 
+@if (mostrarModalCierre)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #004b55;">
+                    <h5 class="modal-title fw-bold text-white">Detalle del Cierre de Caja</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModalCierre"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <h4 class="fw-bold">Cierre del día <strong>@cierreSeleccionado.Fecha.ToString("dd/MM/yyyy")</strong></h4>
+                    </div>
+
+                    <table class="table table-bordered text-center">
+                        <tr>
+                            <th>ID Cierre</th>
+                            <td>@cierreSeleccionado.CierreId</td>
+                        </tr>
+                        <tr>
+                            <th>Monto de Apertura</th>
+                            <td>@cierreSeleccionado.MontoApertura.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                        </tr>
+                        <tr>
+                            <th>Monto de Ventas</th>
+                            <td>@cierreSeleccionado.MontoDeVentas.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                        </tr>
+                        <tr>
+                            <th>Cantidad de Ventas</th>
+                            <td>@cierreSeleccionado.CantidadDeVentas</td>
+                        </tr>
+                        <tr>
+                            <th>Monto de Cierre</th>
+                            <td class="fw-bold">@cierreSeleccionado.MontoDeCierre.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="modal-footer d-flex justify-content-end">
+                    <button class="btn btn-secondary" @onclick="CerrarModalCierre">
+                        <i class="bi bi-x-circle"></i> Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     public CierreCaja cierreCaja { get; set; } = new CierreCaja();
     public List<CierreCaja> ListaCierreCaja { get; set; } = new List<CierreCaja>();
@@ -110,17 +156,25 @@
     private string filtro = "id";
     public DateTime? Desde { get; set; }
     public DateTime? Hasta { get; set; }
+    private bool mostrarModalCierre = false;
+    private CierreCaja cierreSeleccionado = new CierreCaja();
 
     protected override async Task OnInitializedAsync()
     {
         ListaCierreCaja = await cierreCajaService.Listar(c => true);
     }
 
-    private async Task DetalleHistorial()
+    private void DetalleHistorial(CierreCaja cierre)
     {
+        cierreSeleccionado = cierre;
+        mostrarModalCierre = true;
     }
 
- 
+    private void CerrarModalCierre()
+    {
+        cierreSeleccionado = new CierreCaja();
+        mostrarModalCierre = false;
+    }
 
     public async Task Buscar()
     {
