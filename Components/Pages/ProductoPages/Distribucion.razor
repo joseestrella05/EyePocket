@@ -9,10 +9,13 @@
     body {
         background-color: #f8f9fa;
         font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
     }
 
     .container {
-        max-width: 900px;
+        width: 90%;
+        max-width: 1200px;
         margin: auto;
         padding: 20px;
         background: white;
@@ -20,21 +23,37 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #007bff;
+        color: white;
+    }
+
     .btn {
-        padding: 10px 16px;
-        margin: 5px;
+        padding: 8px 16px;
         border: none;
         border-radius: 5px;
         color: white;
         cursor: pointer;
+        transition: background 0.3s;
     }
 
     .btn-blue {
-        background-color: #0d5c63;
+        background-color: #007bff;
     }
 
         .btn-blue:hover {
-            background-color: #084c52;
+            background-color: #0056b3;
         }
 
     .btn-green {
@@ -53,116 +72,525 @@
             background-color: #c82333;
         }
 
-    .section {
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
+    .btn-orange {
+        background-color: #fd7e14;
     }
+
+        .btn-orange:hover {
+            background-color: #e06c00;
+        }
+
+    .footer {
+        text-align: center;
+        padding: 10px;
+        margin-top: 20px;
+        background: #007bff;
+        color: white;
+        border-radius: 5px;
+    }
+
+    .stats-container {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .stat-card {
+        padding: 12px 16px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s, transform 0.2s;
+        cursor: default;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 120px;
+        font-weight: bold;
+    }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+
+    .stat-green {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+        .stat-green:hover {
+            background-color: #c3e6cb;
+        }
+
+    .stat-blue {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+        .stat-blue:hover {
+            background-color: #bee5eb;
+        }
+
+    .stat-red {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+        .stat-red:hover {
+            background-color: #f5c6cb;
+        }
+
+    .stat-purple {
+        background-color: #e2d9f3;
+        color: #4c2c92;
+    }
+
+        .stat-purple:hover {
+            background-color: #d6c7e8;
+        }
+
+    .stat-card .label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .stat-card .value {
+        font-size: 1.5rem;
+    }
+
+    .inline-stats {
+        display: inline-flex;
+        align-items: center;
+        margin-left: 16px;
+        vertical-align: middle;
+    }
+
+        .inline-stats .stat-card {
+            min-width: 100px;
+            padding: 8px 12px;
+        }
+
+            .inline-stats .stat-card .value {
+                font-size: 1.2rem;
+            }
+
+    .search-container {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+        .search-container input,
+        .search-container select {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .search-container button {
+            flex-shrink: 0;
+        }
 </style>
 
 <div class="container">
-    <h3 class="text-2xl font-bold mb-6 text-gray-800">Distribución por Góndola</h3>
+    <h3 class="text-2xl font-bold mb-6 text-gray-800">Distribución de Inventario</h3>
 
-    <button class="btn btn-green" @onclick="IniciarInventario">Iniciar Inventario</button>
-    <button class="btn btn-blue" @onclick="LeerCodigo" disabled="@(!InventarioEnCurso)">Leer Código</button>
-    <button class="btn btn-red" @onclick="FinalizarInventario">Finalizar Inventario</button>
+    <div class="p-4 border rounded mb-4">
+        <EditForm Model="NuevaDistribucion" OnValidSubmit="GuardarDistribucion">
+            <DataAnnotationsValidator />
 
-    <div class="section">
-        <h4>Estantería Actual: <strong>@EstanteriaActual</strong></h4>
+            <div class="mb-3">
+                <button type="button" class="btn btn-orange mb-4" @onclick="IniciarInventario">Iniciar Inventario</button>
+            </div>
+
+            <div class="mb-3 flex items-center">
+                <div class="flex-1">
+                    <label class="block font-semibold">Ubicación de Estantería:</label>
+                    <InputSelect @bind-Value="NuevaDistribucion.UbicacionEstanteria" class="w-full p-2 border rounded">
+                        @foreach (var ubicacion in Ubicaciones)
+                        {
+                            <option value="@ubicacion">@ubicacion</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="inline-stats">
+                    <div class="stat-card stat-purple">
+                        <span class="label">Espacio Disponible</span>
+                        <span class="value">@EspacioDisponibleEstanteria</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3 flex items-center">
+                <label class="block font-semibold mr-2">Producto:</label>
+                <InputText @bind-Value="ProductoSeleccionadoNombre" class="w-full p-2 border rounded" readonly />
+                <button type="button" class="btn btn-blue ml-2" @onclick="LeerCodigoBarras">Leer Código de Barras</button>
+                <button type="button" class="btn btn-blue ml-2" @onclick="ActualizarCantidadDisponible">Actualizar Cantidad</button>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-card stat-green">
+                    <span class="label">Cantidad en Inventario</span>
+                    <span class="value">@CantidadEnInventario</span>
+                </div>
+                <div class="stat-card stat-blue">
+                    <span class="label">Disponible</span>
+                    <span class="value">@CantidadDisponible</span>
+                </div>
+                <div class="stat-card stat-red">
+                    <span class="label">Distribuida</span>
+                    <span class="value">@CantidadDistribuida</span>
+                </div>
+            </div>
+
+            <div class="mb-3 flex items-center">
+                <label class="block font-semibold">Cantidad:</label>
+                <button type="button" class="btn btn-blue" @onclick="() => CambiarCantidad(-1)">-</button>
+                <InputNumber @bind-Value="NuevaDistribucion.Cantidad" class="w-16 text-center border mx-2" readonly />
+                <button type="button" class="btn btn-blue" @onclick="() => CambiarCantidad(1)">+</button>
+            </div>
+
+            <div class="flex space-x-2">
+                <button type="submit" class="btn btn-green">@(NuevaDistribucion.DistribucionId > 0 ? "Actualizar" : "Guardar")</button>
+                <button type="button" class="btn btn-blue" @onclick="LimpiarFormulario">Limpiar</button>
+            </div>
+        </EditForm>
     </div>
 
-    <div class="section">
-        <h4>Espacios Disponibles: <strong>@EspaciosDisponibles</strong></h4>
+    <!-- Sección de búsqueda de distribuciones -->
+    <h4 class="mt-6 font-semibold text-gray-800">Buscar Distribución</h4>
+    <div class="mb-4 search-container">
+        <div>
+            <label class="block font-semibold mb-1">Producto:</label>
+            <InputText @bind-Value="FiltroProducto"
+                       class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       placeholder="Nombre del producto" />
+        </div>
+        <div>
+            <label class="block font-semibold mb-1">Estantería:</label>
+            <InputSelect @bind-Value="FiltroEstanteria"
+                         class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Todas las estanterías</option>
+                @foreach (var ubicacion in Ubicaciones)
+                {
+                    <option value="@ubicacion">@ubicacion</option>
+                }
+            </InputSelect>
+        </div>
+        <div>
+            <label class="block font-semibold mb-1 invisible">Buscar:</label>
+            <button type="button" class="btn btn-blue" @onclick="FiltrarDistribuciones">Buscar</button>
+        </div>
     </div>
 
-    <div class="section">
-        <h4>Productos en esta estantería:</h4>
-        <ul>
-            @foreach (var producto in ProductosEnEstanteria)
+    <h4 class="mt-6 font-semibold text-gray-800">Distribuciones Guardadas</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Ubicación</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var distribucion in DistribucionesFiltradas)
             {
-                <li>@producto.Nombre - Cantidad: @producto.Cantidad</li>
+                <tr>
+                    <td>@Productos.FirstOrDefault(p => p.ProductoId == distribucion.ProductoId)?.Nombre</td>
+                    <td>@distribucion.Cantidad</td>
+                    <td>@distribucion.UbicacionEstanteria</td>
+                    <td>@distribucion.FechaIngreso.ToShortDateString()</td>
+                    <td>
+                        <button class="btn btn-blue" @onclick="() => EditarDistribucion(distribucion)">Editar</button>
+                        <button class="btn btn-red" @onclick="() => EliminarDistribucion(distribucion)">Eliminar</button>
+                    </td>
+                </tr>
             }
-        </ul>
-    </div>
+        </tbody>
+    </table>
 </div>
 
 @code {
-    private List<string> Estanterias = Enumerable.Range(1, 14)
-        .SelectMany(n => new[] { $"{n}A", $"{n}B" }).ToList();
-    private string EstanteriaActual;
-    private List<(string Nombre, int Cantidad)> ProductosEnEstanteria = new();
-    private int IndiceEstanteria = 0;
-    private bool InventarioEnCurso = false;
-    private int CapacidadEstanteria = 5; // Capacidad máxima por estantería
+    private DistribucionInventario NuevaDistribucion { get; set; } = new DistribucionInventario();
+    private List<DistribucionInventario> Distribuciones { get; set; } = new List<DistribucionInventario>();
+    private List<Productos> Productos { get; set; } = new List<Productos>();
+    private List<string> Ubicaciones { get; set; } = new List<string>();
+    private int CantidadEnInventario { get; set; } = 0;
+    private int CantidadDisponible { get; set; } = 0;
+    private int CantidadDistribuida { get; set; } = 0;
+    private string ProductoSeleccionadoNombre { get; set; } = string.Empty;
+    private Random RandomGenerator { get; set; } = new Random();
+    private int EspacioDisponibleEstanteria { get; set; } = 0;
+    private const int CapacidadMaximaEstanteria = 20;
+    private string FiltroEstanteria { get; set; } = string.Empty;
+    private string FiltroProducto { get; set; } = string.Empty;
+    private List<DistribucionInventario> DistribucionesFiltradas { get; set; } = new List<DistribucionInventario>();
 
-    private int EspaciosDisponibles => CapacidadEstanteria - ProductosEnEstanteria.Sum(p => p.Cantidad);
+    protected override async Task OnInitializedAsync()
+    {
+        Ubicaciones = Enumerable.Range(1, 14).SelectMany(numero => new[] { $"{numero}A", $"{numero}B" }).ToList();
+        Productos = await productosService.Listar(producto => true);
+        Distribuciones = await distribucionInventarioService.Listar(distribucion => true);
+        DistribucionesFiltradas = Distribuciones; // Inicialmente mostramos todas las distribuciones
+    }
+
+    private void FiltrarDistribuciones()
+    {
+        var distribucionesFiltradas = Distribuciones.AsQueryable();
+
+        // Filtrar por producto
+        if (!string.IsNullOrEmpty(FiltroProducto))
+        {
+            distribucionesFiltradas = distribucionesFiltradas.Where(d =>
+                Productos.Any(p => p.ProductoId == d.ProductoId &&
+                                   p.Nombre.Contains(FiltroProducto, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        // Filtrar por estantería
+        if (!string.IsNullOrEmpty(FiltroEstanteria))
+        {
+            distribucionesFiltradas = distribucionesFiltradas.Where(d =>
+                d.UbicacionEstanteria.Equals(FiltroEstanteria, StringComparison.OrdinalIgnoreCase));
+        }
+
+        DistribucionesFiltradas = distribucionesFiltradas.ToList();
+        StateHasChanged(); // Actualiza la UI
+    }
 
     private void IniciarInventario()
     {
-        if (!InventarioEnCurso)
-        {
-            InventarioEnCurso = true;
-            IndiceEstanteria = 0;
-            CambiarEstanteria();
-        }
+        NuevaDistribucion = new DistribucionInventario { UbicacionEstanteria = "1A" };
+        ProductoSeleccionadoNombre = string.Empty;
+        CantidadEnInventario = 0;
+        CantidadDisponible = 0;
+        CantidadDistribuida = 0;
+        ActualizarEspacioEstanteria();
     }
 
-    private void CambiarEstanteria()
+    private void ActualizarEspacioEstanteria()
     {
-        if (IndiceEstanteria < Estanterias.Count)
+        if (!string.IsNullOrEmpty(NuevaDistribucion.UbicacionEstanteria))
         {
-            EstanteriaActual = Estanterias[IndiceEstanteria];
-            ProductosEnEstanteria.Clear();
+            var distribucionesEnEstanteria = Distribuciones
+                .Where(d => d.UbicacionEstanteria == NuevaDistribucion.UbicacionEstanteria)
+                .ToList();
+
+            if (NuevaDistribucion.DistribucionId > 0)
+            {
+                distribucionesEnEstanteria = distribucionesEnEstanteria
+                    .Where(d => d.DistribucionId != NuevaDistribucion.DistribucionId)
+                    .ToList();
+            }
+
+            var cantidadOcupada = distribucionesEnEstanteria.Sum(d => d.Cantidad);
+            if (NuevaDistribucion.DistribucionId == 0)
+            {
+                cantidadOcupada += NuevaDistribucion.Cantidad;
+            }
+            EspacioDisponibleEstanteria = CapacidadMaximaEstanteria - cantidadOcupada;
         }
         else
         {
-            FinalizarInventario();
+            EspacioDisponibleEstanteria = 0;
         }
     }
 
-    private void LeerCodigo()
+    private async Task LeerCodigoBarras()
     {
-        if (InventarioEnCurso && EspaciosDisponibles > 0)
+        if (Productos.Any())
         {
-            var producto = ObtenerProductoAleatorio();
-            var existente = ProductosEnEstanteria.FirstOrDefault(p => p.Nombre == producto);
+            var productoAleatorio = Productos[RandomGenerator.Next(Productos.Count)];
+            NuevaDistribucion.ProductoId = productoAleatorio.ProductoId;
+            ProductoSeleccionadoNombre = productoAleatorio.Nombre;
+            await ActualizarDatosProducto(productoAleatorio.ProductoId);
+        }
+    }
 
-            if (!string.IsNullOrEmpty(existente.Nombre))
+    private async Task ActualizarCantidadDisponible()
+    {
+        if (NuevaDistribucion.ProductoId > 0)
+        {
+            await ActualizarDatosProducto(NuevaDistribucion.ProductoId);
+        }
+    }
+
+    private async Task ActualizarDatosProducto(int productoId)
+    {
+        var inventario = await inventarioService.ObtenerInventarioPorProducto(productoId);
+        CantidadEnInventario = inventario?.Stock ?? 0;
+
+        var distribuciones = await distribucionInventarioService.ObtenerDistribucionesPorProducto(productoId);
+
+        if (NuevaDistribucion.DistribucionId > 0)
+        {
+            CantidadDistribuida = distribuciones.Where(distribucion => distribucion.DistribucionId != NuevaDistribucion.DistribucionId).Sum(distribucion => distribucion.Cantidad);
+        }
+        else
+        {
+            CantidadDistribuida = distribuciones.Sum(distribucion => distribucion.Cantidad);
+        }
+
+        CantidadDisponible = CantidadEnInventario - CantidadDistribuida;
+    }
+
+    private void CambiarCantidad(int cambio)
+    {
+        var nuevaCantidad = NuevaDistribucion.Cantidad + cambio;
+        var distribucionesEnEstanteria = Distribuciones
+            .Where(d => d.UbicacionEstanteria == NuevaDistribucion.UbicacionEstanteria)
+            .ToList();
+
+        if (NuevaDistribucion.DistribucionId > 0)
+        {
+            distribucionesEnEstanteria = distribucionesEnEstanteria
+                .Where(d => d.DistribucionId != NuevaDistribucion.DistribucionId)
+                .ToList();
+        }
+
+        var cantidadOcupada = distribucionesEnEstanteria.Sum(d => d.Cantidad);
+        var espacioDisponibleReal = CapacidadMaximaEstanteria - cantidadOcupada;
+
+        if (nuevaCantidad >= 0 &&
+            nuevaCantidad <= CantidadDisponible &&
+            nuevaCantidad <= espacioDisponibleReal)
+        {
+            NuevaDistribucion.Cantidad = nuevaCantidad;
+            ActualizarEspacioEstanteria();
+        }
+    }
+
+    private async Task GuardarDistribucion()
+    {
+        if (NuevaDistribucion.Cantidad > 0 &&
+            !string.IsNullOrEmpty(NuevaDistribucion.UbicacionEstanteria) &&
+            NuevaDistribucion.ProductoId > 0)
+        {
+            var distribucionesEnEstanteria = Distribuciones
+                .Where(d => d.UbicacionEstanteria == NuevaDistribucion.UbicacionEstanteria)
+                .ToList();
+
+            if (NuevaDistribucion.DistribucionId > 0)
             {
-                ProductosEnEstanteria.Remove(existente);
-                ProductosEnEstanteria.Add((producto, existente.Cantidad + 1));
-            }
-            else
-            {
-                ProductosEnEstanteria.Add((producto, 1));
+                distribucionesEnEstanteria = distribucionesEnEstanteria
+                    .Where(d => d.DistribucionId != NuevaDistribucion.DistribucionId)
+                    .ToList();
             }
 
-            // Verificar si la estantería se llenó
-            if (EspaciosDisponibles == 0)
+            var cantidadOcupada = distribucionesEnEstanteria.Sum(d => d.Cantidad);
+            var espacioDisponibleReal = CapacidadMaximaEstanteria - cantidadOcupada;
+
+            if (NuevaDistribucion.Cantidad <= espacioDisponibleReal)
             {
-                IndiceEstanteria++;
-                if (IndiceEstanteria < Estanterias.Count)
+                if (NuevaDistribucion.DistribucionId > 0)
                 {
-                    CambiarEstanteria();
+                    await distribucionInventarioService.Modificar(NuevaDistribucion);
+                    var distribucionExistente = Distribuciones.FirstOrDefault(d => d.DistribucionId == NuevaDistribucion.DistribucionId);
+                    if (distribucionExistente != null)
+                    {
+                        distribucionExistente.ProductoId = NuevaDistribucion.ProductoId;
+                        distribucionExistente.Cantidad = NuevaDistribucion.Cantidad;
+                        distribucionExistente.UbicacionEstanteria = NuevaDistribucion.UbicacionEstanteria;
+                        distribucionExistente.FechaIngreso = NuevaDistribucion.FechaIngreso;
+                    }
                 }
                 else
                 {
-                    FinalizarInventario();
+                    NuevaDistribucion.FechaIngreso = DateTime.Now;
+                    await distribucionInventarioService.Insertar(NuevaDistribucion);
+                    Distribuciones.Add(new DistribucionInventario
+                        {
+                            DistribucionId = NuevaDistribucion.DistribucionId, // Asumimos que Insertar asigna un ID
+                            ProductoId = NuevaDistribucion.ProductoId,
+                            Cantidad = NuevaDistribucion.Cantidad,
+                            UbicacionEstanteria = NuevaDistribucion.UbicacionEstanteria,
+                            FechaIngreso = NuevaDistribucion.FechaIngreso
+                        });
                 }
+
+                var estanteriaActual = NuevaDistribucion.UbicacionEstanteria;
+
+                NuevaDistribucion = new DistribucionInventario();
+                ProductoSeleccionadoNombre = string.Empty;
+                CantidadEnInventario = 0;
+                CantidadDisponible = 0;
+                CantidadDistribuida = 0;
+
+                NuevaDistribucion.UbicacionEstanteria = estanteriaActual;
+                ActualizarEspacioEstanteria();
+
+                if (EspacioDisponibleEstanteria <= 0)
+                {
+                    CambiarASiguienteEstanteriaDisponible();
+                    ActualizarEspacioEstanteria();
+                }
+
+                DistribucionesFiltradas = Distribuciones; // Actualizar la lista filtrada
+                StateHasChanged(); // Forzar actualización de la UI
             }
         }
     }
 
-    private string ObtenerProductoAleatorio()
+    private async Task EditarDistribucion(DistribucionInventario distribucion)
     {
-        var productos = new[] { "Producto A", "Producto B", "Producto C", "Producto D" };
-        var random = new Random();
-        return productos[random.Next(productos.Length)];
+        NuevaDistribucion = new DistribucionInventario
+            {
+                DistribucionId = distribucion.DistribucionId,
+                ProductoId = distribucion.ProductoId,
+                UbicacionEstanteria = distribucion.UbicacionEstanteria,
+                Cantidad = distribucion.Cantidad,
+                FechaIngreso = distribucion.FechaIngreso
+            };
+
+        var producto = Productos.FirstOrDefault(p => p.ProductoId == distribucion.ProductoId);
+        if (producto != null)
+        {
+            ProductoSeleccionadoNombre = producto.Nombre;
+            await ActualizarDatosProducto(distribucion.ProductoId);
+            ActualizarEspacioEstanteria();
+
+            if (EspacioDisponibleEstanteria <= 0)
+            {
+                CambiarASiguienteEstanteriaDisponible();
+            }
+
+            StateHasChanged();
+        }
     }
 
-    private void FinalizarInventario()
+    private async Task EliminarDistribucion(DistribucionInventario distribucion)
     {
-        InventarioEnCurso = false;
-        EstanteriaActual = "Inventario Finalizado";
-        ProductosEnEstanteria.Clear();
+        await distribucionInventarioService.Eliminar(distribucion);
+        Distribuciones.Remove(distribucion);
+        DistribucionesFiltradas = Distribuciones; // Actualizar la lista filtrada
+        ActualizarEspacioEstanteria();
+        StateHasChanged();
+    }
+
+    private void LimpiarFormulario()
+    {
+        var ubicacionActual = NuevaDistribucion.UbicacionEstanteria;
+        NuevaDistribucion = new DistribucionInventario { UbicacionEstanteria = ubicacionActual };
+        ProductoSeleccionadoNombre = string.Empty;
+        CantidadEnInventario = 0;
+        CantidadDisponible = 0;
+        CantidadDistribuida = 0;
+        ActualizarEspacioEstanteria();
+    }
+
+    private void CambiarASiguienteEstanteriaDisponible()
+    {
+        var indiceActual = Ubicaciones.IndexOf(NuevaDistribucion.UbicacionEstanteria);
+        if (indiceActual >= 0 && indiceActual < Ubicaciones.Count - 1)
+        {
+            NuevaDistribucion.UbicacionEstanteria = Ubicaciones[indiceActual + 1];
+        }
+        else
+        {
+            NuevaDistribucion.UbicacionEstanteria = "Sin espacio";
+        }
+
+        EspacioDisponibleEstanteria = CapacidadMaximaEstanteria; // Reiniciar a 20
     }
 }
