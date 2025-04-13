@@ -2,7 +2,7 @@
 
 @inject NavigationManager NavigationManager
 
-<div class="Menu" onclick="document.querySelector('.navbar-toggler').click()">
+@*  <div class="Menu" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
 
         @if (string.IsNullOrEmpty(NavigationManager.ToBaseRelativePath(NavigationManager.Uri)) || NavigationManager.ToBaseRelativePath(NavigationManager.Uri).TrimEnd('#', '/') == "")
@@ -51,11 +51,46 @@
             <button class="btn btn-success" style="background:#0d5c63;" type="button">Iniciar sesión</button>
         </div>
     </nav>
-</div>
+</div> *@
+
+<MudNavMenu>
+    <MudLink Href="/" Class="mud-brand">
+        <img src="/Imagenes/FondoEP.png" alt="Logo eyepocket" class="logo-img" id="logo">
+    </MudLink>
+    <MudNavLink Href="/" Icon="@Icons.Material.Filled.SpaceDashboard" Match="NavLinkMatch.All">Home</MudNavLink>
+    <MudNavGroup HideExpandIcon="false" Title="CxC" Icon="@Icons.Material.Filled.Store" Expanded="true">
+        <MudNavLink Href="/Cuentas-Por-Cobrar/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.AccountBalance" Match="NavLinkMatch.Prefix">Cuentas X Cobrar</MudNavLink>
+        <MudNavLink Href="/Amortizacion-Express" IconColor="Color.Dark" Icon="@Icons.Material.Filled.Calculate" Match="NavLinkMatch.Prefix">Amortización express</MudNavLink>
+        <MudNavLink Href="/Pagos/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.Payments" Match="NavLinkMatch.Prefix">Pagos</MudNavLink>
+        <MudNavLink Href="/Solicitudes-De-Credito/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.CreditScore" Match="NavLinkMatch.Prefix">Solicitudes de crédito</MudNavLink>
+    </MudNavGroup>
+</MudNavMenu>
+<style>
+    .mud-brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: white;
+    }
+
+    .logo-img {
+        width: 200px;
+        height: 175px;
+        transition: visibility 1s, opacity 1s;
+    }
+
+
+    .invisible-logo {
+        visibility: hidden;
+        opacity: 0;
+    }
+</style>
 
 @code {
     private string? currentUrl;
-
     protected override void OnInitialized()
     {
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
