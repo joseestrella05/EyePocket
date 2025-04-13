@@ -57,14 +57,44 @@
     <MudLink Href="/" Class="mud-brand">
         <img src="/Imagenes/FondoEP.png" alt="Logo eyepocket" class="logo-img" id="logo">
     </MudLink>
+    @*CxC*@
     <MudNavLink Href="/" Icon="@Icons.Material.Filled.SpaceDashboard" Match="NavLinkMatch.All">Home</MudNavLink>
-    <MudNavGroup HideExpandIcon="false" Title="CxC" Icon="@Icons.Material.Filled.Store" Expanded="true">
+    <MudNavGroup HideExpandIcon="false" Title="CxC" Icon="@Icons.Material.Filled.Store" Expanded="false">
+        <MudNavLink Href="/Clientes/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.PeopleAlt" Match="NavLinkMatch.Prefix">Clientes</MudNavLink>
         <MudNavLink Href="/Cuentas-Por-Cobrar/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.AccountBalance" Match="NavLinkMatch.Prefix">Cuentas X Cobrar</MudNavLink>
         <MudNavLink Href="/Amortizacion-Express" IconColor="Color.Dark" Icon="@Icons.Material.Filled.Calculate" Match="NavLinkMatch.Prefix">Amortización express</MudNavLink>
         <MudNavLink Href="/Pagos/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.Payments" Match="NavLinkMatch.Prefix">Pagos</MudNavLink>
         <MudNavLink Href="/Solicitudes-De-Credito/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.CreditScore" Match="NavLinkMatch.Prefix">Solicitudes de crédito</MudNavLink>
     </MudNavGroup>
+
+    @*Ventas*@
+    <MudNavGroup HideExpandIcon="false" Title="Ventas" Icon="@Icons.Material.Filled.PointOfSale" Expanded="false">
+        <MudNavLink Href="/Ventas/Facturacion/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.AccountBalance" Match="NavLinkMatch.Prefix">Facturación</MudNavLink>
+        <MudNavLink Href="/Ventas/Estadisticas" IconColor="Color.Dark" Icon="@Icons.Material.Filled.QueryStats" Match="NavLinkMatch.Prefix">Estadisticas</MudNavLink>
+        <MudNavLink Href="/Ventas/Historial" IconColor="Color.Dark" Icon="@Icons.Material.Filled.History" Match="NavLinkMatch.Prefix">Historial</MudNavLink>
+    </MudNavGroup>
+
+    @*Inventario*@
+    <MudNavGroup HideExpandIcon="false" Title="Inventariado" Icon="@Icons.Material.Filled.Inventory" Expanded="false">
+        <MudNavLink Href="/Productos/Inventario" IconColor="Color.Dark" Icon="@Icons.Material.Filled.Backpack" Match="NavLinkMatch.Prefix">Inventario</MudNavLink>
+        <MudNavLink Href="/Productos/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.AddBox" Match="NavLinkMatch.Prefix">Productos</MudNavLink>
+    </MudNavGroup>
+
+    @*CxP*@
+    <MudNavGroup HideExpandIcon="false" Title="CxP" Icon="@Icons.Material.Filled.AddShoppingCart" Expanded="false">
+        <MudNavLink Href="/CxP/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.Home" Match="NavLinkMatch.Prefix">Inicio</MudNavLink>
+        <MudNavLink Href="/CxP/Provedores/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.PeopleAlt" Match="NavLinkMatch.Prefix">Proveedores</MudNavLink>
+        <MudNavLink Href="/CxP/Compra/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.Payments" Match="NavLinkMatch.Prefix">Cuentas X Pagar</MudNavLink>
+    </MudNavGroup>
+
+    @*SAC*@
+    <MudNavGroup HideExpandIcon="false" Title="SAC" Icon="@Icons.Material.Filled.QuestionAnswer" Expanded="false">
+        <MudNavLink Href="/Servicio/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.AccountBalance" Match="NavLinkMatch.Prefix">Tickets</MudNavLink>
+        <MudNavLink Href="/Cita/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.CalendarMonth" Match="NavLinkMatch.Prefix">Citas</MudNavLink>
+        <MudNavLink Href="/Agente/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.PeopleAlt" Match="NavLinkMatch.Prefix">Agentes</MudNavLink>
+    </MudNavGroup>
 </MudNavMenu>
+
 <style>
     .mud-brand {
         display: flex;
