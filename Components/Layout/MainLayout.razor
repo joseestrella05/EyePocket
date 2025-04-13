@@ -1,30 +1,87 @@
 ﻿@inherits LayoutComponentBase
-@inject NavigationManager navigationManager
-<Toasts class="p-3" AutoHide="true" Delay="5000" Placement="ToastsPlacement.TopRight" />
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
 
+@* Required *@
+<MudThemeProvider />
+<MudPopoverProvider />
+@* Needed for dialogs *@
+<MudDialogProvider />
+@* Needed for snackbars *@
+<MudSnackbarProvider />
 
-<div class="page">
-    @if (!string.IsNullOrEmpty(navigationManager.ToBaseRelativePath(navigationManager.Uri).TrimEnd('#', '/')))
-    {
-        <div class="sidebar">
-            <MenuLateral />
-        </div>
-    }
-
-    <main>
+<MudLayout>
+    <Toasts class="p-3 mud-toast-container" AutoHide="true" Delay="5000" Placement="ToastsPlacement.TopRight" />
+    <MudAppBar Class="app-bar-gradient mud-app-bar" Elevation="1" Dense=true>
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
+        <span><strong>EyePocket</strong></span>
+        <MudSpacer />
+        <AuthorizeView>
+            <Authorized>
+                <span class="me-3">¡Hola, @NombreUsuarioAutenticado!</span>
+                <a class="me-3" href="/Account/Manage">Mi Cuenta</a>
+                <form action="Account/Logout" method="post" class="d-inline">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                    <button type="submit" class="btn btn-link p-0" style="color: #bf1ff0;">Cerrar Sesión</button>
+                </form>
+            </Authorized>
+            <NotAuthorized>
+                <MudLink class="col-md-3" Href="/Account/Login">Iniciar Sesión</MudLink>
+                <MudLink Href="/Account/Register">Registrarse</MudLink>
+            </NotAuthorized>
+        </AuthorizeView>
+    </MudAppBar>
+    <MudDrawer Open="true" Elevation="1" Variant="@DrawerVariant.Mini" Class="drawer-gradient">
         <NavMenu />
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-
-</div>
-
-
+    </MudDrawer>
+    <MudMainContent Class="pt-16 px-16">
+        @Body
+    </MudMainContent>
+</MudLayout>
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+<style>
+    .drawer-gradient {
+        background: linear-gradient(180deg, #141414 54%, #217485 98%) !important;
+        color: white; /* opcional: texto claro */
+    }
+
+    .app-bar-gradient {
+        background: #fff;
+        color: #000;
+    }
+
+    .mud-toast-container {
+        z-index: 1050 !important;
+    }
+
+    /* Asegurar que el MudAppBar tenga un z-index adecuado si es necesario */
+    .mud-app-bar {
+        z-index: 1040; /* Asegúrate de que el app-bar no cubra los toasts */
+    }
+</style>
+
+@code {
+    private string? currentUrl;
+    public string? NombreUsuarioAutenticado { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var userAutenticado = authState.User;
+        NombreUsuarioAutenticado = userAutenticado.Identity.Name;
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+    }
+}
