@@ -7,11 +7,20 @@ using EyePocket.Service;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor.Services;
 using OfficeOpenXml;
+using QuestPDF.Infrastructure;
 
 var modelbuilder = WebApplication.CreateBuilder(args);
 
 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+QuestPDF.Settings.License = LicenseType.Community;
+
+modelbuilder.Services.AddLogging(config =>
+{
+	config.AddConsole();
+	config.SetMinimumLevel(LogLevel.Debug); // Esto captura todos los logs desde debug hacia arriba
+});
 
 // Add services to the container.
 modelbuilder.Services.AddRazorComponents()
@@ -62,6 +71,9 @@ modelbuilder.Services.AddScoped<OrdenVentasDetalleService>();
 modelbuilder.Services.AddScoped<SolicitudesCreditoService>();
 modelbuilder.Services.AddScoped<CategoriaService>();
 modelbuilder.Services.AddScoped<DistribucionInventarioService>();
+
+// MudBlazor
+modelbuilder.Services.AddMudServices();
 
 //notificacion
 modelbuilder.Services.AddBlazoredToast();
