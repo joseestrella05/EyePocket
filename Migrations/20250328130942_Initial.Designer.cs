@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EyePocket.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250325162113_Initial")]
+    [Migration("20250328130942_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -55,6 +55,34 @@ namespace EyePocket.Migrations
                     b.HasKey("AgenteId");
 
                     b.ToTable("Agentes");
+                });
+
+            modelBuilder.Entity("DistribucionInventario", b =>
+                {
+                    b.Property<int>("DistribucionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DistribucionId"));
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaIngreso")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UbicacionEstanteria")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("DistribucionId");
+
+                    b.HasIndex("ProductoId");
+
+                    b.ToTable("DistribucionInventario");
                 });
 
             modelBuilder.Entity("EyePocket.Data.ApplicationUser", b =>
@@ -126,6 +154,66 @@ namespace EyePocket.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("EyePocket.Models.Categoria", b =>
+                {
+                    b.Property<int>("CategoriaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoriaId"));
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("CategoriaId");
+
+                    b.ToTable("Categorias");
+
+                    b.HasData(
+                        new
+                        {
+                            CategoriaId = 1,
+                            Descripcion = "Productos comestibles y bebidas.",
+                            Nombre = "Alimentos"
+                        },
+                        new
+                        {
+                            CategoriaId = 2,
+                            Descripcion = "Dispositivos electrónicos y accesorios.",
+                            Nombre = "Electrónica"
+                        },
+                        new
+                        {
+                            CategoriaId = 3,
+                            Descripcion = "Cosméticos y productos de cuidado personal.",
+                            Nombre = "Belleza"
+                        },
+                        new
+                        {
+                            CategoriaId = 4,
+                            Descripcion = "Productos para el hogar y decoración.",
+                            Nombre = "Hogar"
+                        },
+                        new
+                        {
+                            CategoriaId = 5,
+                            Descripcion = "Herramientas y suministros de construcción.",
+                            Nombre = "Ferreteria"
+                        },
+                        new
+                        {
+                            CategoriaId = 6,
+                            Descripcion = "Artículos de oficina y escolar.",
+                            Nombre = "Papeleria"
+                        });
                 });
 
             modelBuilder.Entity("EyePocket.Models.Citas", b =>
@@ -385,6 +473,11 @@ namespace EyePocket.Migrations
                         {
                             EstadoId = 5,
                             Nombre = "Aprobado"
+                        },
+                        new
+                        {
+                            EstadoId = 6,
+                            Nombre = "Denegado"
                         });
                 });
 
@@ -561,9 +654,8 @@ namespace EyePocket.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductoId"));
 
-                    b.Property<string>("Categoria")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CategoriaId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Codigo")
                         .IsRequired()
@@ -590,6 +682,8 @@ namespace EyePocket.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ProductoId");
+
+                    b.HasIndex("CategoriaId");
 
                     b.HasIndex("ProveedorId");
 
@@ -936,6 +1030,17 @@ namespace EyePocket.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("DistribucionInventario", b =>
+                {
+                    b.HasOne("EyePocket.Models.Productos", "Producto")
+                        .WithMany()
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Producto");
+                });
+
             modelBuilder.Entity("EyePocket.Models.Compras", b =>
                 {
                     b.HasOne("EyePocket.Models.Estados", "Estado")
@@ -1062,11 +1167,19 @@ namespace EyePocket.Migrations
 
             modelBuilder.Entity("EyePocket.Models.Productos", b =>
                 {
+                    b.HasOne("EyePocket.Models.Categoria", "Categoria")
+                        .WithMany()
+                        .HasForeignKey("CategoriaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("EyePocket.Models.Provedores", "Proveedor")
                         .WithMany()
                         .HasForeignKey("ProveedorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Categoria");
 
                     b.Navigation("Proveedor");
                 });
