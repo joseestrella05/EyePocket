@@ -1,6 +1,7 @@
-﻿@page "/CxP/Provedores/Index"
-@inject ProvedoresServices provedoresService
-@rendermode InteractiveServer
+﻿@page "/CXPs/Index"
+@inject CXPService cxpService
+@inject EstadoCXPService estadoService
+@inject MetodosPagoService metodoPagoService
 @inject NavigationManager navigation
 @inject ToastService toastService
 
@@ -8,11 +9,11 @@
 <div class="row" style="background-color:white; padding:10px; margin:10px;">
 	<div class="col">
 		<div class="text-left">
-			<h2 class="text-black"><i class="bi bi-person-badge m-1"></i> Proveedores</h2>
+			<h2 class="text-black"><i class="bi bi bi-cash-coin m-1"></i> Cuentas por cobrar</h2>
 		</div>
 	</div>
 	<div class="col text-end">
-		<a href="/CxP/Provedores/Create" class="btn btn-secondary">Crear nuevo proveedor</a>
+		<a href="/CXPs/Create" class="btn btn-secondary">Crear nueva cuenta por cobrar</a>
 	</div>
 </div>
 
@@ -25,9 +26,7 @@
 						<div class="form-floating">
 							<InputSelect class="form-select" id="floatingSelect" aria-label="Floating label select example" @bind-Value="@valorFiltro">
 								<option value="" selected disabled>--- Selecciona ---</option>
-								<option value="id">ProvedoresID</option>
-								<option value="Nombres">Nombre</option>
-								<option value="Correo">Email</option>
+								<option value="id">CuentaId</option>
 							</InputSelect>
 							<label for="floatingSelect"><strong>Filtrar en base a...</strong></label>
 						</div>
@@ -45,37 +44,40 @@
 					</div>
 				</div>
 			</div>
-			
+
 			<div style="overflow-x: auto;">
 				<table class="table table-light table-hover" style="min-width: 100%;">
 					<thead class="table table-striped">
 						<tr class="text-center">
 							<th>ID</th>
-							<th>Nombre</th>
-							<th style="white-space: nowrap;">Contacto</th>
-							<th>Email</th>
-							<th>Dirección</th>
+							<th>Saldo Pendiente</th>
+							<th>Estado</th>
+							<th>Ultimo Pago aportado</th>
+							<th>Metodo Pago </th>
 							<th>Acciones</th>
 						</tr>
 					</thead>
+
 					<tbody>
-						@foreach (var provedores in ListaProvedores)
+						@foreach (var cxp in ListaCXP)
 						{
+							var estado = ListaEstados.FirstOrDefault(c => c.EstadoCXPId == cxp.EstadoCXPId);
+							var metodoPago = ListaMetodoPago.FirstOrDefault(c => c.MetodoPagoId == cxp.MetodoPagoId);
+
 							<tr class="text-center">
-								<td>@provedores.ProvedorId</td>
-								<td>@provedores.Nombre</td>
-								<td style="white-space: nowrap;">@($"({provedores.Telefono?[..3]}) {provedores.Telefono?[3..6]}-{provedores.Telefono?[6..]}")</td>
-								<td>@provedores.Correo</td>
-								<td>@provedores.Direccion</td>
+								<td>@cxp.CuentaId</td>
+								<td>@(cxp.SaldoPendiente)</td>
+								<td>@(estado?.descripcion)</td>
+								<td>@(cxp.UltimoPago)</td>
+								<td>@(metodoPago?.Descripcion)</td>
 								<td class="text-center" style="display: flex; justify-content: center; gap: 5px;">
-									<a href="/CxP/Provedores/Details/@provedores.ProvedorId" class="btn btn-outline-dark bi-eye"></a>
-									<a href="/CxP/Provedores/Edit/@provedores.ProvedorId" class="btn btn-outline-info bi bi-pencil-square"></a>
-									<button type="button" @onclick="() => MostrarModal(provedores.ProvedorId, provedores.Correo)" class="btn btn-outline-danger bi bi-trash"></button>
+									<a href="/CXPs/Edit/@cxp.CuentaId" class="btn btn-outline-info bi bi-pencil-square"></a>
+									<button type="button" @onclick="() => MostrarModal(cxp.CuentaId, cxp.SaldoPendiente)" class="btn btn-outline-danger bi bi-trash"></button>
 								</td>
 							</tr>
 						}
 					</tbody>
-					<caption>Cant. De Provedor: @ListaProvedores.Count</caption>
+					<caption>Cant. De Cuentas por cobrar: @ListaCXP.Count</caption>
 				</table>
 			</div>
 		</div>
@@ -108,109 +110,92 @@
 }
 
 
-
 @code {
+
 	public string searchBarValue { get; set; } = string.Empty;
 	public string valorFiltro { get; set; } = string.Empty;
-	public List<Provedores> ListaProvedores { get; set; } = new List<Provedores>();
+	public List<CXP> ListaCXP { get; set; } = new List<CXP>();
+	public List<EstadoCXP> ListaEstados { get; set; } = new List<EstadoCXP>();
+	public List<MetodosPago> ListaMetodoPago { get; set; } = new List<MetodosPago>();
 	private bool mostrarModal = false;
-	private int ProvedoreIdSeleccionado { get; set; }
+	private int IdSeleccionado { get; set; }
 	private string EmailProvedoresSelecionado { get; set; } = "";
-
-	//NOTIFICACIONES
 	public ToastType TipoNotificacion { get; set; }
 	public string MensajeNotificacion { get; set; } = string.Empty;
 	public string TituloNotificacion { get; set; } = string.Empty;
 
 	protected override async Task OnInitializedAsync()
 	{
-		ListaProvedores = await provedoresService.Listar(C => true);
+		ListaCXP = await cxpService.Listar(C => true);
+		ListaEstados = await estadoService.Listar(C => true);
+		ListaMetodoPago = await metodoPagoService.Listar(MP => true);
 	}
 
-	private void MostrarModal(int provedoreId, string provoresEmail)
+	private void MostrarModal(int cuentaId, decimal SaldoPendiente)
 	{
-		ProvedoreIdSeleccionado = provedoreId;
-		EmailProvedoresSelecionado = provoresEmail;
+		IdSeleccionado = cuentaId;
 		mostrarModal = true;
 	}
 
 	private void CerrarModal()
 	{
 		mostrarModal = false;
-		ProvedoreIdSeleccionado = 0;
+		IdSeleccionado = 0;
 		EmailProvedoresSelecionado = "";
 	}
+
 	private async Task Buscar()
 	{
-		if (!string.IsNullOrWhiteSpace(valorFiltro) && !string.IsNullOrWhiteSpace(searchBarValue))
+		if (!string.IsNullOrWhiteSpace(valorFiltro) && valorFiltro == "id")
 		{
-			switch (valorFiltro)
+			if (int.TryParse(searchBarValue, out int cuentaId))
 			{
-				case "id":
-					if (int.TryParse(searchBarValue, out int ProvedoreId))
-					{
-						ListaProvedores = await provedoresService.Listar(s => s.ProvedorId == ProvedoreId);
-					}
-					else
-					{
-						TipoNotificacion = ToastType.Warning;
-						TituloNotificacion = "Aviso";
-						MensajeNotificacion = "Debe ingresar un ID válido.";
-						MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
-					}
-					break;
-
-				case "Nombres":
-					ListaProvedores = await provedoresService.Listar(s => s.Nombre.ToLower().Contains(searchBarValue.ToLower()));
-					break;
-
-				case "Correo":
-					ListaProvedores = await provedoresService.Listar(s => s.Correo.ToLower().Contains(searchBarValue.ToLower()));
-					break;
-
-				default:
-					TipoNotificacion = ToastType.Warning;
-					TituloNotificacion = "Aviso";
-					MensajeNotificacion = "Seleccione un filtro válido.";
-					MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
-					break;
+				// Filtrar por CuentaId
+				ListaCXP = await cxpService.Listar(c => c.CuentaId == cuentaId);
+			}
+			else
+			{
+				TipoNotificacion = ToastType.Warning;
+				TituloNotificacion = "Advertencia";
+				MensajeNotificacion = "Por favor ingrese un ID válido.";
+				MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 			}
 		}
 		else
 		{
-			ListaProvedores = await provedoresService.Listar(p => true);
+			// Mostrar todas las cuentas
+			ListaCXP = await cxpService.Listar(c => true);
 		}
 	}
-
 
 	public async Task Eliminar()
 	{
 		try
 		{
-			await provedoresService.Eliminar(ProvedoreIdSeleccionado);
-			ListaProvedores = await provedoresService.Listar(x => true);
+			await cxpService.Eliminar(IdSeleccionado);
+			ListaCXP = await cxpService.Listar(x => true);  // ACTUALIZA ListaCXP
 			mostrarModal = false;
-			ProvedoreIdSeleccionado = 0;
+			IdSeleccionado = 0;
 			TipoNotificacion = ToastType.Success;
 			TituloNotificacion = "Enhorabuena";
-			MensajeNotificacion = "¡Se ha eliminado el provedor exitosamente!";
+			MensajeNotificacion = "¡Se ha eliminado exitosamente!";
 			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 		}
 		catch (Exception ex)
 		{
 			TipoNotificacion = ToastType.Danger;
 			TituloNotificacion = "Error";
-			MensajeNotificacion = "Hubo un error al eliminar el provedor.";
+			MensajeNotificacion = "Hubo un error al eliminar la cuenta.";
 			MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 		}
 	}
 
 	public void MostrarToast(ToastType tipo, string titulo, string cuerpo)
-	=> toastService.Notify(new(tipo, titulo, cuerpo));
+		=> toastService.Notify(new(tipo, titulo, cuerpo));
 
 	public async Task Restablecer()
 	{
-		ListaProvedores = await provedoresService.Listar(x => true);
+		ListaCXP = await cxpService.Listar(x => true);
 		searchBarValue = string.Empty;
 		valorFiltro = string.Empty;
 
@@ -219,4 +204,5 @@
 		MensajeNotificacion = "Se han restablecido los criterios de búsqueda.";
 		MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 	}
+
 }

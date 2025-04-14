@@ -52,6 +52,14 @@ modelbuilder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEm
 modelbuilder.Services.AddBlazorBootstrap();
 
 //inject services
+
+
+modelbuilder.Services.AddScoped<CXPService>();
+modelbuilder.Services.AddScoped<PagoService>();
+modelbuilder.Services.AddScoped<EstadoCXPService>();
+modelbuilder.Services.AddScoped<MetodosPagoService>();
+modelbuilder.Services.AddScoped<DevolucionesService>();
+modelbuilder.Services.AddScoped<CiudadesService>();
 modelbuilder.Services.AddScoped<ClienteServices>();
 modelbuilder.Services.AddScoped<ProductosService>();
 modelbuilder.Services.AddScoped<MermasService>();
@@ -68,6 +76,7 @@ modelbuilder.Services.AddScoped<ProvedoresServices>();
 modelbuilder.Services.AddScoped<EstadoServices>();
 modelbuilder.Services.AddScoped<CompraServices>();
 modelbuilder.Services.AddScoped<OrdenVentasDetalleService>();
+modelbuilder.Services.AddScoped<CierreCajaService>();
 modelbuilder.Services.AddScoped<SolicitudesCreditoService>();
 modelbuilder.Services.AddScoped<CategoriaService>();
 modelbuilder.Services.AddScoped<DistribucionInventarioService>();

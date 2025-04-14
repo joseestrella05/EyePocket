@@ -86,6 +86,26 @@ namespace EyePocket.Migrations
                 });
 
             migrationBuilder.CreateTable(
+<<<<<<<< HEAD:Migrations/20250328130942_Initial.cs
+========
+                name: "CierreCaja",
+                columns: table => new
+                {
+                    CierreId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MontoApertura = table.Column<double>(type: "float", nullable: false),
+                    CantidadDeVentas = table.Column<int>(type: "int", nullable: false),
+                    MontoDeVentas = table.Column<double>(type: "float", nullable: false),
+                    MontoDeCierre = table.Column<double>(type: "float", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CierreCaja", x => x.CierreId);
+                });
+
+            migrationBuilder.CreateTable(
+>>>>>>>> 69926832ae1b1cd762ef56403913e8ee18d33d0d:Migrations/20250414095015_Initial.cs
                 name: "Citas",
                 columns: table => new
                 {
@@ -100,6 +120,21 @@ namespace EyePocket.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Citas", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Ciudades",
+                columns: table => new
+                {
+                    CiudadId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CiudadNombre = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
+                    ClienteId = table.Column<int>(type: "int", nullable: false),
+                    Cliente = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ciudades", x => x.CiudadId);
                 });
 
             migrationBuilder.CreateTable(
@@ -120,6 +155,36 @@ namespace EyePocket.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Clientes", x => x.ClienteId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Devoluciones",
+                columns: table => new
+                {
+                    DevolucionId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Asunto = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Cliente = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Producto = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProductoId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Devoluciones", x => x.DevolucionId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EstadoCXP",
+                columns: table => new
+                {
+                    EstadoCXPId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EstadoCXP", x => x.EstadoCXPId);
                 });
 
             migrationBuilder.CreateTable(
@@ -295,6 +360,7 @@ namespace EyePocket.Migrations
                     OrdenVentaId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ClienteId = table.Column<int>(type: "int", nullable: false),
+                    CierreCajaCierreId = table.Column<int>(type: "int", nullable: true),
                     FechaEmision = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FechaVencimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
                     NumeroFactura = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -305,6 +371,11 @@ namespace EyePocket.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OrdenVenta", x => x.OrdenVentaId);
+                    table.ForeignKey(
+                        name: "FK_OrdenVenta_CierreCaja_CierreCajaCierreId",
+                        column: x => x.CierreCajaCierreId,
+                        principalTable: "CierreCaja",
+                        principalColumn: "CierreId");
                     table.ForeignKey(
                         name: "FK_OrdenVenta_Clientes_ClienteId",
                         column: x => x.ClienteId,
@@ -364,6 +435,35 @@ namespace EyePocket.Migrations
                         column: x => x.EstadosId,
                         principalTable: "Estados",
                         principalColumn: "EstadoId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CXPs",
+                columns: table => new
+                {
+                    CuentaId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FacturaId = table.Column<int>(type: "int", nullable: false),
+                    EstadoCXPId = table.Column<int>(type: "int", nullable: false),
+                    SaldoPendiente = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    UltimoPago = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MetodoPagoId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CXPs", x => x.CuentaId);
+                    table.ForeignKey(
+                        name: "FK_CXPs_EstadoCXP_EstadoCXPId",
+                        column: x => x.EstadoCXPId,
+                        principalTable: "EstadoCXP",
+                        principalColumn: "EstadoCXPId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CXPs_MetodosPago_MetodoPagoId",
+                        column: x => x.MetodoPagoId,
+                        principalTable: "MetodosPago",
+                        principalColumn: "MetodoPagoId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -455,6 +555,33 @@ namespace EyePocket.Migrations
                         principalTable: "OrdenVenta",
                         principalColumn: "OrdenVentaId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "pagocxp",
+                columns: table => new
+                {
+                    PagoId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MetodoPagoId = table.Column<int>(type: "int", nullable: false),
+                    CuentaPorPagarId = table.Column<int>(type: "int", nullable: false),
+                    FechaPago = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    monto = table.Column<double>(type: "float", nullable: false),
+                    montoFaltante = table.Column<double>(type: "float", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_pagocxp", x => x.PagoId);
+                    table.ForeignKey(
+                        name: "FK_pagocxp_CXPs_CuentaPorPagarId",
+                        column: x => x.CuentaPorPagarId,
+                        principalTable: "CXPs",
+                        principalColumn: "CuentaId");
+                    table.ForeignKey(
+                        name: "FK_pagocxp_MetodosPago_MetodoPagoId",
+                        column: x => x.MetodoPagoId,
+                        principalTable: "MetodosPago",
+                        principalColumn: "MetodoPagoId");
                 });
 
             migrationBuilder.CreateTable(
@@ -668,6 +795,21 @@ namespace EyePocket.Migrations
                 });
 
             migrationBuilder.InsertData(
+<<<<<<<< HEAD:Migrations/20250328130942_Initial.cs
+========
+                table: "EstadoCXP",
+                columns: new[] { "EstadoCXPId", "descripcion" },
+                values: new object[,]
+                {
+                    { 1, "Pagada" },
+                    { 2, "Pendiente" },
+                    { 3, "Retrasada" },
+                    { 4, "Aceptada" },
+                    { 5, "Rechazada" }
+                });
+
+            migrationBuilder.InsertData(
+>>>>>>>> 69926832ae1b1cd762ef56403913e8ee18d33d0d:Migrations/20250414095015_Initial.cs
                 table: "Estados",
                 columns: new[] { "EstadoId", "Nombre" },
                 values: new object[,]
@@ -770,6 +912,19 @@ namespace EyePocket.Migrations
                 column: "EstadoId");
 
             migrationBuilder.CreateIndex(
+<<<<<<<< HEAD:Migrations/20250328130942_Initial.cs
+========
+                name: "IX_CXPs_EstadoCXPId",
+                table: "CXPs",
+                column: "EstadoCXPId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CXPs_MetodoPagoId",
+                table: "CXPs",
+                column: "MetodoPagoId");
+
+            migrationBuilder.CreateIndex(
+>>>>>>>> 69926832ae1b1cd762ef56403913e8ee18d33d0d:Migrations/20250414095015_Initial.cs
                 name: "IX_DistribucionInventario_ProductoId",
                 table: "DistribucionInventario",
                 column: "ProductoId");
@@ -790,6 +945,11 @@ namespace EyePocket.Migrations
                 column: "ProductoId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrdenVenta_CierreCajaCierreId",
+                table: "OrdenVenta",
+                column: "CierreCajaCierreId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrdenVenta_ClienteId",
                 table: "OrdenVenta",
                 column: "ClienteId");
@@ -803,6 +963,16 @@ namespace EyePocket.Migrations
                 name: "IX_OrdenVentasDetalle_ProductoId",
                 table: "OrdenVentasDetalle",
                 column: "ProductoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_pagocxp_CuentaPorPagarId",
+                table: "pagocxp",
+                column: "CuentaPorPagarId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_pagocxp_MetodoPagoId",
+                table: "pagocxp",
+                column: "MetodoPagoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PagosCXC_CXCId",
@@ -860,22 +1030,31 @@ namespace EyePocket.Migrations
                 name: "Citas");
 
             migrationBuilder.DropTable(
+                name: "Ciudades");
+
+            migrationBuilder.DropTable(
                 name: "ComprasDetalles");
 
             migrationBuilder.DropTable(
                 name: "CuotasCXC");
 
             migrationBuilder.DropTable(
+<<<<<<<< HEAD:Migrations/20250328130942_Initial.cs
+========
+                name: "Devoluciones");
+
+            migrationBuilder.DropTable(
+>>>>>>>> 69926832ae1b1cd762ef56403913e8ee18d33d0d:Migrations/20250414095015_Initial.cs
                 name: "DistribucionInventario");
 
             migrationBuilder.DropTable(
                 name: "Mermas");
 
             migrationBuilder.DropTable(
-                name: "MetodosPago");
+                name: "OrdenVentasDetalle");
 
             migrationBuilder.DropTable(
-                name: "OrdenVentasDetalle");
+                name: "pagocxp");
 
             migrationBuilder.DropTable(
                 name: "PagosCXC");
@@ -902,10 +1081,19 @@ namespace EyePocket.Migrations
                 name: "Inventarios");
 
             migrationBuilder.DropTable(
+                name: "CXPs");
+
+            migrationBuilder.DropTable(
                 name: "CuentasXCobrar");
 
             migrationBuilder.DropTable(
                 name: "Productos");
+
+            migrationBuilder.DropTable(
+                name: "EstadoCXP");
+
+            migrationBuilder.DropTable(
+                name: "MetodosPago");
 
             migrationBuilder.DropTable(
                 name: "Estados");
@@ -918,6 +1106,9 @@ namespace EyePocket.Migrations
 
             migrationBuilder.DropTable(
                 name: "Provedores");
+
+            migrationBuilder.DropTable(
+                name: "CierreCaja");
 
             migrationBuilder.DropTable(
                 name: "Clientes");

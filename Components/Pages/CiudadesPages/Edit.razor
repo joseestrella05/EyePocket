@@ -1,0 +1,112 @@
+@page "/Servicio/Ciudades/Edit/{CiudadId:int}"
+@inject CiudadesService ciudadesService
+@inject NavigationManager navigation
+
+<PageTitle>Editando Ciudad</PageTitle>
+<div class="text-left">
+    <h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-building-edit m-1"></i>Editando Ciudad</h2>
+</div>
+
+<EditForm Model="ciudad" OnValidSubmit="Actualizar">
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="section-title">Datos de la Ciudad</div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Nombre Ciudad *</label>
+                        <InputText class="form-control" @bind-Value="ciudad.CiudadNombre" placeholder="Nombre de la ciudad"></InputText>
+                    </div>
+
+                    <div class="col">
+                        <label>Cliente *</label>
+                        <InputText class="form-control" @bind-Value="ciudad.Cliente" placeholder="Cliente relacionado"></InputText>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="text-center">
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <a href="/Servicio/Ciudades/Index" class="btn btn-secondary">Volver</a>
+    </div>
+
+</EditForm>
+
+<style>
+    body {
+    background-color: #f5f5f5;
+    }
+
+    .container {
+    max-width: 800px;
+    margin: auto;
+    padding: 10px;
+    }
+
+    .card {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    }
+
+    .section-title {
+    background: #0d5c63;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    padding: 8px;
+    margin: 10px;
+    border-radius: 5px;
+    }
+
+    .btn {
+    margin: 10px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    }
+
+    .btn-success {
+    background-color: #0d5c63;
+    border: none;
+    }
+
+    .btn-secondary {
+    background-color: #444;
+    color: white;
+    text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+    background-color: #222;
+    }
+</style>
+
+@code {
+    [Parameter] public int CiudadId { get; set; }
+    public Ciudades ciudad { get; set; } = new Ciudades();
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ciudad = await ciudadesService.Buscar(CiudadId);
+    }
+    
+    public async Task Actualizar()
+    {
+        var actualizado = await ciudadesService.Guardar(ciudad);
+        if (actualizado)
+        {
+            ToastService.Notify(new(ToastType.Success, "Exito", $"Ciudad actualizada correctamente."));
+            navigation.NavigateTo("/Servicio/Ciudades/Index");
+        }
+        else
+        {
+            ToastService.Notify(new(ToastType.Danger, "Error", $"Error al actualizar la ciudad."));
+        }
+    }
+}

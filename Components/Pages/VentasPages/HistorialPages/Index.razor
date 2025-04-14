@@ -1,7 +1,338 @@
-﻿@page "/Ventas/Historial"
+﻿ @page "/Ventas/Historial"
+@using System.Globalization
+@inject OrdenVentaService ordenVentaService
+@inject OrdenVentasDetalleService ordenVentaDetalleService
+@inject NavigationManager navigationManager
 
 <PageTitle>Historial</PageTitle>
 
+<div class="card-header text-center py-2 rounded-3" style="background-color: #004b55; color: white;">
+    <h3 class="mb-0 font-weight-bold" style="font-weight: bold;">Historial</h3>
+</div>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-auto">
+            <div class="card  border-0 rounded-3">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-3 text-center text-md-end mb-3 mb-md-0">
+                            <label class="d-inline-block fs-4 fw-bold text-black">
+                                Buscar
+                            </label>
+                        </div>
+                        <!-- Filtro -->
+                        <div class="col-md-4 d-flex align-items-center mb-3 mb-md-0">
+                            <label for="Filtro" class="form-label fw-bold me-3">Filtrar:</label>
+                            <select @bind="filtro" class="form-select form-select-lg">
+                                <option value="factura">Factura</option>
+                                <option value="fecha">Fecha</option>
+                                <option value="cliente">Cliente</option>
+                            </select>
+                        </div>
+
+                        <!-- Barra de BÃºsqueda -->
+                        <div class="col-md-5 col-12 d-flex align-items-center mb-3 mb-md-0">
+                            <label for="ValorFiltro" class="form-label fw-bold me-3"></label>
+                            <div class="input-group input-group-lg w-100">
+                                <input @bind="valorFiltro" class="form-control" placeholder="Buscar..." />
+                                <button @onclick="Buscar" class="btn btn-primary" type="button">
+                                    <span class="bi bi-search"></span> Buscar
+                                </button>
+                            </div>
+                            <!-- Restablecer -->
+                            <div class="col-md-2 d-flex align-items-center  ms-3">
+                                <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2" @onclick="Restablecer">
+                                    <span class="bi bi-arrow-counterclockwise"></span>
+                                </button>
+                            </div>
+                        </div>
+
+
+                        <!-- FiltroFecha - Mostrar solo si se selecciona "fecha" en el filtro -->
+                        @if (filtro == "fecha")
+                        {
+                            <div class="row mt-3">
+                                <!-- Desde -->
+                                <div class="col-3">
+                                    <label class="col-form-label"><strong>Desde</strong></label>
+                                    <InputDate class="form-control" @bind-Value="Desde"></InputDate>
+                                </div>
+
+                                <!-- Hasta -->
+                                <div class="col-3">
+                                    <label class="col-form-label"><strong>Hasta</strong></label>
+                                    <div class="input-group">
+                                        <InputDate class="form-control" @bind-Value="Hasta"></InputDate>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<!-- Tabla -->
+<table class="table table-striped table-hover table-bordered text-center align-middle">
+    <thead class="bg-dark">
+        <tr>
+            <th>Factura</th>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Total Pagado</th>
+            <th>Detalle</th>
+            <th>Eliminar</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var venta in ListaOrdenVenta)
+        {
+            <tr>
+                <td>@venta.NumeroFactura</td>
+                <td>@venta.FechaEmision.ToString("dd/MM/yyyy")</td>
+                <td>@venta.Clientes?.Nombre</td>
+                <td>@venta.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" @onclick="() => MostrarModalDetalleHistorial(venta)">
+                        <span class="bi bi-eye"></span> Detalle
+                    </button>
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-sm" @onclick="() => MostrarModalEliminar(venta)">
+                        <span class="bi bi-trash"></span> Eliminar
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<style>
+    .form-group {
+        display: inline-block;
+        margin-right: 7px;
+    }
+
+        .form-group label {
+            display: inline-block;
+            margin-right: 2.5px;
+        }
+
+        .form-group input {
+            width: 100px;
+        }
+
+    .table thead.bg-dark th {
+        color: black;
+    }
+</style>
+@*   <div class="card-footer text-start">
+    <p>Total de Contacto: @ListaContacto.Count</p>
+</div>
+<div style="height: 415px;"></div> *@
+
+@if (mostrarModalFactura && ordenSeleccionada != null)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #004b55;">
+                    <h5 class="modal-title fw-bold text-white">Factura - Detalle</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModalDetalleHistorial"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="invoice-header text-center mb-4">
+                        <h2>Factura</h2>
+                        <p>Detalle de la factura seleccionada.</p>
+                    </div>
+
+                    <div class="invoice-details">
+                        <p><strong>Factura n°:</strong> @ordenSeleccionada.NumeroFactura</p>
+                        <p><strong>Fecha:</strong> @ordenSeleccionada.FechaEmision.ToString("dd/MM/yyyy")</p>
+                        <p><strong>Cliente:</strong> @ordenSeleccionada.Clientes?.Nombre</p>
+                    </div>
+
+                    <table class="invoice-table table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Descripción</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < DetallesSeleccionados.Count; i++)
+                            {
+                                var detalle = DetallesSeleccionados[i];
+                                <tr>
+                                    <td>@detalle.Productos.Codigo</td>
+                                    <td>@detalle.Productos?.Nombre</td>
+                                    <td>@detalle.Cantidad</td>
+                                    <td>@detalle.Productos?.Precio.ToString("C2")</td>
+                                    <td>@detalle.Subtotal.ToString("C2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <div class="invoice-total text-end">
+                        <p><strong>Subtotal:</strong> $@DetallesSeleccionados.Sum(d => d.Subtotal).ToString("N2")</p>
+                        <p><strong>TOTAL:</strong> $@ordenSeleccionada.MontoTotal.ToString("N2")</p>
+                    </div>
+                </div>
+
+                <div class="modal-footer d-flex justify-content-between">
+                    <button class="btn btn-secondary" @onclick="CerrarModalDetalleHistorial">
+                        <i class="bi bi-x-circle"></i> Volver
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@if (mostrarModalEliminar && ordenSeleccionada is not null)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #004b55; color: white;">
+                    <h5 class="modal-title">Eliminar Factura</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModalEliminar"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="fw-bold">¿Está seguro de que desea eliminar la factura <strong>@ordenSeleccionada.NumeroFactura</strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CerrarModalEliminar">Cancelar</button>
+                    <button class="btn btn-danger" @onclick="EliminarFactura">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
+    public OrdenVentaDetalle ordenVentaDetalle { get; set; } = new OrdenVentaDetalle();
+    public OrdenVenta ordenventa { get; set; }
+    public List<OrdenVenta> ListaOrdenVenta { get; set; } = new List<OrdenVenta>();
+    public List<OrdenVentaDetalle> DetallesSeleccionados { get; set; } = new List<OrdenVentaDetalle>();
+    private string valorFiltro = "";
+    private string filtro = "id";
+    public DateTime? Desde { get; set; }
+    public DateTime? Hasta { get; set; }
+    private bool mostrarModalEliminar = false;
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     ListaOrdenVenta = await ordenVentaService.Listar(u => true);
+    // }
+
+    private async Task MostrarModalEliminar(OrdenVenta orden)
+    {
+        ordenSeleccionada = orden;
+        DetallesSeleccionados = await ordenVentaDetalleService.Listar(d => d.OrdenVentaId == orden.OrdenVentaId);
+        mostrarModalEliminar = true;
+    }
+
+    private void CerrarModalEliminar()
+    {
+        ordenSeleccionada = null;
+        mostrarModalEliminar = false;
+        mostrarModalEliminar = false;
+    }
+
+    private async Task EliminarFactura()
+    {
+        if (ordenSeleccionada != null)
+        {
+            await ordenVentaService.Eliminar(ordenSeleccionada);
+            ListaOrdenVenta.Remove(ordenSeleccionada);
+            CerrarModalEliminar();
+        }
+    }
+
+    public OrdenVenta ordenSeleccionada { get; set; } = new OrdenVenta();
+
+    private bool mostrarModalFactura = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaOrdenVenta = await ordenVentaService.Listar(u => true);
+    }
+
+    private async Task MostrarModalDetalleHistorial(OrdenVenta orden)
+    {
+        ordenSeleccionada = orden;
+        DetallesSeleccionados = await ordenVentaDetalleService.Listar(d => d.OrdenVentaId == orden.OrdenVentaId);
+
+        mostrarModalFactura = true;
+    }
+
+
+    private void CerrarModalDetalleHistorial()
+    {
+        ordenSeleccionada = new OrdenVenta();
+        mostrarModalFactura = false;
+    }
+
+    public async Task Buscar()
+    {
+        if (!string.IsNullOrWhiteSpace(valorFiltro))
+        {
+
+            if (filtro == "factura")
+            {
+                ListaOrdenVenta = await ordenVentaService.Listar(orden => orden.NumeroFactura.Contains(valorFiltro));
+            }
+
+            else if (filtro == "fecha" && Desde.HasValue && Hasta.HasValue)
+            {
+                ListaOrdenVenta = await ordenVentaService.Listar(orden => orden.FechaEmision >= Desde.Value && orden.FechaEmision <= Hasta.Value);
+            }
+
+            else if (filtro == "cliente")
+            {
+                ListaOrdenVenta = await ordenVentaService.Listar(
+                    orden => (orden.Clientes != null && orden.Clientes.Nombre.Contains(valorFiltro))
+                );
+            }
+        }
+        else if (filtro == "fecha" && Desde.HasValue && Hasta.HasValue)
+        {
+
+            ListaOrdenVenta = await ordenVentaService.Listar(orden => orden.FechaEmision >= Desde.Value && orden.FechaEmision <= Hasta.Value);
+        }
+        else
+        {
+
+            ListaOrdenVenta = await ordenVentaService.Listar(u => true);
+        }
+    }
+
+    public void Volver()
+    {
+        navigationManager.NavigateTo("/");
+    }
+
+    private async Task Restablecer()
+    {
+        filtro = "id";
+        valorFiltro = string.Empty;
+        Desde = null;
+        Hasta = null;
+
+        ListaOrdenVenta = await ordenVentaService.Listar(u => true);
+    }
 
 }
