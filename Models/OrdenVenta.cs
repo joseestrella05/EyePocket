@@ -13,6 +13,8 @@ public class OrdenVenta
     [ForeignKey("ClienteId")]
     public Clientes? Clientes { get; set; }
 
+    public CierreCaja? CierreCaja { get; set; }
+
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
     public DateTime FechaEmision { get; set; } = DateTime.Now;

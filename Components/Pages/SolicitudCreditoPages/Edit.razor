@@ -133,7 +133,7 @@
 	public async Task Guardar()
 	{
 		await solicitudesCreditoService.Guardar(Solicitud);
-		ToastService.Notify(new(ToastType.Success, "Exito", $"Solicitud de credito registrada correctamente."));
+		ToastService.Notify(new(ToastType.Success, "Exito", $"Solicitud de credito actulizada correctamente."));
 		navigation.NavigateTo("/Solicitudes-de-Credito/Index");
 	}
 }

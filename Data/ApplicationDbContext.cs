@@ -30,24 +30,34 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<SolicitudesCredito> SolicitudesCredito { get; set; }
     public DbSet<Categoria> Categorias { get; set; }
     public DbSet<DistribucionInventario> DistribucionInventario { get; set; }
+    public DbSet<CierreCaja> CierreCaja { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<IdentityUserLogin<string>>()
-            .HasKey(login => new { login.LoginProvider, login.ProviderKey });
-
         modelBuilder.Entity<MetodosPago>().HasData(
             new MetodosPago { MetodoPagoId = 1, Descripcion = "Tarjeta" },
             new MetodosPago { MetodoPagoId = 2, Descripcion = "Efectivo" },
             new MetodosPago { MetodoPagoId = 3, Descripcion = "Cheque" }
         );
 
+        modelBuilder.Entity<IdentityRole>().HasData(
+           new IdentityRole { Id= "6ac343b0-00ef-4a1c-8f64-68daaca77b5b ", Name = "Ventas", NormalizedName = "VENTAS", ConcurrencyStamp= "6ac343b0-00ef-4a1c-8f64-68daaca77b5b" },
+           new IdentityRole { Id= "6ac343b0-00ef-4a1c-8f64-68daaca77b4b", Name = "CuentasXCobrar", NormalizedName = "CUENTASXCOBRAR",ConcurrencyStamp= "6ac343b0-00ef-4a1c-8f64-68daaca77b4b" },
+           new IdentityRole { Id= "6ac343b0-00ef-4a1c-8f64-68daaca77b2b", Name = "CuentasXPagar", NormalizedName = "CUENTASXPAGAR", ConcurrencyStamp = "6ac343b0-00ef-4a1c-8f64-68daaca77b2b" },
+           new IdentityRole { Id= "6ac343b0-00ef-4a1c-8f64-68daaca77b1b",Name = "Inventario", NormalizedName = "INVENTARIO",ConcurrencyStamp="6ac343b0-00ef-4a1c-8f64-68daaca77b1b" },
+           new IdentityRole { Id= "6ac343b0-00ef-4a1c-8f64-68daaca77b0b", Name = "ServicioAlCliente", NormalizedName = "SERVICIOALCLIENTE", ConcurrencyStamp= "6ac343b0-00ef-4a1c-8f64-68daaca77b0b" }
+       );
+
         modelBuilder.Entity<Estados>().HasData(
             new Estados { EstadoId = 1, Nombre = "Pendiente" },
             new Estados { EstadoId = 2, Nombre = "Pagado" },
-            new Estados { EstadoId = 3, Nombre = "Vencido" }
+            new Estados { EstadoId = 3, Nombre = "Vencido" },
+            new Estados { EstadoId = 4, Nombre = "Cancelado"},
+            new Estados { EstadoId = 5, Nombre = "Aprobado" },
+            new Estados { EstadoId = 6, Nombre = "Denegado" }
+
         );
 
         modelBuilder.Entity<Categoria>().HasData(
