@@ -12,11 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EyePocket.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-<<<<<<<< HEAD:Migrations/20250328130942_Initial.Designer.cs
-    [Migration("20250328130942_Initial")]
-========
-    [Migration("20250414095015_Initial")]
->>>>>>>> 69926832ae1b1cd762ef56403913e8ee18d33d0d:Migrations/20250414095015_Initial.Designer.cs
+    [Migration("20250414183831_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -160,8 +156,6 @@ namespace EyePocket.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-<<<<<<<< HEAD:Migrations/20250328130942_Initial.Designer.cs
-========
             modelBuilder.Entity("EyePocket.Models.CXP", b =>
                 {
                     b.Property<int>("CuentaId")
@@ -194,7 +188,6 @@ namespace EyePocket.Migrations
                     b.ToTable("CXPs");
                 });
 
->>>>>>>> 69926832ae1b1cd762ef56403913e8ee18d33d0d:Migrations/20250414095015_Initial.Designer.cs
             modelBuilder.Entity("EyePocket.Models.Categoria", b =>
                 {
                     b.Property<int>("CategoriaId")
@@ -255,8 +248,6 @@ namespace EyePocket.Migrations
                         });
                 });
 
-<<<<<<<< HEAD:Migrations/20250328130942_Initial.Designer.cs
-========
             modelBuilder.Entity("EyePocket.Models.CierreCaja", b =>
                 {
                     b.Property<int>("CierreId")
@@ -285,7 +276,6 @@ namespace EyePocket.Migrations
                     b.ToTable("CierreCaja");
                 });
 
->>>>>>>> 69926832ae1b1cd762ef56403913e8ee18d33d0d:Migrations/20250414095015_Initial.Designer.cs
             modelBuilder.Entity("EyePocket.Models.Citas", b =>
                 {
                     b.Property<int>("Id")
@@ -1249,8 +1239,6 @@ namespace EyePocket.Migrations
                     b.Navigation("Producto");
                 });
 
-<<<<<<<< HEAD:Migrations/20250328130942_Initial.Designer.cs
-========
             modelBuilder.Entity("EyePocket.Models.CXP", b =>
                 {
                     b.HasOne("EyePocket.Models.EstadoCXP", "EstadoCXP")
@@ -1270,7 +1258,6 @@ namespace EyePocket.Migrations
                     b.Navigation("MetodoPago");
                 });
 
->>>>>>>> 69926832ae1b1cd762ef56403913e8ee18d33d0d:Migrations/20250414095015_Initial.Designer.cs
             modelBuilder.Entity("EyePocket.Models.Compras", b =>
                 {
                     b.HasOne("EyePocket.Models.Estados", "Estado")

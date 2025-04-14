@@ -86,8 +86,6 @@ namespace EyePocket.Migrations
                 });
 
             migrationBuilder.CreateTable(
-<<<<<<<< HEAD:Migrations/20250328130942_Initial.cs
-========
                 name: "CierreCaja",
                 columns: table => new
                 {
@@ -105,7 +103,6 @@ namespace EyePocket.Migrations
                 });
 
             migrationBuilder.CreateTable(
->>>>>>>> 69926832ae1b1cd762ef56403913e8ee18d33d0d:Migrations/20250414095015_Initial.cs
                 name: "Citas",
                 columns: table => new
                 {
@@ -795,8 +792,6 @@ namespace EyePocket.Migrations
                 });
 
             migrationBuilder.InsertData(
-<<<<<<<< HEAD:Migrations/20250328130942_Initial.cs
-========
                 table: "EstadoCXP",
                 columns: new[] { "EstadoCXPId", "descripcion" },
                 values: new object[,]
@@ -809,7 +804,6 @@ namespace EyePocket.Migrations
                 });
 
             migrationBuilder.InsertData(
->>>>>>>> 69926832ae1b1cd762ef56403913e8ee18d33d0d:Migrations/20250414095015_Initial.cs
                 table: "Estados",
                 columns: new[] { "EstadoId", "Nombre" },
                 values: new object[,]
@@ -912,8 +906,6 @@ namespace EyePocket.Migrations
                 column: "EstadoId");
 
             migrationBuilder.CreateIndex(
-<<<<<<<< HEAD:Migrations/20250328130942_Initial.cs
-========
                 name: "IX_CXPs_EstadoCXPId",
                 table: "CXPs",
                 column: "EstadoCXPId");
@@ -924,7 +916,6 @@ namespace EyePocket.Migrations
                 column: "MetodoPagoId");
 
             migrationBuilder.CreateIndex(
->>>>>>>> 69926832ae1b1cd762ef56403913e8ee18d33d0d:Migrations/20250414095015_Initial.cs
                 name: "IX_DistribucionInventario_ProductoId",
                 table: "DistribucionInventario",
                 column: "ProductoId");
@@ -1039,12 +1030,9 @@ namespace EyePocket.Migrations
                 name: "CuotasCXC");
 
             migrationBuilder.DropTable(
-<<<<<<<< HEAD:Migrations/20250328130942_Initial.cs
-========
                 name: "Devoluciones");
 
             migrationBuilder.DropTable(
->>>>>>>> 69926832ae1b1cd762ef56403913e8ee18d33d0d:Migrations/20250414095015_Initial.cs
                 name: "DistribucionInventario");
 
             migrationBuilder.DropTable(
