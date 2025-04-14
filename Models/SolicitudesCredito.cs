@@ -26,8 +26,9 @@ public class SolicitudesCredito
 
 
 	[Required(ErrorMessage = "Este campo es obligatorio")]
-	public string DescripcionGarantia { get; set; }
+	public string? DescripcionGarantia { get; set; }
 
-
+	public int EstadosId { get; set; } = 1;
+	public Estados? Estados { get; set; }
 	public bool EstatusDataCredito { get; set; } = true;
 }

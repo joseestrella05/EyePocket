@@ -4,6 +4,7 @@ using EyePocket.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EyePocket.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250328054540_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -152,40 +155,6 @@ namespace EyePocket.Migrations
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
-
-
-            modelBuilder.Entity("EyePocket.Models.CXP", b =>
-                {
-                    b.Property<int>("CuentaId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CuentaId"));
-
-                    b.Property<int>("EstadoCXPId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FacturaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MetodoPagoId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("SaldoPendiente")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("UltimoPago")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("CuentaId");
-
-                    b.HasIndex("EstadoCXPId");
-
-                    b.HasIndex("MetodoPagoId");
-
-                    b.ToTable("CXPs");
-                });
-
 
             modelBuilder.Entity("EyePocket.Models.Categoria", b =>
                 {
@@ -463,50 +432,6 @@ namespace EyePocket.Migrations
                     b.ToTable("CuotasCXC");
                 });
 
-            modelBuilder.Entity("EyePocket.Models.EstadoCXP", b =>
-                {
-                    b.Property<int>("EstadoCXPId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EstadoCXPId"));
-
-                    b.Property<string>("descripcion")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("EstadoCXPId");
-
-                    b.ToTable("EstadoCXP");
-
-                    b.HasData(
-                        new
-                        {
-                            EstadoCXPId = 1,
-                            descripcion = "Pagada"
-                        },
-                        new
-                        {
-                            EstadoCXPId = 2,
-                            descripcion = "Pendiente"
-                        },
-                        new
-                        {
-                            EstadoCXPId = 3,
-                            descripcion = "Retrasada"
-                        },
-                        new
-                        {
-                            EstadoCXPId = 4,
-                            descripcion = "Aceptada"
-                        },
-                        new
-                        {
-                            EstadoCXPId = 5,
-                            descripcion = "Rechazada"
-                        });
-                });
-
             modelBuilder.Entity("EyePocket.Models.Estados", b =>
                 {
                     b.Property<int>("EstadoId")
@@ -689,38 +614,6 @@ namespace EyePocket.Migrations
                     b.HasIndex("ProductoId");
 
                     b.ToTable("OrdenVentasDetalle");
-                });
-
-            modelBuilder.Entity("EyePocket.Models.PagoCXP", b =>
-                {
-                    b.Property<int>("PagoId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PagoId"));
-
-                    b.Property<int>("CuentaPorPagarId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("FechaPago")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("MetodoPagoId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("monto")
-                        .HasColumnType("float");
-
-                    b.Property<double>("montoFaltante")
-                        .HasColumnType("float");
-
-                    b.HasKey("PagoId");
-
-                    b.HasIndex("CuentaPorPagarId");
-
-                    b.HasIndex("MetodoPagoId");
-
-                    b.ToTable("pagocxp");
                 });
 
             modelBuilder.Entity("EyePocket.Models.PagosCXC", b =>
@@ -920,7 +813,7 @@ namespace EyePocket.Migrations
 
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
-7
+
                     b.Property<string>("NombreCliente")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1148,26 +1041,6 @@ namespace EyePocket.Migrations
                     b.Navigation("Producto");
                 });
 
-
-            modelBuilder.Entity("EyePocket.Models.CXP", b =>
-                {
-                    b.HasOne("EyePocket.Models.EstadoCXP", "EstadoCXP")
-                        .WithMany()
-                        .HasForeignKey("EstadoCXPId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EyePocket.Models.MetodosPago", "MetodoPago")
-                        .WithMany()
-                        .HasForeignKey("MetodoPagoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EstadoCXP");
-
-                    b.Navigation("MetodoPago");
-                });
-
             modelBuilder.Entity("EyePocket.Models.Compras", b =>
                 {
                     b.HasOne("EyePocket.Models.Estados", "Estado")
@@ -1279,25 +1152,6 @@ namespace EyePocket.Migrations
                     b.Navigation("OrdenVenta");
 
                     b.Navigation("Productos");
-                });
-
-            modelBuilder.Entity("EyePocket.Models.PagoCXP", b =>
-                {
-                    b.HasOne("EyePocket.Models.CXP", "CuentaPorPagar")
-                        .WithMany()
-                        .HasForeignKey("CuentaPorPagarId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("EyePocket.Models.MetodosPago", "MetodoPago")
-                        .WithMany()
-                        .HasForeignKey("MetodoPagoId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("CuentaPorPagar");
-
-                    b.Navigation("MetodoPago");
                 });
 
             modelBuilder.Entity("EyePocket.Models.PagosCXC", b =>

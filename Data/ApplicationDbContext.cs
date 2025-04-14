@@ -36,6 +36,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<IdentityUserLogin<string>>()
             .HasKey(login => new { login.LoginProvider, login.ProviderKey });
 
@@ -52,16 +53,29 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .OnDelete(DeleteBehavior.NoAction); // Cambio a NoAction
 
 
+
         modelBuilder.Entity<MetodosPago>().HasData(
             new MetodosPago { MetodoPagoId = 1, Descripcion = "Tarjeta" },
             new MetodosPago { MetodoPagoId = 2, Descripcion = "Efectivo" },
             new MetodosPago { MetodoPagoId = 3, Descripcion = "Cheque" }
         );
 
+        modelBuilder.Entity<IdentityRole>().HasData(
+           new IdentityRole { Id= "6ac343b0-00ef-4a1c-8f64-68daaca77b5b ", Name = "Ventas", NormalizedName = "VENTAS", ConcurrencyStamp= "6ac343b0-00ef-4a1c-8f64-68daaca77b5b" },
+           new IdentityRole { Id= "6ac343b0-00ef-4a1c-8f64-68daaca77b4b", Name = "CuentasXCobrar", NormalizedName = "CUENTASXCOBRAR",ConcurrencyStamp= "6ac343b0-00ef-4a1c-8f64-68daaca77b4b" },
+           new IdentityRole { Id= "6ac343b0-00ef-4a1c-8f64-68daaca77b2b", Name = "CuentasXPagar", NormalizedName = "CUENTASXPAGAR", ConcurrencyStamp = "6ac343b0-00ef-4a1c-8f64-68daaca77b2b" },
+           new IdentityRole { Id= "6ac343b0-00ef-4a1c-8f64-68daaca77b1b",Name = "Inventario", NormalizedName = "INVENTARIO",ConcurrencyStamp="6ac343b0-00ef-4a1c-8f64-68daaca77b1b" },
+           new IdentityRole { Id= "6ac343b0-00ef-4a1c-8f64-68daaca77b0b", Name = "ServicioAlCliente", NormalizedName = "SERVICIOALCLIENTE", ConcurrencyStamp= "6ac343b0-00ef-4a1c-8f64-68daaca77b0b" }
+       );
+
         modelBuilder.Entity<Estados>().HasData(
             new Estados { EstadoId = 1, Nombre = "Pendiente" },
             new Estados { EstadoId = 2, Nombre = "Pagado" },
-            new Estados { EstadoId = 3, Nombre = "Vencido" }
+            new Estados { EstadoId = 3, Nombre = "Vencido" },
+            new Estados { EstadoId = 4, Nombre = "Cancelado"},
+            new Estados { EstadoId = 5, Nombre = "Aprobado" },
+            new Estados { EstadoId = 6, Nombre = "Denegado" }
+
         );
 
 
@@ -101,11 +115,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         modelBuilder.Entity<Categoria>().HasData(
             new Categoria { CategoriaId = 1, Nombre = "Alimentos", Descripcion = "Productos comestibles y bebidas." },
-            new Categoria { CategoriaId = 2, Nombre = "Electr髇ica", Descripcion = "Dispositivos electr髇icos y accesorios." },
-            new Categoria { CategoriaId = 3, Nombre = "Belleza", Descripcion = "Cosm閠icos y productos de cuidado personal." },
-            new Categoria { CategoriaId = 4, Nombre = "Hogar", Descripcion = "Productos para el hogar y decoraci髇." },
-            new Categoria { CategoriaId = 5, Nombre = "Ferreteria", Descripcion = "Herramientas y suministros de construcci髇." },
-            new Categoria { CategoriaId = 6, Nombre = "Papeleria", Descripcion = "Art韈ulos de oficina y escolar." }
+            new Categoria { CategoriaId = 2, Nombre = "Electr贸nica", Descripcion = "Dispositivos electr贸nicos y accesorios." },
+            new Categoria { CategoriaId = 3, Nombre = "Belleza", Descripcion = "Cosm茅ticos y productos de cuidado personal." },
+            new Categoria { CategoriaId = 4, Nombre = "Hogar", Descripcion = "Productos para el hogar y decoraci贸n." },
+            new Categoria { CategoriaId = 5, Nombre = "Ferreteria", Descripcion = "Herramientas y suministros de construcci贸n." },
+            new Categoria { CategoriaId = 6, Nombre = "Papeleria", Descripcion = "Art铆culos de oficina y escolar." }
         );
     }
 
