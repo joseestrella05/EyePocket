@@ -44,10 +44,13 @@ modelbuilder.Services.AddBlazorBootstrap();
 
 //inject services
 
+
 builder.Services.AddScoped<CXPService>();
 builder.Services.AddScoped<PagoService>();
 builder.Services.AddScoped<EstadoCXPService>();
 builder.Services.AddScoped<MetodosPagoService>();
+modelbuilder.Services.AddScoped<DevolucionesService>();
+modelbuilder.Services.AddScoped<CiudadesService>();
 modelbuilder.Services.AddScoped<ClienteServices>();
 modelbuilder.Services.AddScoped<ProductosService>();
 modelbuilder.Services.AddScoped<MermasService>();
@@ -64,6 +67,7 @@ modelbuilder.Services.AddScoped<ProvedoresServices>();
 modelbuilder.Services.AddScoped<EstadoServices>();
 modelbuilder.Services.AddScoped<CompraServices>();
 modelbuilder.Services.AddScoped<OrdenVentasDetalleService>();
+modelbuilder.Services.AddScoped<CierreCajaService>();
 modelbuilder.Services.AddScoped<SolicitudesCreditoService>();
 modelbuilder.Services.AddScoped<CategoriaService>();
 modelbuilder.Services.AddScoped<DistribucionInventarioService>();

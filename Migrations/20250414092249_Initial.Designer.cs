@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EyePocket.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250328054540_Initial")]
+    [Migration("20250414092249_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -187,33 +187,61 @@ namespace EyePocket.Migrations
                         new
                         {
                             CategoriaId = 2,
-                            Descripcion = "Dispositivos electrónicos y accesorios.",
-                            Nombre = "Electrónica"
+                            Descripcion = "Dispositivos electr�nicos y accesorios.",
+                            Nombre = "Electr�nica"
                         },
                         new
                         {
                             CategoriaId = 3,
-                            Descripcion = "Cosméticos y productos de cuidado personal.",
+                            Descripcion = "Cosm�ticos y productos de cuidado personal.",
                             Nombre = "Belleza"
                         },
                         new
                         {
                             CategoriaId = 4,
-                            Descripcion = "Productos para el hogar y decoración.",
+                            Descripcion = "Productos para el hogar y decoraci�n.",
                             Nombre = "Hogar"
                         },
                         new
                         {
                             CategoriaId = 5,
-                            Descripcion = "Herramientas y suministros de construcción.",
+                            Descripcion = "Herramientas y suministros de construcci�n.",
                             Nombre = "Ferreteria"
                         },
                         new
                         {
                             CategoriaId = 6,
-                            Descripcion = "Artículos de oficina y escolar.",
+                            Descripcion = "Art�culos de oficina y escolar.",
                             Nombre = "Papeleria"
                         });
+                });
+
+            modelBuilder.Entity("EyePocket.Models.CierreCaja", b =>
+                {
+                    b.Property<int>("CierreId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CierreId"));
+
+                    b.Property<int>("CantidadDeVentas")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("MontoApertura")
+                        .HasColumnType("float");
+
+                    b.Property<double>("MontoDeCierre")
+                        .HasColumnType("float");
+
+                    b.Property<double>("MontoDeVentas")
+                        .HasColumnType("float");
+
+                    b.HasKey("CierreId");
+
+                    b.ToTable("CierreCaja");
                 });
 
             modelBuilder.Entity("EyePocket.Models.Citas", b =>
@@ -247,6 +275,31 @@ namespace EyePocket.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Citas");
+                });
+
+            modelBuilder.Entity("EyePocket.Models.Ciudades", b =>
+                {
+                    b.Property<int>("CiudadId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CiudadId"));
+
+                    b.Property<string>("CiudadNombre")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("Cliente")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ClienteId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CiudadId");
+
+                    b.ToTable("Ciudades");
                 });
 
             modelBuilder.Entity("EyePocket.Models.Clientes", b =>
@@ -432,6 +485,38 @@ namespace EyePocket.Migrations
                     b.ToTable("CuotasCXC");
                 });
 
+            modelBuilder.Entity("EyePocket.Models.Devoluciones", b =>
+                {
+                    b.Property<int>("DevolucionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DevolucionId"));
+
+                    b.Property<string>("Asunto")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Cliente")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Producto")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DevolucionId");
+
+                    b.ToTable("Devoluciones");
+                });
+
             modelBuilder.Entity("EyePocket.Models.Estados", b =>
                 {
                     b.Property<int>("EstadoId")
@@ -557,6 +642,9 @@ namespace EyePocket.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrdenVentaId"));
 
+                    b.Property<int?>("CierreCajaCierreId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ClienteId")
                         .HasColumnType("int");
 
@@ -581,6 +669,8 @@ namespace EyePocket.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("OrdenVentaId");
+
+                    b.HasIndex("CierreCajaCierreId");
 
                     b.HasIndex("ClienteId");
 
@@ -1126,11 +1216,17 @@ namespace EyePocket.Migrations
 
             modelBuilder.Entity("EyePocket.Models.OrdenVenta", b =>
                 {
+                    b.HasOne("EyePocket.Models.CierreCaja", "CierreCaja")
+                        .WithMany()
+                        .HasForeignKey("CierreCajaCierreId");
+
                     b.HasOne("EyePocket.Models.Clientes", "Clientes")
                         .WithMany()
                         .HasForeignKey("ClienteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CierreCaja");
 
                     b.Navigation("Clientes");
                 });

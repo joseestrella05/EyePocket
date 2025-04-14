@@ -1,0 +1,140 @@
+@page "/Servicio/Devoluciones/Index"
+@inject DevolucionesService devolucionesServices
+@inject ToastService toastService
+
+@rendermode InteractiveServer
+
+<PageTitle>Gestión de Devoluciones</PageTitle>
+<div class="row" style="background-color:white; padding:10px; margin:10px;">
+    <div class="col">
+        <div class="text-left">
+            <h2 class="text-black"><i class="bi bi-arrow-counterclockwise m-1"></i> Gestión de Devoluciones</h2>
+        </div>
+    </div>
+    <div class="col">
+        <a href="/Servicio/Devoluciones/Create" class="btn btn-secondary">Crear nueva devolución</a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-4">
+                    <div class="input-group" style="width: 250px">
+                        <div class="form-floating">
+                            <InputSelect class="form-select" id="floatingSelect" aria-label="Filtro" @bind-Value="valorFiltro">
+                                <option value="" selected disabled>--- Selecciona ---</option>
+                                <option value="iddevolucion">ID Devolución</option>
+                                <option value="asunto">Asunto</option>
+                                <option value="fecha">Fecha</option>
+                            </InputSelect>
+                            <label for="floatingSelect"><strong>Filtrar por...</strong></label>
+                        </div>
+                        <button type="button" class="btn btn-secondary bi bi-arrow-counterclockwise" @onclick="Restablecer"></button>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="input-group" style="width: 500px">
+                        <div class="form-floating d-flex align-items-center">
+                            <InputText @bind-Value="searchBarValue" class="form-control" placeholder="" id="floatingSearch" />
+                            <label for="floatingSearch">Buscar</label>
+                        </div>
+                        <button @onclick="Buscar" class="btn btn-secondary bi bi-search" type="button"></button>
+                    </div>
+                </div>
+            </div>
+
+            <br />
+
+            <table class="table table-light table-hover">
+                <thead class="table table-striped">
+                    <tr class="text-center">
+                        <th>ID</th>
+                        <th>Asunto</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Producto</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var devolucion in listaDevoluciones)
+                {
+                    <tr class="text-center">
+                        <td>@devolucion.DevolucionId</td>
+                        <td>@devolucion.Asunto</td>
+                        <td>@devolucion.Fecha.ToShortDateString()</td>
+                        <td>@devolucion.Cliente?</td>
+                        <td>@devolucion.Producto?</td>
+                        <td>
+                            <a href="/Servicio/Devoluciones/Edit/@devolucion.DevolucionId" class="btn btn-outline-info bi bi-pencil-square"></a>
+                            <button type="button" @onclick="() => Eliminar(devolucion.DevolucionId)" class="btn btn-outline-danger bi bi-trash"></button>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+                <caption>Cant. de devoluciones: @listaDevoluciones.Count</caption>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    public string searchBarValue { get; set; } = string.Empty;
+    public string valorFiltro { get; set; } = string.Empty;
+    public List<Devoluciones> listaDevoluciones { get; set; } = new List<Devoluciones>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        listaDevoluciones = await devolucionesServices.Listar(d => true);
+    }
+
+    public async Task Buscar()
+    {
+        if (string.IsNullOrEmpty(valorFiltro))
+        {
+            toastService.Notify(new(ToastType.Warning, "Aviso", "Debe seleccionar una opción en el filtro."));
+            listaDevoluciones = await devolucionesServices.Listar(d => true);
+            return;
+        }
+
+        searchBarValue = searchBarValue.Trim().ToLower();
+
+        switch (valorFiltro)
+        {
+            case "iddevolucion":
+                if (int.TryParse(searchBarValue, out int id))
+                    listaDevoluciones = await devolucionesServices.Listar(d => d.DevolucionId == id);
+                break;
+
+            case "asunto":
+                listaDevoluciones = await devolucionesServices.Listar(d => d.Asunto.ToLower().Contains(searchBarValue));
+                break;
+
+            case "fecha":
+                if (DateTime.TryParse(searchBarValue, out DateTime fecha))
+                    listaDevoluciones = await devolucionesServices.Listar(d => d.Fecha.Date == fecha.Date);
+                break;
+
+            default:
+                listaDevoluciones = await devolucionesServices.Listar(d => true);
+                break;
+        }
+    }
+
+    public async Task Eliminar(int devolucionId)
+    {
+        await devolucionesServices.Eliminar(devolucionId);
+        listaDevoluciones = await devolucionesServices.Listar(d => true);
+    }
+
+    public async Task Restablecer()
+    {
+        listaDevoluciones = await devolucionesServices.Listar(d => true);
+        searchBarValue = string.Empty;
+        valorFiltro = string.Empty;
+        toastService.Notify(new(ToastType.Info, "Aviso", "Se han restablecido los criterios de búsqueda."));
+    }
+}

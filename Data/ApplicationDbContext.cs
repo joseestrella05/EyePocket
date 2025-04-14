@@ -7,6 +7,8 @@ namespace EyePocket.Data;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
 {
+    public DbSet<Ciudades> Ciudades { get; set; }
+    public DbSet<Devoluciones> Devoluciones { get; set; }
     public DbSet<Clientes> Clientes { get; set; }
     public DbSet<Estados> Estados { get; set; }
     public DbSet<Citas> Citas { get; set; }    
@@ -31,6 +33,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<EstadoCXP> EstadoCXP { get; set; }
     public DbSet<PagoCXP> pagocxp { get; set; }
     public DbSet<CXP> CXPs { get; set; }
+    public DbSet<CierreCaja> CierreCaja { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -120,6 +123,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             new Categoria { CategoriaId = 4, Nombre = "Hogar", Descripcion = "Productos para el hogar y decoración." },
             new Categoria { CategoriaId = 5, Nombre = "Ferreteria", Descripcion = "Herramientas y suministros de construcción." },
             new Categoria { CategoriaId = 6, Nombre = "Papeleria", Descripcion = "Artículos de oficina y escolar." }
+
         );
     }
 
