@@ -37,7 +37,7 @@
                                 @foreach (var cxc in ListaCXC)
                                 {
                                     <option value="@cxc.CXCId">
-                                        Nombre: @cxc.OrdenVenta.Clientes.Nombre -- Capital: @($"RD${(cxc.Capital + (cxc.Interes / 100 * cxc.Capital)):N2}")
+                                        Nombre: @cxc.OrdenVenta.Clientes.Nombre -- Capital: RD$@((cxc.OrdenVenta.MontoTotal + cxc.OrdenVenta.MontoTotal * (cxc.Interes / 100)).ToString("N2"))
                                     </option>
                                 }
                             </InputSelect>
