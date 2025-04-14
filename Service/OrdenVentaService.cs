@@ -71,11 +71,22 @@ public class OrdenVentaService(IDbContextFactory<ApplicationDbContext> DbFactory
             .AsNoTracking()
             .FirstOrDefaultAsync(o => o.OrdenVentaId == ordenVentaId);
     }
-    public async Task<List<OrdenVenta>> Listar(Expression<Func<OrdenVenta, bool>> criterio)
+	public async Task<List<OrdenVenta>> BuscarPorCliente(int clienteId)
+	{
+		await using var _contexto = await DbFactory.CreateDbContextAsync();
+
+		return await _contexto.OrdenVenta
+			.AsNoTracking()
+			.Where(o => o.ClienteId == clienteId)
+			.ToListAsync();
+	}
+
+	public async Task<List<OrdenVenta>> Listar(Expression<Func<OrdenVenta, bool>> criterio)
     {
         await using var _contexto = await DbFactory.CreateDbContextAsync();
 
         return await _contexto.OrdenVenta
+            .Include(x => x.Clientes)
             .AsNoTracking()
             .Where(criterio)
             .ToListAsync();
