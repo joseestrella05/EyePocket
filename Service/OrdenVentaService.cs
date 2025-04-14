@@ -76,6 +76,7 @@ public class OrdenVentaService(IDbContextFactory<ApplicationDbContext> DbFactory
         await using var _contexto = await DbFactory.CreateDbContextAsync();
 
         return await _contexto.OrdenVenta
+            .Include(c => c.Clientes)
             .AsNoTracking()
             .Where(criterio)
             .ToListAsync();

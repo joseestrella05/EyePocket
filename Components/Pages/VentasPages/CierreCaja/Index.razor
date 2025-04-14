@@ -1,0 +1,185 @@
+﻿@page "/Ventas/CierreCaja"
+@using EyePocket.Models
+@inject ToastService toastService
+@inject NavigationManager NavigationManager
+@inject CierreCajaService cierreCajaService
+@inject OrdenVentaService ordenVentaService
+
+<PageTitle>Cierre de Caja</PageTitle>
+
+<EditForm Model="cierreCaja" OnValidSubmit="GuardarCierre">
+    <DataAnnotationsValidator />
+    <div class="cierre-container">
+        <h3 class="cierre-titulo">Cierre de caja</h3>
+        <p class="cierre-fecha">Fecha: @cierreCaja.Fecha.ToString("dd/MM/yyyy")</p>
+
+        <div class="cierre-field">
+            <label>Apertura</label><br />
+            <input type="number" class="form-control" value="@cierreCaja.MontoApertura" readonly />
+        </div>
+
+        <div class="cierre-field">
+            <label>Ingresos (Monto total de ventas del día)</label><br />
+            <input type="number" class="form-control" value="@cierreCaja.MontoDeVentas" readonly />
+        </div>
+
+        <div class="cierre-field">
+            <label>Cantidad de ventas</label><br />
+            <input type="number" class="form-control" value="@cierreCaja.CantidadDeVentas" readonly />
+        </div>
+
+        <div class="cierre-field">
+            <label>Monto de cierre (Apertura + Ingresos)</label><br />
+            <input type="number" class="form-control" value="@cierreCaja.MontoDeCierre" readonly />
+        </div>
+
+        <div class="boton-centrado"><button class="btn btn-primary" type="submit">Guardar</button></div>
+    </div>
+</EditForm>
+
+@if (mostrarModalCierre)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #004b55;">
+                    <h5 class="modal-title fw-bold text-white">Cierre de Caja Confirmado</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModalCierre"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <h4 class="fw-bold">¡Cierre exitoso!</h4>
+                        <p>Resumen del cierre realizado el <strong>@cierreCaja.Fecha.ToString("dd/MM/yyyy")</strong>:</p>
+                    </div>
+                    <table class="table table-bordered text-center">
+                        <tr>
+                            <th>Apertura</th>
+                            <td>@cierreCaja.MontoApertura.ToString("C")</td>
+                        </tr>
+                        <tr>
+                            <th>Monto de Ventas</th>
+                            <td>@cierreCaja.MontoDeVentas.ToString("C")</td>
+                        </tr>
+                        <tr>
+                            <th>Cantidad de Ventas</th>
+                            <td>@cierreCaja.CantidadDeVentas</td>
+                        </tr>
+                        <tr>
+                            <th>Monto de Cierre</th>
+                            <td class="fw-bold">@cierreCaja.MontoDeCierre.ToString("C")</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button class="btn btn-secondary" @onclick="CerrarModalCierre">
+                        <i class="bi bi-x-circle"></i> Cerrar
+                    </button>
+                    @*                     <button class="btn btn-primary" @onclick="() => NavigationManager.NavigateTo("/Ventas/CierreCajaHistorial")">
+                        <i class="bi bi-list-check"></i> Ver Historial
+                    </button> *@
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .cierre-container {
+        background-color: #004750;
+        padding: 2rem;
+        border-radius: 20px;
+        max-width: 800px;
+        margin: 3rem auto 0 auto;
+        color: white;
+    }
+
+    .cierre-titulo {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .cierre-fecha {
+        text-align: right;
+        margin-bottom: 2rem;
+    }
+
+    .cierre-field {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.5rem;
+        border-radius: 5px;
+        border: none;
+    }
+
+    .boton-centrado {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+
+        .boton-centrado .btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 5px;
+        }
+</style>
+
+@code {
+    public CierreCaja cierreCaja { get; set; } = new CierreCaja();
+    public List<OrdenVenta> ListaOrdenVentas { get; set; } = new();
+    private bool cierreYaHecho = false;
+    private bool mostrarModalCierre = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var hoy = DateTime.Today;
+
+        cierreYaHecho = await cierreCajaService.ExisteCierreDeHoy();
+
+        if (cierreYaHecho)
+        {
+            MostrarToast(ToastType.Danger, "Cierre ya realizado", "Ya se ha realizado el cierre de caja para hoy.");
+        }
+
+        ListaOrdenVentas = await ordenVentaService.Listar(o => o.FechaEmision.Date == hoy);
+
+        cierreCaja.Fecha = hoy;
+        cierreCaja.MontoApertura = 5000;
+        cierreCaja.CantidadDeVentas = ListaOrdenVentas.Count;
+        cierreCaja.MontoDeVentas = ListaOrdenVentas.Sum(o => o.MontoTotal);
+        cierreCaja.MontoDeCierre = cierreCaja.MontoApertura + cierreCaja.MontoDeVentas;
+    }
+
+    private void CerrarModalCierre()
+    {
+        mostrarModalCierre = false;
+        NavigationManager.NavigateTo("/Ventas/CierreCaja", forceLoad: true);
+    }
+
+    private async Task GuardarCierre()
+    {
+        if (cierreYaHecho)
+        {
+            MostrarToast(ToastType.Danger, "Cierre ya registrado", "Ya existe un cierre de caja para hoy.");
+            return;
+        }
+
+        cierreCaja.MontoDeCierre = cierreCaja.MontoApertura + cierreCaja.MontoDeVentas;
+
+        var guardado = await cierreCajaService.Guardar(cierreCaja);
+
+        if (guardado)
+        {
+            MostrarToast(ToastType.Success, "Cierre exitoso", "El cierre de caja se ha realizado correctamente.");
+            mostrarModalCierre = true;
+        }
+        else
+        {
+            MostrarToast(ToastType.Warning, "Atención", "No se pudo realizar el cierre de caja");
+        }
+    }
+
+    public void MostrarToast(ToastType tipo, string titulo, string cuerpo) =>
+        toastService.Notify(new(tipo, titulo, cuerpo));
+}
