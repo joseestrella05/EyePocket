@@ -184,41 +184,35 @@ namespace EyePocket.Migrations
                         new
                         {
                             CategoriaId = 2,
-
                             Descripcion = "Dispositivos electr�nicos y accesorios.",
                             Nombre = "Electr�nica"
-                            Descripcion = "Dispositivos electrónicos y accesorios.",
-                            Nombre = "Electrónica"
                         },
                         new
                         {
                             CategoriaId = 3,
                             Descripcion = "Cosm�ticos y productos de cuidado personal.",
-                            Descripcion = "Cosméticos y productos de cuidado personal.",
                             Nombre = "Belleza"
                         },
                         new
                         {
                             CategoriaId = 4,
                             Descripcion = "Productos para el hogar y decoraci�n.",
-                            Descripcion = "Productos para el hogar y decoración.",
                             Nombre = "Hogar"
                         },
                         new
                         {
                             CategoriaId = 5,
                             Descripcion = "Herramientas y suministros de construcci�n.",
-                            Descripcion = "Herramientas y suministros de construcción.",
                             Nombre = "Ferreteria"
                         },
                         new
                         {
                             CategoriaId = 6,
                             Descripcion = "Art�culos de oficina y escolar.",
-                            Descripcion = "Artículos de oficina y escolar.",
                             Nombre = "Papeleria"
                         });
                 });
+
             modelBuilder.Entity("EyePocket.Models.CierreCaja", b =>
                 {
                     b.Property<int>("CierreId")
@@ -246,7 +240,7 @@ namespace EyePocket.Migrations
 
                     b.ToTable("CierreCaja");
                 });
-7
+
             modelBuilder.Entity("EyePocket.Models.Citas", b =>
                 {
                     b.Property<int>("Id")
