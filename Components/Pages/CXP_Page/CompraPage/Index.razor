@@ -10,7 +10,7 @@
 <div class="row" style="background-color:white; padding:10px; margin:10px;">
 	<div class="col">
 		<div class="text-left">
-			<h2 class="text-black"><i class="bi bi-person-badge m-1"></i> Compra</h2>
+			<h2 class="text-black"><i class="bi bi-bag-fill m-1"></i> Compra</h2>
 		</div>
 	</div>
 	<div class="col text-end">
@@ -28,6 +28,7 @@
 							<InputSelect class="form-select" id="floatingSelect" aria-label="Floating label select example" @bind-Value="@valorFiltro">
 								<option value="" selected disabled>--- Selecciona ---</option>
 								<option value="id">CompraId</option>
+								<option value="Proveedor">Proveedor</option>
 							</InputSelect>
 							<label for="floatingSelect"><strong>Filtrar en base a...</strong></label>
 						</div>
@@ -54,9 +55,11 @@
 							<th>Provedor</th>
 							<th>Fecha</th>
 							<th>Estado</th>
+							<th>Monto</th>
 							<th>Acciones</th>
 						</tr>
 					</thead>
+
 					<tbody>
 						@foreach (var compras in ListaCompra)
 						{
@@ -67,8 +70,8 @@
 								<td>@(provedor?.Nombre ?? "no encontrado")</td>
 								<td>@compras.Fecha.ToString("dd/mm/yyyy")</td>
 								<td>@(estado?.Nombre ?? "no encontrado")</td>
+								<td>@compras.Total</td>
 								<td class="text-center" style="display: flex; justify-content: center; gap: 5px;">
-									<a href="/CxP/Compra/Details/@compras.CompraId" class="btn btn-outline-dark bi-eye"></a>
 									<a href="/CxP/Compra/Edit/@compras.CompraId" class="btn btn-outline-info bi bi-pencil-square"></a>
 									<button type="button" @onclick="() => MostrarModal(compras.CompraId, compras.Descripcion)" class="btn btn-outline-danger bi bi-trash"></button>
 								</td>
@@ -109,13 +112,15 @@
 
 
 @code {
+	[Parameter]
+	public int IdSeleccionado { get; set; }
 	public string searchBarValue { get; set; } = string.Empty;
 	public string valorFiltro { get; set; } = string.Empty;
 	public List<Provedores> ListaProvedores { get; set; } = new List<Provedores>();
 	public List<Compras> ListaCompra { get; set; } = new List<Compras>();
+	public Compras compra { get; set; } = new Compras();
 	public List<Estados> ListaEstados { get; set; } = new List<Estados>();
 	private bool mostrarModal = false;
-	private int IdSeleccionado { get; set; }
 	private string ProvedorSelecionado { get; set; } = "";
 
 	public ToastType TipoNotificacion { get; set; }
@@ -145,19 +150,29 @@
 
 	private async Task Buscar()
 	{
-		if (!string.IsNullOrWhiteSpace(valorFiltro) && valorFiltro == "id")
+		if (!string.IsNullOrWhiteSpace(valorFiltro))
 		{
-			if (int.TryParse(searchBarValue, out int compraId))
+			if (valorFiltro == "id" && int.TryParse(searchBarValue, out int compraId))
 			{
 				// Filtrar por CompraId
 				ListaCompra = await compraService.Listar(c => c.CompraId == compraId);
 			}
+			else if (valorFiltro == "Proveedor")
+			{
+				// Filtrar por Proveedor
+				var proveedoresFiltrados = ListaProvedores
+					.Where(p => p.Nombre.Contains(searchBarValue, StringComparison.OrdinalIgnoreCase))
+					.Select(p => p.ProvedorId)
+					.ToList();
+
+				ListaCompra = await compraService.Listar(c => proveedoresFiltrados.Contains(c.ProvedorId));
+			}
 			else
 			{
-				// Si no se puede convertir a int, mostrar un mensaje o manejar el error
+				// Mostrar mensaje de error si el ID no es válido
 				TipoNotificacion = ToastType.Warning;
 				TituloNotificacion = "Advertencia";
-				MensajeNotificacion = "Por favor ingrese un ID válido.";
+				MensajeNotificacion = "Por favor ingrese un criterio de búsqueda válido.";
 				MostrarToast(TipoNotificacion, TituloNotificacion, MensajeNotificacion);
 			}
 		}
@@ -167,6 +182,7 @@
 			ListaCompra = await compraService.Listar(c => true);
 		}
 	}
+
 
 
 	public async Task Eliminar()

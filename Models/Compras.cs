@@ -17,7 +17,7 @@ public class Compras
     [Required(ErrorMessage = "Campo obrigatório")]
     public string? Descripcion { get; set; }
     public int EstadoId { get; set; }
-
+     
     [ForeignKey("EstadoId")]
     public Estados? Estado { get; set; } 
 

@@ -1,0 +1,65 @@
+﻿@page "/Pago/Details/{PagoId:int}"
+@inject PagoService pagoService
+@inject CXPService cxpService
+@inject EstadoCXPService estadoCXPService
+@inject MetodosPagoService metodoPagoService
+@inject NavigationManager navigation
+
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <div class="section-title">Datos del Proveedor</div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold">Pago ID:</label>
+                    <span>@pago.PagoId</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold"> Metodo Pago:</label>
+                    <span>@pago.MetodoPago</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold">Cuenta por pagar Id:</label>
+                    <span>@pago.CuentaPorPagarId</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label class="font-weight-bold">Monto:</label>
+                    <span>@pago.monto</span>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    <div class="text-center mt-3">
+        <a href="/Pago/Index" class="btn btn-secondary">Volver</a>
+    </div>
+</div>
+
+@code {
+
+
+    [Parameter]
+    public int PagoId { get; set; }
+    public PagoCXP pago { get; set; } = new PagoCXP();
+
+
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        pago = await pagoService.Buscar(PagoId);
+    }
+
+}

@@ -43,6 +43,12 @@ modelbuilder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEm
 modelbuilder.Services.AddBlazorBootstrap();
 
 //inject services
+
+
+builder.Services.AddScoped<CXPService>();
+builder.Services.AddScoped<PagoService>();
+builder.Services.AddScoped<EstadoCXPService>();
+builder.Services.AddScoped<MetodosPagoService>();
 modelbuilder.Services.AddScoped<DevolucionesService>();
 modelbuilder.Services.AddScoped<CiudadesService>();
 modelbuilder.Services.AddScoped<ClienteServices>();

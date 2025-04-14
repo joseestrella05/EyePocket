@@ -4,6 +4,7 @@ using EyePocket.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EyePocket.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250326193111_CuentaXPagar")]
+    partial class CuentaXPagar
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,12 +104,6 @@ namespace EyePocket.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("FechaIngreso")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("FechaNacimiento")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -153,7 +150,6 @@ namespace EyePocket.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-
             modelBuilder.Entity("EyePocket.Models.CXP", b =>
                 {
                     b.Property<int>("CuentaId")
@@ -186,7 +182,6 @@ namespace EyePocket.Migrations
                     b.ToTable("CXPs");
                 });
 
-
             modelBuilder.Entity("EyePocket.Models.Categoria", b =>
                 {
                     b.Property<int>("CategoriaId")
@@ -218,61 +213,33 @@ namespace EyePocket.Migrations
                         new
                         {
                             CategoriaId = 2,
-                            Descripcion = "Dispositivos electr�nicos y accesorios.",
-                            Nombre = "Electr�nica"
+                            Descripcion = "Dispositivos electrónicos y accesorios.",
+                            Nombre = "Electrónica"
                         },
                         new
                         {
                             CategoriaId = 3,
-                            Descripcion = "Cosm�ticos y productos de cuidado personal.",
+                            Descripcion = "Cosméticos y productos de cuidado personal.",
                             Nombre = "Belleza"
                         },
                         new
                         {
                             CategoriaId = 4,
-                            Descripcion = "Productos para el hogar y decoraci�n.",
+                            Descripcion = "Productos para el hogar y decoración.",
                             Nombre = "Hogar"
                         },
                         new
                         {
                             CategoriaId = 5,
-                            Descripcion = "Herramientas y suministros de construcci�n.",
+                            Descripcion = "Herramientas y suministros de construcción.",
                             Nombre = "Ferreteria"
                         },
                         new
                         {
                             CategoriaId = 6,
-                            Descripcion = "Art�culos de oficina y escolar.",
+                            Descripcion = "Artículos de oficina y escolar.",
                             Nombre = "Papeleria"
                         });
-                });
-
-            modelBuilder.Entity("EyePocket.Models.CierreCaja", b =>
-                {
-                    b.Property<int>("CierreId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CierreId"));
-
-                    b.Property<int>("CantidadDeVentas")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("MontoApertura")
-                        .HasColumnType("float");
-
-                    b.Property<double>("MontoDeCierre")
-                        .HasColumnType("float");
-
-                    b.Property<double>("MontoDeVentas")
-                        .HasColumnType("float");
-
-                    b.HasKey("CierreId");
-
-                    b.ToTable("CierreCaja");
                 });
 
             modelBuilder.Entity("EyePocket.Models.Citas", b =>
@@ -306,31 +273,6 @@ namespace EyePocket.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Citas");
-                });
-
-            modelBuilder.Entity("EyePocket.Models.Ciudades", b =>
-                {
-                    b.Property<int>("CiudadId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CiudadId"));
-
-                    b.Property<string>("CiudadNombre")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("nvarchar(40)");
-
-                    b.Property<string>("Cliente")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ClienteId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CiudadId");
-
-                    b.ToTable("Ciudades");
                 });
 
             modelBuilder.Entity("EyePocket.Models.Clientes", b =>
@@ -516,7 +458,6 @@ namespace EyePocket.Migrations
                     b.ToTable("CuotasCXC");
                 });
 
-
             modelBuilder.Entity("EyePocket.Models.EstadoCXP", b =>
                 {
                     b.Property<int>("EstadoCXPId")
@@ -559,37 +500,6 @@ namespace EyePocket.Migrations
                             EstadoCXPId = 5,
                             descripcion = "Rechazada"
                         });
-            modelBuilder.Entity("EyePocket.Models.Devoluciones", b =>
-                {
-                    b.Property<int>("DevolucionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DevolucionId"));
-
-                    b.Property<string>("Asunto")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Cliente")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Producto")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DevolucionId");
-
-                    b.ToTable("Devoluciones");
-
                 });
 
             modelBuilder.Entity("EyePocket.Models.Estados", b =>
@@ -623,21 +533,6 @@ namespace EyePocket.Migrations
                         {
                             EstadoId = 3,
                             Nombre = "Vencido"
-                        },
-                        new
-                        {
-                            EstadoId = 4,
-                            Nombre = "Cancelado"
-                        },
-                        new
-                        {
-                            EstadoId = 5,
-                            Nombre = "Aprobado"
-                        },
-                        new
-                        {
-                            EstadoId = 6,
-                            Nombre = "Denegado"
                         });
                 });
 
@@ -717,9 +612,6 @@ namespace EyePocket.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrdenVentaId"));
 
-                    b.Property<int?>("CierreCajaCierreId")
-                        .HasColumnType("int");
-
                     b.Property<int>("ClienteId")
                         .HasColumnType("int");
 
@@ -744,8 +636,6 @@ namespace EyePocket.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("OrdenVentaId");
-
-                    b.HasIndex("CierreCajaCierreId");
 
                     b.HasIndex("ClienteId");
 
@@ -799,9 +689,6 @@ namespace EyePocket.Migrations
                         .HasColumnType("int");
 
                     b.Property<double>("monto")
-                        .HasColumnType("float");
-
-                    b.Property<double>("montoFaltante")
                         .HasColumnType("float");
 
                     b.HasKey("PagoId");
@@ -931,9 +818,6 @@ namespace EyePocket.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EstadosId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("EstatusDataCredito")
                         .HasColumnType("bit");
 
@@ -950,8 +834,6 @@ namespace EyePocket.Migrations
                     b.HasKey("SolicitudCreditoId");
 
                     b.HasIndex("ClienteId");
-
-                    b.HasIndex("EstadosId");
 
                     b.ToTable("SolicitudesCredito");
                 });
@@ -1010,7 +892,7 @@ namespace EyePocket.Migrations
 
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
-7
+
                     b.Property<string>("NombreCliente")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1082,43 +964,6 @@ namespace EyePocket.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "6ac343b0-00ef-4a1c-8f64-68daaca77b5b ",
-                            ConcurrencyStamp = "6ac343b0-00ef-4a1c-8f64-68daaca77b5b",
-                            Name = "Ventas",
-                            NormalizedName = "VENTAS"
-                        },
-                        new
-                        {
-                            Id = "6ac343b0-00ef-4a1c-8f64-68daaca77b4b",
-                            ConcurrencyStamp = "6ac343b0-00ef-4a1c-8f64-68daaca77b4b",
-                            Name = "CuentasXCobrar",
-                            NormalizedName = "CUENTASXCOBRAR"
-                        },
-                        new
-                        {
-                            Id = "6ac343b0-00ef-4a1c-8f64-68daaca77b2b",
-                            ConcurrencyStamp = "6ac343b0-00ef-4a1c-8f64-68daaca77b2b",
-                            Name = "CuentasXPagar",
-                            NormalizedName = "CUENTASXPAGAR"
-                        },
-                        new
-                        {
-                            Id = "6ac343b0-00ef-4a1c-8f64-68daaca77b1b",
-                            ConcurrencyStamp = "6ac343b0-00ef-4a1c-8f64-68daaca77b1b",
-                            Name = "Inventario",
-                            NormalizedName = "INVENTARIO"
-                        },
-                        new
-                        {
-                            Id = "6ac343b0-00ef-4a1c-8f64-68daaca77b0b",
-                            ConcurrencyStamp = "6ac343b0-00ef-4a1c-8f64-68daaca77b0b",
-                            Name = "ServicioAlCliente",
-                            NormalizedName = "SERVICIOALCLIENTE"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1238,7 +1083,6 @@ namespace EyePocket.Migrations
                     b.Navigation("Producto");
                 });
 
-
             modelBuilder.Entity("EyePocket.Models.CXP", b =>
                 {
                     b.HasOne("EyePocket.Models.EstadoCXP", "EstadoCXP")
@@ -1343,17 +1187,11 @@ namespace EyePocket.Migrations
 
             modelBuilder.Entity("EyePocket.Models.OrdenVenta", b =>
                 {
-                    b.HasOne("EyePocket.Models.CierreCaja", "CierreCaja")
-                        .WithMany()
-                        .HasForeignKey("CierreCajaCierreId");
-
                     b.HasOne("EyePocket.Models.Clientes", "Clientes")
                         .WithMany()
                         .HasForeignKey("ClienteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("CierreCaja");
 
                     b.Navigation("Clientes");
                 });
@@ -1434,15 +1272,7 @@ namespace EyePocket.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EyePocket.Models.Estados", "Estados")
-                        .WithMany()
-                        .HasForeignKey("EstadosId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Cliente");
-
-                    b.Navigation("Estados");
                 });
 
             modelBuilder.Entity("EyePocket.Models.TarjetaPuntos", b =>
