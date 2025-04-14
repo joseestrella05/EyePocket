@@ -27,7 +27,7 @@
 							@foreach (var cxc in ListaCXC)
 							{
 								<option value="@cxc.CXCId">
-									ID: @cxc.CXCId -- Deudor: @cxc.OrdenVenta?.Clientes?.Nombre --  Balance: RD$@cxc.Capital.ToString("N2")
+									ID: @cxc.CXCId -- Deudor: @cxc.OrdenVenta?.Clientes?.Nombre --  Balance: @($"RD${(cxc.Capital + (cxc.Interes / 100 * cxc.Capital)):N2}")
 								</option>
 							}
 						</InputSelect>
@@ -70,7 +70,7 @@
 
 				<div class="text-center">
 					<button class="btn btn-success bi bi-floppy">   Guardar</button>
-					<a href="/Pagos/Index" class="btn btn-secondary bi bi-arrow-left-circle">   Volver</a>
+					<a href="/Pagos/Index" class="btn btn-success bi bi-arrow-left-circle">   Volver</a>
 				</div>
 			</EditForm>
 		</div>
@@ -110,6 +110,15 @@
 		margin: 10px;
 		padding: 10px 20px;
 	}
+
+		.btn-success:hover {
+			background-color: #09484e; /* ligeramente más oscuro */
+		}
+
+		.btn-success:active {
+			background-color: #0d5c63; /* vuelve al color original al hacer click */
+		}
+
 
 	.btn-secondary {
 		background-color: #444;
