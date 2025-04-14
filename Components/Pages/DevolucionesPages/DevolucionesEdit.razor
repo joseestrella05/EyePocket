@@ -1,0 +1,129 @@
+﻿@page "/Servicio/Devoluciones/Edit/{DevolucionesId:int}"
+@inject DevolucionesService devolucionesService
+@inject NavigationManager navigation
+
+<PageTitle>Creando Devolucion</PageTitle>
+<div class="text-left">
+    <h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-person-plus m-1"></i>Nueva Devolucion</h2>
+</div>
+
+<EditForm Model="devoluciones" OnValidSubmit="Crear">
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="section-title">Datos</div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Nombre Cliente</label>
+                        <InputText class="form-control" @bind-Value="devoluciones.Cliente" placeholder="Nombre del cliente"></InputText>
+                    </div>
+                    <div class="col">
+                        <label>Nombre Producto</label>
+                        <InputText class="form-control" @bind-Value="devoluciones.Producto" placeholder="Nombre del producto"></InputText>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Asunto *</label>
+                        <InputText class="form-control" @bind-Value="devoluciones.Asunto"></InputText>
+                    </div>
+
+                    <div class="col">
+                        <label>Fecha Registro *</label>
+                        <InputDate class="form-control" @bind-Value="devoluciones.Fecha"></InputDate>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="text-center">
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <a href="/Servicio/Devoluciones/Index" class="btn btn-secondary">Volver</a>
+    </div>
+
+</EditForm>
+
+<style>
+    body {
+    background-color: #f5f5f5;
+    }
+
+    .container {
+    max-width: 800px;
+    margin: auto;
+    padding: 10px;
+    }
+
+    .card {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    }
+
+    .section-title {
+    background: #0d5c63;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    padding: 8px;
+    margin: 10px;
+    border-radius: 5px;
+    }
+
+    .btn {
+    margin: 10px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    }
+
+    .btn-success {
+    background-color: #0d5c63;
+    border: none;
+    }
+
+    .btn-secondary {
+    background-color: #444;
+    color: white;
+    text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+    background-color: #222;
+    }
+</style>
+
+@code {
+    public Devoluciones devoluciones { get; set; } = new Devoluciones();
+    [Inject] protected ToastService ToastService { get; set; }
+
+    [Parameter]
+    public int DevolucionesId { get; set; }
+
+    protected override async Task OnInitializedAsync(){
+        devoluciones = await devolucionesService.Buscar(DevolucionesId);
+    }
+
+    public async Task Crear()
+    {
+
+        var creado = await devolucionesService.Guardar(devoluciones);
+        if (creado)
+        {
+            ToastService.Notify(new(ToastType.Success, "Exito", $"Devolucion Registrada correctamente."));
+            devoluciones = new Devoluciones();
+            navigation.NavigateTo("/Servicio/Devoluciones/Index");
+        }
+        else
+        {
+            ToastService.Notify(new(ToastType.Danger, "Error", $"La devolucion ya esta registrada."));
+        }
+    }
+
+
+}
