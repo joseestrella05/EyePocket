@@ -2,57 +2,6 @@
 
 @inject NavigationManager NavigationManager
 
-@*  <div class="Menu" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-
-        @if (string.IsNullOrEmpty(NavigationManager.ToBaseRelativePath(NavigationManager.Uri)) || NavigationManager.ToBaseRelativePath(NavigationManager.Uri).TrimEnd('#', '/') == "")
-        {
-            <div class="brand">
-                <a class="navbar-brand" href="#">EYEPOCKET</a>
-            </div>
-        }
-        else
-        {
-            <div class="input-group" style="width:500px; margin-left:80px;">
-                <input text" class="form-control" placeholder="Buscar" aria-label="Buscar">
-                <button class="btn btn-outline-secondary" type="button" id="button-addon2">
-                    <i class="bi bi-search"></i>
-                </button>
-            </div>
-        }
-
-        <!-- Botón de toggler para dispositivos móviles -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="Cuentas-Por-Cobrar/Index">CxC</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/CxP/Index">CxP</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/Ventas/Facturacion/Index">Ventas</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="Productos/Inventario">Inventario</a>
-                </li>
-                <li>
-                    <a class="nav-link" href="Servicio/Index">Servicio al Cliente</a>
-
-                </li>
-            </ul>
-            <button class="btn btn-success" style="background:#0d5c63;" type="button">Iniciar sesión</button>
-        </div>
-    </nav>
-</div> *@
-
 <MudNavMenu>
     <MudLink Href="/" Class="mud-brand">
         <img src="/Imagenes/FondoEP.png" alt="Logo eyepocket" class="logo-img" id="logo">
@@ -63,6 +12,7 @@
         <MudNavLink Href="/Clientes/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.PeopleAlt" Match="NavLinkMatch.Prefix">Clientes</MudNavLink>
         <MudNavLink Href="/Cuentas-Por-Cobrar/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.AccountBalance" Match="NavLinkMatch.Prefix">Cuentas X Cobrar</MudNavLink>
         <MudNavLink Href="/Amortizacion-Express" IconColor="Color.Dark" Icon="@Icons.Material.Filled.Calculate" Match="NavLinkMatch.Prefix">Amortización express</MudNavLink>
+        <MudNavLink Href="/Amortizaciones" IconColor="Color.Dark" Icon="@Icons.Material.Filled.Calculate" Match="NavLinkMatch.Prefix">Amortizaciones</MudNavLink>
         <MudNavLink Href="/Pagos/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.Payments" Match="NavLinkMatch.Prefix">Pagos</MudNavLink>
         <MudNavLink Href="/Solicitudes-De-Credito/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.CreditScore" Match="NavLinkMatch.Prefix">Solicitudes de crédito</MudNavLink>
     </MudNavGroup>
