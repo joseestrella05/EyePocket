@@ -9,7 +9,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<Clientes> Clientes { get; set; }
     public DbSet<Estados> Estados { get; set; }
-    public DbSet<Citas> Citas { get; set; }
+    public DbSet<Citas> Citas { get; set; }    
     public DbSet<Agentes> Agentes { get; set; }
     public DbSet<TarjetaPuntos> TarjetaPuntos { get; set; }
     public DbSet<Mermas> Mermas { get; set; }
@@ -28,11 +28,32 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<SolicitudesCredito> SolicitudesCredito { get; set; }
     public DbSet<Categoria> Categorias { get; set; }
     public DbSet<DistribucionInventario> DistribucionInventario { get; set; }
+    public DbSet<EstadoCXP> EstadoCXP { get; set; }
+    public DbSet<PagoCXP> pagocxp { get; set; }
+    public DbSet<CXP> CXPs { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<IdentityUserLogin<string>>()
+            .HasKey(login => new { login.LoginProvider, login.ProviderKey });
+
+        modelBuilder.Entity<PagoCXP>()
+      .HasOne(p => p.MetodoPago)
+      .WithMany()
+      .HasForeignKey(p => p.MetodoPagoId)
+      .OnDelete(DeleteBehavior.NoAction); // Cambio a NoAction
+
+        modelBuilder.Entity<PagoCXP>()
+            .HasOne(p => p.CuentaPorPagar)
+            .WithMany()
+            .HasForeignKey(p => p.CuentaPorPagarId)
+            .OnDelete(DeleteBehavior.NoAction); // Cambio a NoAction
+
+
+
         modelBuilder.Entity<MetodosPago>().HasData(
             new MetodosPago { MetodoPagoId = 1, Descripcion = "Tarjeta" },
             new MetodosPago { MetodoPagoId = 2, Descripcion = "Efectivo" },
@@ -57,13 +78,48 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         );
 
+
+
+
+        modelBuilder.Entity<EstadoCXP>().HasData(
+   new List<EstadoCXP>()
+   {
+        new EstadoCXP()
+        {
+            EstadoCXPId = 1,
+            descripcion = "Pagada"
+        },
+        new EstadoCXP()
+        {
+            EstadoCXPId = 2,
+            descripcion = "Pendiente"
+        },
+        new EstadoCXP()
+        {
+            EstadoCXPId = 3,
+            descripcion = "Retrasada"
+        },
+        new EstadoCXP()
+        {
+            EstadoCXPId = 4,
+            descripcion = "Aceptada"
+        },
+        new EstadoCXP()
+        {
+            EstadoCXPId = 5,
+            descripcion = "Rechazada"
+        }
+   }
+      );
+
+
         modelBuilder.Entity<Categoria>().HasData(
             new Categoria { CategoriaId = 1, Nombre = "Alimentos", Descripcion = "Productos comestibles y bebidas." },
-            new Categoria { CategoriaId = 2, Nombre = "Electr髇ica", Descripcion = "Dispositivos electr髇icos y accesorios." },
-            new Categoria { CategoriaId = 3, Nombre = "Belleza", Descripcion = "Cosm閠icos y productos de cuidado personal." },
-            new Categoria { CategoriaId = 4, Nombre = "Hogar", Descripcion = "Productos para el hogar y decoraci髇." },
-            new Categoria { CategoriaId = 5, Nombre = "Ferreteria", Descripcion = "Herramientas y suministros de construcci髇." },
-            new Categoria { CategoriaId = 6, Nombre = "Papeleria", Descripcion = "Art韈ulos de oficina y escolar." }
+            new Categoria { CategoriaId = 2, Nombre = "Electr贸nica", Descripcion = "Dispositivos electr贸nicos y accesorios." },
+            new Categoria { CategoriaId = 3, Nombre = "Belleza", Descripcion = "Cosm茅ticos y productos de cuidado personal." },
+            new Categoria { CategoriaId = 4, Nombre = "Hogar", Descripcion = "Productos para el hogar y decoraci贸n." },
+            new Categoria { CategoriaId = 5, Nombre = "Ferreteria", Descripcion = "Herramientas y suministros de construcci贸n." },
+            new Categoria { CategoriaId = 6, Nombre = "Papeleria", Descripcion = "Art铆culos de oficina y escolar." }
         );
     }
 
