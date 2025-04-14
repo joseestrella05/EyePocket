@@ -108,40 +108,48 @@ public class CuotasCXCService(IDbContextFactory<ApplicationDbContext> DbFactory)
 	public async Task<List<CuotasCXC>> CalcularCuotas(CuentasXCobrar cxc)
 	{
 		var listaCuotas = new List<CuotasCXC>();
-		double saldo = cxc.Capital;
-		double tasaMensual = cxc.Interes / 100 / 12;
 
-		double cuota = saldo * (tasaMensual / (1 - Math.Pow(1 + tasaMensual, - cxc.Periodos)));
-		cuota = Math.Round(cuota, 2); // Redondeamos para evitar errores de precisión
+		// Cálculo de interés total fijo y total a pagar
+		double interesTotal = Math.Round((cxc.Interes / 100) * cxc.Capital, 2);
+		double totalAPagar = Math.Round(cxc.Capital + interesTotal, 2);
+		double cuotaSemanal = Math.Round(totalAPagar / cxc.Periodos, 2);
+		double interesSemanal = Math.Round(interesTotal / cxc.Periodos, 2);
 
-		for (int mes = 1; mes <= cxc.Periodos; mes++)
+		double saldo = totalAPagar;
+
+		for (int semana = 1; semana <= cxc.Periodos; semana++)
 		{
-			double interes = Math.Round(saldo * tasaMensual, 2);
-			double pagoCapital = Math.Round(cuota - interes, 2);
-			double saldoFinal = Math.Round(saldo - pagoCapital, 2);
+			double pagoCapital = Math.Round(cuotaSemanal - interesSemanal, 2);
+			double saldoFinal = Math.Round(saldo - cuotaSemanal, 2);
 
-			// Ajuste en la última cuota para que saldoFinal sea exactamente cero
-			if (mes == cxc.Periodos)
+			// Última cuota ajustada para cuadrar todo
+			if (semana == cxc.Periodos)
 			{
-				pagoCapital = saldo;
+				pagoCapital = saldo - interesSemanal;
+				cuotaSemanal = pagoCapital + interesSemanal;
 				saldoFinal = 0;
 			}
 
-			var cuotaAux = new CuotasCXC
+			var cuota = new CuotasCXC
 			{
 				CXCId = cxc.CXCId,
-				Interes = interes,
+				NumeroCuota = semana,
+				Interes = interesSemanal,
 				PagoCapital = pagoCapital,
+				Mora = 0,
 				SaldoFinal = saldoFinal,
-				FechaVencimiento = DateTime.Now.AddMonths(mes),
-				NumeroCuota = mes,
-				EstadoId = 1
+				FechaVencimiento = DateTime.Now.AddDays(7 * semana),
+				EstadoId = 1 // Pendiente
 			};
 
+			listaCuotas.Add(cuota);
 			saldo = saldoFinal;
-			listaCuotas.Add(cuotaAux);
 		}
+
 		return listaCuotas;
 	}
+
+
+
 
 }
