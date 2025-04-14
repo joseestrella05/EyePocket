@@ -19,9 +19,11 @@
 
     @*Ventas*@
     <MudNavGroup HideExpandIcon="false" Title="Ventas" Icon="@Icons.Material.Filled.PointOfSale" Expanded="false">
+ga        <MudNavLink Href="/Ventas/CierreCajaHistorial" IconColor="Color.Dark" Icon="@Icons.Material.Filled.HistoryToggleOff" Match="NavLinkMatch.Prefix">Historial de caja</MudNavLink>
+        <MudNavLink Href="/Ventas/CierreCaja" IconColor="Color.Dark" Icon="@Icons.Material.Filled.Work" Match="NavLinkMatch.Prefix">Cierre de caja</MudNavLink>
         <MudNavLink Href="/Ventas/Facturacion/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.AccountBalance" Match="NavLinkMatch.Prefix">Facturación</MudNavLink>
         <MudNavLink Href="/Ventas/Estadisticas" IconColor="Color.Dark" Icon="@Icons.Material.Filled.QueryStats" Match="NavLinkMatch.Prefix">Estadisticas</MudNavLink>
-        <MudNavLink Href="/Ventas/Historial" IconColor="Color.Dark" Icon="@Icons.Material.Filled.History" Match="NavLinkMatch.Prefix">Historial</MudNavLink>
+        <MudNavLink Href="/Ventas/Historial" IconColor="Color.Dark" Icon="@Icons.Material.Filled.History" Match="NavLinkMatch.Prefix">Historial de ventas</MudNavLink>
     </MudNavGroup>
 
     @*Inventario*@
@@ -42,6 +44,9 @@
         <MudNavLink Href="/Servicio/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.AccountBalance" Match="NavLinkMatch.Prefix">Tickets</MudNavLink>
         <MudNavLink Href="/Cita/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.CalendarMonth" Match="NavLinkMatch.Prefix">Citas</MudNavLink>
         <MudNavLink Href="/Agente/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.PeopleAlt" Match="NavLinkMatch.Prefix">Agentes</MudNavLink>
+        <MudNavLink Href="/Servicio/Ciudades/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.LocationCity" Match="NavLinkMatch.Prefix">Ciudades</MudNavLink>
+        <MudNavLink Href="/Servicio/Devoluciones/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.BackHand" Match="NavLinkMatch.Prefix">Devoluciones</MudNavLink>
+        <MudNavLink Href="/TarjetaPunto/Index" IconColor="Color.Dark" Icon="@Icons.Material.Filled.CardGiftcard" Match="NavLinkMatch.Prefix">Tarjeta Puntos</MudNavLink>
     </MudNavGroup>
 </MudNavMenu>
 
