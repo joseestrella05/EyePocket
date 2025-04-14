@@ -1,4 +1,4 @@
-﻿@page "/Solicitudes-De-Credito/Edit/{SolicitudID:int}"
+﻿@page "/Solicitudes-De-Credito/Create"
 
 @rendermode InteractiveServer
 
@@ -6,11 +6,11 @@
 @inject ClienteServices clientesService
 @inject NavigationManager navigation
 
-<PageTitle>Editar Solicitud de Crédito</PageTitle>
+<PageTitle>Crear Solicitud de Crédito</PageTitle>
 <div class="container">
 	<div class="card">
 		<div class="text-left">
-			<h2 class="text-black" style="background-color:white;"><i class="bi bi-wallet2 m-3"></i>Editar Solicitud de Crédito</h2>
+			<h2 class="text-black" style="background-color:white;"><i class="bi bi-wallet2 m-3"></i>Nueva Solicitud de Crédito</h2>
 		</div>
 	</div>
 </div>
@@ -63,7 +63,7 @@
 
 				<div class="text-center">
 					<button class="btn btn-success bi bi-floppy">   Guardar</button>
-					<a href="/Solicitudes-De-Credito/Index" class="btn btn-secondary bi bi-arrow-left-circle">   Volver</a>
+					<a href="/Solicitudes-De-Credito/Index" class="btn btn-success bi bi-arrow-left-circle">   Volver</a>
 				</div>
 			</EditForm>
 		</div>
@@ -104,6 +104,15 @@
 	padding: 10px 20px;
 	}
 
+		.btn-success:hover {
+			background-color: #09484e; /* ligeramente más oscuro */
+		}
+
+		.btn-success:active {
+			background-color: #0d5c63; /* vuelve al color original al hacer click */
+		}
+
+
 	.btn-secondary {
 	background-color: #444;
 	color: white;
@@ -118,7 +127,6 @@
 </style>
 
 @code {
-	[Parameter] public int SolicitudID { get; set; }
 	[Inject] protected ToastService ToastService { get; set; }
 	public SolicitudesCredito Solicitud { get; set; } = new();
 	public Clientes Cliente { get; set; } = new Clientes();
@@ -126,14 +134,13 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		Solicitud = await solicitudesCreditoService.Buscar(SolicitudID);
 		ListaClientes = await clientesService.Listar(c => true);
 	}
 
 	public async Task Guardar()
 	{
 		await solicitudesCreditoService.Guardar(Solicitud);
-		ToastService.Notify(new(ToastType.Success, "Exito", $"Solicitud de credito actulizada correctamente."));
+		ToastService.Notify(new(ToastType.Success, "Exito", $"Solicitud de credito registrada correctamente."));
 		navigation.NavigateTo("/Solicitudes-de-Credito/Index");
 	}
 }

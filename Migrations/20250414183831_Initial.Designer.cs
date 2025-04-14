@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EyePocket.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250414095015_Initial")]
+    [Migration("20250414183831_Initial")]
     partial class Initial
     {
         /// <inheritdoc />

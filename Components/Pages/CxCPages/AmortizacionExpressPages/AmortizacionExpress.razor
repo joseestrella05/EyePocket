@@ -1,4 +1,7 @@
 ﻿@page "/Amortizacion-Express"
+@using QuestPDF.Fluent
+@using QuestPDF.Helpers
+@using QuestPDF.Infrastructure
 
 @rendermode InteractiveServer
 @inject ToastService toast
@@ -37,12 +40,28 @@
 						<InputNumber required class="form-control" @bind-Value="Cuota.Periodos" placeholder="RD$0.00"></InputNumber>
 					</div>
 				</div>
-				<div class="d-flex justify-content-lg-center mb-3">
-					@*Btn restablecer y calcular*@
-					<button type="button" @onclick="Restablecer" class="m-2 btn btn-secondary"><i class="m-1 bi bi-arrow-counterclockwise"></i>Restablecer</button>
-					<button type="submit" class="m-2 btn btn-success"><i class="m-1 bi bi-calculator"></i>Calcular</button>
-					<button class="m-2 btn btn-success" @onclick="ExportarAExcel"><i class="m-1 bi bi-file-earmark-spreadsheet"></i>Exportar a Excel</button>
+
+                    @*Btn restablecer y calcular*@
+				<div class="container-fluid">
+					<div class="d-flex justify-content-center m-2">
+						<div class="btn-group" role="group">
+							<button type="submit" class="btn btn-success">
+								<i class="m-1 bi bi-calculator"></i>Calcular
+							</button>
+							<button type="button" @onclick="Restablecer" class="btn btn-success">
+								<i class="m-1 bi bi-arrow-counterclockwise"></i>Restablecer
+							</button>
+							<button type="button" class="btn btn-success" @onclick="ExportarAExcel">
+								<i class="m-1 bi bi-file-earmark-spreadsheet"></i>Exportar a Excel
+							</button>
+							<button type="button" class="btn btn-danger" @onclick="ExportarAPdf">
+								<i class="m-1 bi bi-file-earmark-pdf"></i>Exportar a PDF
+							</button>
+						</div>
+					</div>
 				</div>
+
+
 			</EditForm>
 
 			<table class="table table-sm table-striped table-hover">
@@ -98,6 +117,15 @@
 		.btn-secondary:hover {
 			background-color: #222;
 		}
+
+	.btn-success:hover {
+		background-color: #09484e; /* ligeramente más oscuro */
+	}
+
+	.btn-success:active {
+		background-color: #0d5c63; /* vuelve al color original al hacer click */
+	}
+
 </style>
 
 @code {
@@ -189,6 +217,85 @@
 			toast.Notify(new(ToastType.Danger, "Error", $"Hubo un problema exportando el archivo: {ex.Message}"));
 		}
 	}
+
+	public async Task ExportarAPdf()
+	{
+		try
+		{
+			if (Cuota.Interes <= 0 || Cuota.Monto <= 0 || Cuota.Periodos <= 0)
+			{
+				toast.Notify(new(ToastType.Warning, "Aviso", "Ningún campo puede ser menor o igual a 0"));
+				return;
+			}
+
+			if (ListaCuotas.Count <= 0)
+			{
+				toast.Notify(new(ToastType.Warning, "Aviso", "Primero debe calcular la amortización antes de exportar a PDF"));
+				return;
+			}
+
+			byte[] pdfBytes = CreatePdf(ListaCuotas);
+
+            // Convertimos el PDF a Base64
+			var pdfBase64 = Convert.ToBase64String(pdfBytes);
+			await JS.InvokeVoidAsync("saveAsFile", "Amortizacion.pdf", pdfBase64);
+		}
+		catch (Exception ex)
+		{
+			toast.Notify(new(ToastType.Danger, "Error", $"Hubo un problema exportando el PDF: {ex.Message}"));
+		}
+	}
+
+	private byte[] CreatePdf(List<CuotasExpress> cuotas)
+{
+	using var stream = new MemoryStream();
+	var document = Document.Create(container =>
+	{
+		container.Page(page =>
+		{
+			page.Margin(30);
+			page.Size(PageSizes.A4);
+			page.Content()
+				.Table(table =>
+				{
+					table.ColumnsDefinition(columns =>
+					{
+						columns.RelativeColumn();
+						columns.RelativeColumn();
+						columns.RelativeColumn();
+						columns.RelativeColumn();
+						columns.RelativeColumn();
+					});
+
+					table.Header(header =>
+					{
+						header.Cell().Element(CellStyle).Text("#");
+						header.Cell().Element(CellStyle).Text("Cuota");
+						header.Cell().Element(CellStyle).Text("Capital");
+						header.Cell().Element(CellStyle).Text("Interés");
+						header.Cell().Element(CellStyle).Text("Balance");
+					});
+
+					foreach (var cuota in cuotas)
+					{
+						table.Cell().Element(CellStyle).Text(cuota.NumeroCuota.ToString());
+						table.Cell().Element(CellStyle).Text($"RD${cuota.Monto:N2}");
+						table.Cell().Element(CellStyle).Text($"RD${(cuota.Monto - cuota.Interes):N2}");
+						table.Cell().Element(CellStyle).Text($"RD${cuota.Interes:N2}");
+						table.Cell().Element(CellStyle).Text($"RD${cuota.SaldoFinal:N2}");
+					}
+				});
+		});
+	});
+
+	document.GeneratePdf(stream);
+	return stream.ToArray();
+
+	static IContainer CellStyle(IContainer container) =>
+		container.Padding(5).BorderBottom(1);
+}
+
+
 
 	public void Restablecer()
 	{

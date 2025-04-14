@@ -1,0 +1,122 @@
+﻿@page "/Cuentas-Por-Cobrar/View/{CuentaXCobrarID:int}"
+@rendermode InteractiveServer
+@inject OrdenVentaService OrdenVentaServices
+@inject CuentasXCobrarService DeudaServices
+@inject CuotasCXCService cuotasCXCServices
+@inject ClienteServices clientesService
+@inject NavigationManager navigation
+
+<PageTitle>Crear Cuenta x Cobrar</PageTitle>
+<div class="container mb-4">
+    <div class="card">
+        <div class="text-left">
+            <h2 class="text-black" style="background-color:white; padding:5px;"><i class="bi bi-cash-stack m-1"></i>Nueva Cuenta x Cobrar</h2>
+        </div>
+    </div>
+</div>
+
+<div class="contenedor">
+    <div class="card">
+        <div class="card-body">
+
+            <div class="section-title">Complete la información</div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label"><strong>Orden de Venta *</strong></label>
+                    <InputSelect required class="form-select" @bind-Value="CuentaXCobrar.OrdenVentaId">
+                        @foreach (var ordenVenta in ListaOrdenVenta)
+                        {
+                            if (CuentaXCobrar.OrdenVentaId == ordenVenta.OrdenVentaId)
+                            {
+                                <option selected disabled value="@ordenVenta.OrdenVentaId">Codigo: @ordenVenta.NumeroFactura -- Deudor: @ordenVenta.Clientes?.Nombre -- Monto Orden: RD$@ordenVenta.MontoTotal.ToString("N2")</option>
+                            }
+                        }
+                    </InputSelect>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <label><strong>% de interes *</strong></label>
+                    <InputNumber disabled class="form-control" @bind-Value="CuentaXCobrar.Interes" placeholder="123"></InputNumber>
+                </div>
+                <div class="col">
+                    <label><strong>Plazos *</strong></label>
+                    <InputNumber disabled class="form-control" @bind-Value="CuentaXCobrar.Periodos" placeholder="123"></InputNumber>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <a href="/Cuentas-Por-Cobrar/Index" class="btn btn-secondary bi bi-arrow-left-circle">   Volver</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+    background-color: #f5f5f5;
+    }
+
+    .contenedor {
+    max-width: 800px;
+    margin: auto;
+    padding: 10px;
+    }
+
+    .card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    }
+
+    .section-title {
+    background: #0d5c63;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    padding: 8px;
+    margin: 10px;
+    border-radius: 5px;
+    }
+
+    .btn-success {
+    background-color: #0d5c63;
+    border: none;
+    margin: 10px;
+    padding: 10px 20px;
+    }
+
+    .btn-secondary {
+    background-color: #444;
+    color: white;
+    text-decoration: none;
+    margin: 10px;
+    padding: 10px 20px;
+    }
+
+    .btn-secondary:hover {
+    background-color: #222;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public int CuentaXCobrarID { get; set; }
+    [Parameter]
+    public int OrdenVentaID { get; set; }
+    public List<Clientes> ListaCliente { get; set; } = new();
+    public CuentasXCobrar CuentaXCobrar { get; set; } = new();
+    public OrdenVenta OrdenVenta { get; set; } = new();
+    public List<OrdenVenta> ListaOrdenVenta { get; set; } = [];
+
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaCliente = await clientesService.Listar(x => true);
+        ListaOrdenVenta = await OrdenVentaServices.Listar(o => true);
+        CuentaXCobrar = await DeudaServices.Buscar(CuentaXCobrarID);
+    }
+}

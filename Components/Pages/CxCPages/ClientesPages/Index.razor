@@ -14,7 +14,7 @@
 				</div>
 			</div>
 			<div class="col text-end">
-				<a href="/Clientes/Create" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Nuevo Cliente</a>
+				<a href="/Clientes/Create" class="btn btn-success"><i class="bi bi-plus-lg"></i> Nuevo Cliente</a>
 			</div>
 		</div>
 	</div>
@@ -38,7 +38,7 @@
 							<label for="floatingSelect"><strong>Filtrar en base a...</strong></label>
 						</div>
 						@*btn restablecer*@
-						<button type="button" class="btn btn-secondary bi bi-arrow-counterclockwise" @onclick="() => Restablecer()"></button>
+						<button type="button" class="btn btn-success bi bi-arrow-counterclockwise" @onclick="() => Restablecer()"></button>
 					</div>
 				</div>
 
@@ -50,7 +50,7 @@
 							<InputText @bind-Value="@searchBarValue" class="form-control" placeholder="" id="floatingSearch" />
 							<label for="floatingSearch">Buscar</label>
 						</div>
-						<button @onclick="Buscar" class="btn btn-secondary bi bi-search" type="button"></button>
+						<button @onclick="Buscar" class="btn btn-success bi bi-search" type="button"></button>
 					</div>
 				</div>
 			</div>
@@ -106,11 +106,11 @@
 
 							@*Botones*@
 							<td>
-								<a href="/Clientes/Details/@cliente.ClienteId" class="btn btn-sm btn-outline-dark bi-eye"></a>
+								<a href="/Clientes/Details/@cliente.ClienteId" class="btn btn-sm btn-dark bi-eye"></a>
 
-								<a href="/Clientes/Edit/@cliente.ClienteId" class="btn btn-sm btn-outline-info bi bi-pencil-square"></a>
+								<a href="/Clientes/Edit/@cliente.ClienteId" class="btn btn-sm btn-dark bi bi-pencil-square"></a>
 
-								<button type="button" @onclick="() => MostrarModal(cliente.ClienteId, cliente.Email)" class="btn btn-sm btn-outline-danger bi bi-trash"></button>
+								<button type="button" @onclick="() => MostrarModal(cliente.ClienteId, cliente.Email)" class="btn btn-sm btn-danger bi bi-trash"></button>
 							</td>
 						</tr>
 					}
@@ -153,6 +153,15 @@
 	background-color: #0d5c63;
 	border: none;
 	}
+
+	    .btn-success:hover {
+    background-color: #09484e; /* ligeramente más oscuro */
+    }
+
+    .btn-success:active {
+    background-color: #0d5c63; /* vuelve al color original al hacer click */
+    }
+
 </style>
 @code {
 	public string searchBarValue { get; set; } = string.Empty;
