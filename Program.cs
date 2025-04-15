@@ -38,7 +38,7 @@ modelbuilder.Services.AddAuthentication(options =>
     })
     .AddIdentityCookies();
 
-var connectionString = modelbuilder.Configuration.GetConnectionString("SqlConStr");
+var connectionString = modelbuilder.Configuration.GetConnectionString("DefaultConnection");
 modelbuilder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 modelbuilder.Services.AddDatabaseDeveloperPageExceptionFilter();
